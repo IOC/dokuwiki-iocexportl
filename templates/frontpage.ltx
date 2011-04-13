@@ -1,0 +1,36 @@
+\begin{document}
+\thispagestyle{empty}
+\ThisCenterWallPaper{1}{media/background.pdf}
+%FrontPage
+\hyphenpenalty=100000
+\begin{spacing}{0.8}
+\begin{textblock*}{145mm}(1cm,11cm)
+	\raggedright\noindent\fontfamily{phv}\selectfont
+	\Huge 
+	@IOC_EXPORT_NOMCOMPLERT@\\
+	\vspace*{10mm}
+	\Large
+	@IOC_EXPORT_AUTOR@
+\end{textblock*}
+\begin{textblock*}{145mm}(@IOC_EXPORT_POS_CREDITNOM@)
+	\raggedright\noindent\fontfamily{phv}\selectfont
+	\huge\bfseries
+	\textcolor{white}{@IOC_EXPORT_CREDIT@}
+\end{textblock*}
+\end{spacing}
+\hyphenpenalty=1000
+\null\pagebreak
+%TOC
+\newgeometry{top=20mm, bottom=20mm, right=20mm, left=20mm}
+\headingnonumbers
+\tableofcontents
+\restoregeometry
+\newpage
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyhead[LO]{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_CREDIT@}}}
+	\fancyhead[CO]{\fontfamily{phv}\selectfont{\tiny{\thepage}}}
+	\fancyhead[RO]{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT@}}}
+	\fancyfoot[RO]{}
+}
+\chead{\fontfamily{phv}\selectfont{\tiny{\thepage}}}

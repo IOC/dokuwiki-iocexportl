@@ -1,0 +1,11 @@
+div.dokuwiki .bar img{
+	vertical-align: middle;
+}
+
+div.dokuwiki .bar form input{
+	vertical-align: middle;
+}
+
+.ioctoolbar{
+width:auto !important;
+}

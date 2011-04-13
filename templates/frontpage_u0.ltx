@@ -1,0 +1,43 @@
+\newcommand{\credits}{\fontfamily{phv}\selectfont}
+\begin{document}
+\thispagestyle{empty}
+\ThisCenterWallPaper{1}{media/background.pdf}
+%FrontPage
+\hyphenpenalty=100000
+\begin{spacing}{0.8}
+\begin{textblock*}{140mm}(1.35cm,-0.7cm)
+	\raggedleft\noindent\fontfamily{phv}\selectfont
+	\LARGE\bfseries
+	@IOC_EXPORT_FAMILIA@
+\end{textblock*}
+\begin{textblock*}{20mm}(16.2cm,-1.35cm)
+	\includegraphics[height=21mm,width=21mm]{@IOC_EXPORT_IMGFAMILIA@}
+\end{textblock*}
+\begin{textblock*}{140mm}(1cm,11cm)
+	\raggedright\noindent\fontfamily{phv}\selectfont
+	\Huge
+	@IOC_EXPORT_NOMCOMPLERT@\\
+	\vspace*{10mm}
+	\Large 
+	@IOC_EXPORT_CREDIT@
+\end{textblock*}
+\begin{textblock*}{140mm}(@IOC_EXPORT_POS_CICLENOM@)
+	\raggedright\noindent\fontfamily{phv}\selectfont
+	\huge\bfseries
+	\textcolor{white}{@IOC_EXPORT_CICLENOM@}
+\end{textblock*}
+\end{spacing}
+\hyphenpenalty=1000
+\newpage
+\headingnonumbers
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
+	\fancyhead[CO]{\fontfamily{phv}\selectfont\tiny\thepage}
+	\fancyhead[RO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT@}
+	\fancyfoot[RO]{}
+}
+\chead{\fontfamily{phv}\selectfont{\tiny{\thepage}}}
+\newgeometry{top=20mm, bottom=20mm, right=60mm, left=20mm}
+\creditspacingline
+\thispagestyle{empty}
