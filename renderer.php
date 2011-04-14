@@ -24,6 +24,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $hr_width = 375;    
     var $imgext = '.pdf';//Format to convert images
     var $max_cols = 0;
+    var $monospace = false;
     var $p_width = 360;//415.12572;
     var $table = false;
     var $tableheader = false;
@@ -328,6 +329,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function toc_additem($id, $text, $level) {}
 
     function cdata($text) {
+        if ($this->monospace){
+            $text = preg_replace('/\n/', '\\newline', $text);
+        }
         $this->doc .= $this->_xmlEntities($text);
     }
 
@@ -435,11 +439,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function monospace_open() {
+        $this->monospace = true;
         $this->doc .= '\texttt{';
     }
 
     function monospace_close() {
         $this->doc .= '}';
+        $this->monospace = false;
     }
 
     function subscript_open() {
@@ -477,7 +483,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc .= '\fonttable'.DOKU_LF;
         $this->doc .= '\begin{longtabu}{';
         for($i=0; $i < $maxcols; $i++){
-            $this->doc .= 'X[l] ';
+            $this->doc .= 'X[m,l] ';
         }
         $this->doc .= '}';
         if (!empty($_SESSION['table_title'])){
@@ -896,7 +902,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
             return ' \begin{math}'.filter_tex_sanitize_formula($text).'\end{math} ';
         }
-        return str_ireplace($find, $replace, $value);
+        if ($this->monospace){
+            $value = str_ireplace($find, $replace, $value);
+            return preg_replace('/\n/', '\\newline', $value);                        
+        }else{
+            return str_ireplace($find, $replace, $value);
+        }
     }
     
     function _ttEntities($value) {
