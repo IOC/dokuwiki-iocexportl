@@ -88,22 +88,39 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'iocexportl') return false;
-        list ($state, $text, $title, $params) = $data;
-        switch ($state) {
-            case DOKU_LEXER_ENTER : 
-					$_SESSION['table_title'] = $title;
-                break;
-            case DOKU_LEXER_UNMATCHED :
-                $_SESSION['table_id'] = (isset($params['id']))?$params['id']:'';
-                $instructions = get_latex_instructions($text);
-                $renderer->doc .= p_render($mode, $instructions, $info);
-                $_SESSION['table_id'] = '';                
-                $_SESSION['table_title'] = '';
-                break;
-            case DOKU_LEXER_EXIT : 
-                break;
+        if ($mode === 'ioccounter'){
+            list ($state, $text, $title, $params) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER : 
+                        $renderer->doc .= $title;
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT : 
+                    break;
+            }
+            return true;
+        }elseif ($mode === 'iocexportl'){
+            list ($state, $text, $title, $params) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER : 
+    				$_SESSION['table_title'] = $title;
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $_SESSION['table_id'] = (isset($params['id']))?$params['id']:'';
+                    $instructions = get_latex_instructions($text);
+                    //$renderer->doc .= p_render($mode, $instructions, $info);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);                
+                    $_SESSION['table_id'] = '';                
+                    $_SESSION['table_title'] = '';
+                    break;
+                case DOKU_LEXER_EXIT : 
+                    break;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 }

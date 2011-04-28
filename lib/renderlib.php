@@ -7,6 +7,8 @@ require_once DOKU_INC . 'inc/parser/renderer.php';
 
 static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ','λ','μ','Ξ','Π','π','ρ','Σ','σ','Τ','τ','υ','Φ','φ','χ','Ψ','ψ','Ω','Ω','ω','≠','≤','≥','Ф','∑','∞');
 
+$RENDER_CLASS = array();
+
 
     function filter_tex_sanitize_formula($texexp) {
         /// Check $texexp against blacklist (whitelisting could be more complete but also harder to maintain)
@@ -152,4 +154,37 @@ static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','
             }
             closedir($dp);
         }
+    }
+    
+    function p_latex_render($mode,$instructions,&$info){
+        global $RENDER_CLASS;
+        
+        if(is_null($instructions)) return '';
+        
+        require_once DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php';
+        $class = "renderer_plugin_".$mode;
+        $Renderer = new $class;
+        
+        if (is_null($Renderer)) return null;
+    
+        $Renderer->reset();
+    
+        $Renderer->smileys = getSmileys();
+        $Renderer->entities = getEntities();
+        $Renderer->acronyms = getAcronyms();
+        $Renderer->interwiki = getInterwiki();
+    
+        // Loop through the instructions
+        foreach ( $instructions as $instruction ) {
+            // Execute the callback against the Renderer
+            call_user_func_array(array(&$Renderer, $instruction[0]),$instruction[1]);
+        }
+    
+        //set info array
+        $info = $Renderer->info;
+    
+        // Post process and return the output
+        $data = array($mode,& $Renderer->doc);
+        trigger_event('RENDERER_CONTENT_POSTPROCESS',$data);
+        return $Renderer->doc;
     }

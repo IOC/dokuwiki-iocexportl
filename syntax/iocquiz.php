@@ -77,35 +77,51 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if($mode !== 'iocexportl') return false;
-        list($state, $text) = $data;
-        switch ($state) {
-          case DOKU_LEXER_ENTER :
-              $this->class = $text;
-              break;
-          case DOKU_LEXER_UNMATCHED :
-              //convert unnumered lists to numbered
-              $_SESSION['quizmode'] = $this->class;
-              if ($this->class !== 'complete' && $this->class !== 'relations'){
-                 $text = $this->getsolutions($text);     
-              }
-              if ($this->class === 'relations'){
-                  $text = preg_replace('/(\n)(\n  \*)/', '$1'.DOKU_LF.'@IOCRELATIONS@'.DOKU_LF.'$2', $text, 1);
-              }
-              $instructions = get_latex_instructions($text);
-              $renderer->doc .= p_render($mode, $instructions, $info);
-              $_SESSION['quizmode'] = false;
-              break;
-          case DOKU_LEXER_EXIT :
-              if ($this->class === 'relations'){
-                  $this->printoptions($renderer);
-              }
-              $this->printsolutions($renderer);
-              $this->class='';         
-              unset($_SESSION['quizsol']);     
-              break;
+        if($mode === 'ioccounter'){
+            list($state, $text) = $data;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  $instructions = get_latex_instructions($text);
+                  $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                  break;
+              case DOKU_LEXER_EXIT :
+                  break;
+            }
+            return true;
+        }elseif($mode === 'iocexportl'){
+            list($state, $text) = $data;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  $this->class = $text;
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  //convert unnumered lists to numbered
+                  $_SESSION['quizmode'] = $this->class;
+                  if ($this->class !== 'complete' && $this->class !== 'relations'){
+                     $text = $this->getsolutions($text);     
+                  }
+                  if ($this->class === 'relations'){
+                      $text = preg_replace('/(\n)(\n  \*)/', '$1'.DOKU_LF.'@IOCRELATIONS@'.DOKU_LF.'$2', $text, 1);
+                  }
+                  $instructions = get_latex_instructions($text);
+                  //$renderer->doc .= p_render($mode, $instructions, $info);
+                  $renderer->doc .= p_latex_render($mode, $instructions, $info);              
+                  $_SESSION['quizmode'] = false;
+                  break;
+              case DOKU_LEXER_EXIT :
+                  if ($this->class === 'relations'){
+                      $this->printoptions($renderer);
+                  }
+                  $this->printsolutions($renderer);
+                  $this->class='';         
+                  unset($_SESSION['quizsol']);     
+                  break;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
     
     function getsolutions($text){

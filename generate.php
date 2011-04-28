@@ -59,20 +59,23 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
         foreach ($data[0]['intro'] as $page){
             $text = io_readFile(wikiFN($page));
             $instructions = get_latex_instructions($text);
-            $latex .= p_render('iocexportl', $instructions, $info);
+            //$latex .= p_render('iocexportl', $instructions, $info);
+            $latex .= p_latex_render('iocexportl', $instructions, $info);            
         }
         //Content
         foreach ($data[0]['pageid'] as $page){
             $text = io_readFile(wikiFN($page));
             $instructions = get_latex_instructions($text);
-            $latex .= p_render('iocexportl', $instructions, $info);
+            //$latex .= p_render('iocexportl', $instructions, $info);
+            $latex .= p_latex_render('iocexportl', $instructions, $info);            
             //render activities
             if (array_key_exists($page, $data[0]['activities'])){
                 $_SESSION['activities'] = true;
                 foreach ($data[0]['activities'][$page] as $act){
                     $text = io_readFile(wikiFN($act));
                     $instructions = get_latex_instructions($text);
-                    $latex .= p_render('iocexportl', $instructions, $info);
+                    //$latex .= p_render('iocexportl', $instructions, $info);
+                    $latex .= p_latex_render('iocexportl', $instructions, $info);                    
                 }
                 $_SESSION['activities'] = false;
             }
@@ -87,21 +90,24 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
             $matches[0] = preg_replace('/\n{2,3}/', '@IOCBR@', $matches[0]);
             $instructions = get_latex_instructions($matches[0]);
-            $latex .= p_render('iocexportl', $instructions, $info);
+            //$latex .= p_render('iocexportl', $instructions, $info);
+            $latex .= p_latex_render('iocexportl', $instructions, $info);            
             $latex = preg_replace('/@IOCBR@/', DOKU_LF.DOKU_LF.'\vspace*{5mm} ', $latex);
             $text = preg_replace('/(\={5} Credits \={5}\n{2,}(.*?\n?)+)(?=\={5} copyright \={5})/', '', $text);
             preg_match('/(?<=\={5} copyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
             if (isset($matches[0])){
                 $latex .= '\vfill'.DOKU_LF;
                 $instructions = get_latex_instructions($matches[0]);
-                $latex .= p_render('iocexportl', $instructions, $info);
+                //$latex .= p_render('iocexportl', $instructions, $info);
+                $latex .= p_latex_render('iocexportl', $instructions, $info);                
                 $text = preg_replace('/\={5} copyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
                 preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
                 if (isset($matches[0])){
                     $latex .= '\renewcommand{\baselinestretch}{1.9}\tiny'.DOKU_LF;
                     $matches[0] = preg_replace('/(http.*)/', DOKU_LF.DOKU_LF.'$1', $matches[0]);
                     $instructions = get_latex_instructions($matches[0]);
-                    $latex .= p_render('iocexportl', $instructions, $info);
+                    //$latex .= p_render('iocexportl', $instructions, $info);
+                    $latex .= p_latex_render('iocexportl', $instructions, $info);                    
                     $text = preg_replace('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', '', $text);
                 }
             }
@@ -110,7 +116,8 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
         $latex .= '\defaultspacingpar\defaultspacingline' . DOKU_LF;
         $latex .= '\normalfont\normalsize' . DOKU_LF;
         $instructions = get_latex_instructions($text);
-        $latex .= p_render('iocexportl', $instructions, $info);
+        //$latex .= p_render('iocexportl', $instructions, $info);
+        $latex .= p_latex_render('iocexportl', $instructions, $info);        
     }
     //replace IOCQRCODE 
     $qrcode = '';        

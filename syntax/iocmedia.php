@@ -86,7 +86,8 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             $_SESSION['imgB'] = true;
             $instructions = get_latex_instructions($data);            
             $renderer->doc .= '\imgB{';
-            $renderer->doc .= p_render($mode, $instructions, $info);
+            //$renderer->doc .= p_render($mode, $instructions, $info);
+            $renderer->doc .= p_latex_render($mode, $instructions, $info);            
             $renderer->doc .= '}'.DOKU_LF;
             $_SESSION['imgB'] = false;
         }elseif($site === 'vimeo' || $site === 'youtube'){

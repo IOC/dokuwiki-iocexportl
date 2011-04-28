@@ -65,27 +65,43 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $data) {
-        if($mode !== 'iocexportl') return false;
-        list($state, $text) = $data;
-        switch ($state) {
-          case DOKU_LEXER_ENTER :
-              break;
-          case DOKU_LEXER_UNMATCHED :
-              if (!isset($_SESSION['quizsol'])){
-                  $_SESSION['quizsol'] = array();
-              }
-              $instructions = get_latex_instructions($text);
-              $sol = p_render($mode, $instructions, $info);
-              array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
-              if($_SESSION['quizmode'] !== 'relations'){
-                  $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
-              }else{
-                  $renderer->doc .= ' (\hspace{5mm})';
-              }
-              break;
-          case DOKU_LEXER_EXIT :
-              break;
+        if($mode === 'ioccounter'){
+            list($state, $text) = $data;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  $instructions = get_latex_instructions($text);
+                  $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                  break;
+              case DOKU_LEXER_EXIT :
+                  break;
+            }
+            return true;
+        }elseif($mode === 'iocexportl'){
+            list($state, $text) = $data;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  if (!isset($_SESSION['quizsol'])){
+                      $_SESSION['quizsol'] = array();
+                  }
+                  $instructions = get_latex_instructions($text);
+                  //$sol = p_render($mode, $instructions, $info);
+                  $sol = p_latex_render($mode, $instructions, $info);              
+                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
+                  if($_SESSION['quizmode'] !== 'relations'){
+                      $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
+                  }else{
+                      $renderer->doc .= ' (\hspace{5mm})';
+                  }
+                  break;
+              case DOKU_LEXER_EXIT :
+                  break;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 }

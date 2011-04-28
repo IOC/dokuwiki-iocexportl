@@ -70,7 +70,7 @@ class syntax_plugin_iocexportl_iocnota extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'iocexportl') return false;
+        if ($mode !== 'iocexportl' && $mode !== 'ioccounter') return false;
         return true;
     }
 }

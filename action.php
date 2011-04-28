@@ -35,6 +35,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         if ($ACT === 'show'){
             //$controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE',  $this, '_jquery');
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'showform', array());
+            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'counter', array());
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
     }
@@ -70,6 +71,20 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         return true;
     }
 
+    function counter(&$event) {
+        if ($this->checkPerms() && $this->showcounts()){
+            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/lib.js"></script>';
+        }
+    }
+
+   
+    function showcounts(){
+        global $conf;
+        $this->id = getID();
+        $counter = (isset($conf['plugin']['iocexportl']['counter']) && $conf['plugin']['iocexportl']['counter']);
+        return $counter && preg_match('/:(pdfindex|htmlindex)$/', $this->id, $matches);
+    }
+    
     function checkPerms() {
         global $ID;
         global $USERINFO;

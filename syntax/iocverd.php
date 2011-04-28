@@ -75,18 +75,34 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'iocexportl') return false;
-        list ($state, $text) = $data;
-        switch ($state) {
-            case DOKU_LEXER_ENTER :
-                break;
-            case DOKU_LEXER_UNMATCHED :
-                $instructions = get_latex_instructions($text);
-                $renderer->doc .= p_render($mode, $instructions, $info);
-                break;
-            case DOKU_LEXER_EXIT :
-                break;
+        if ($mode === 'ioccounter'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    $renderer->verd .= ' ' . p_latex_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return true;
+        }elseif ($mode === 'iocexportl'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    //$renderer->doc .= p_render($mode, $instructions, $info);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);                
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 }

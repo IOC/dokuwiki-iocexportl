@@ -70,24 +70,39 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         global $symbols;
-        if ($mode !== 'iocexportl') return false;
-        list ($state, $text) = $data;
-        switch ($state) {
-            case DOKU_LEXER_ENTER : 
-                $renderer->doc .= ' \begin{center}'. DOKU_LF;
-                $renderer->doc .= '\begin{math}';
-                break;
-            case DOKU_LEXER_UNMATCHED :
-                $text = str_ireplace($symbols, ' (INVALID CHARACTER) ', $text);
-				//replace \\ (not supported in math mode) by \break
-				$text = preg_replace('/\\\\\\\\/', '\\\\break', $text);
-                $renderer->doc .= filter_tex_sanitize_formula($text);
-                break;
-            case DOKU_LEXER_EXIT : 
-                $renderer->doc .= '\end{math} '. DOKU_LF;
-                $renderer->doc .= '\end{center}' . DOKU_LF.DOKU_LF;
-                break;
-        }
-        return true;
+        
+        if ($mode === 'ioccounter'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $renderer->doc .= $text;
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return true;
+        }elseif ($mode === 'iocexportl'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER : 
+                    $renderer->doc .= ' \begin{center}'. DOKU_LF;
+                    $renderer->doc .= '\begin{math}';
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $text = str_ireplace($symbols, ' (INVALID CHARACTER) ', $text);
+    				//replace \\ (not supported in math mode) by \break
+    				$text = preg_replace('/\\\\\\\\/', '\\\\break', $text);
+                    $renderer->doc .= filter_tex_sanitize_formula($text);
+                    break;
+                case DOKU_LEXER_EXIT : 
+                    $renderer->doc .= '\end{math} '. DOKU_LF;
+                    $renderer->doc .= '\end{center}' . DOKU_LF.DOKU_LF;
+                    break;
+            }
+            return true;
+       }
+       return false;
     }
  }

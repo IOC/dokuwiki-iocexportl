@@ -9,3 +9,4 @@
 // for the configuration manager
 $lang['jquery_url'] = 'jQuery Url';
 $lang['allowexport']   = 'Allow other roles than administrator export to pdf.';
+$lang['counter'] = 'Enable character counter.';

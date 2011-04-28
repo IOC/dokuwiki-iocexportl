@@ -483,7 +483,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc .= '\fonttable'.DOKU_LF;
         $this->doc .= '\begin{longtabu}{';
         for($i=0; $i < $maxcols; $i++){
-            $this->doc .= 'X[m,l] ';
+            $this->doc .= 'X[l] ';
         }
         $this->doc .= '}';
         if (!empty($_SESSION['table_title'])){
