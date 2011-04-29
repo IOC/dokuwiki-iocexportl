@@ -109,7 +109,6 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
     				break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
-                    //$renderer->doc .= p_render($mode, $instructions, $info);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);                
     				$_SESSION['figlabel'] = '';
                     break;

@@ -88,7 +88,6 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                       $_SESSION['quizsol'] = array();
                   }
                   $instructions = get_latex_instructions($text);
-                  //$sol = p_render($mode, $instructions, $info);
                   $sol = p_latex_render($mode, $instructions, $info);              
                   array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
                   if($_SESSION['quizmode'] !== 'relations'){

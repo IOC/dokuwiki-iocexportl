@@ -159,7 +159,6 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
         $info = array();
         $_SESSION['iocstl'] = true;
         $instructions = get_latex_instructions($text);
-        //$text = p_render($mode, $instructions, $info);
         $text = p_latex_render($mode, $instructions, $info);        
         $_SESSION['iocstl'] = false;
         return preg_replace('/\n\n/', '', $text);

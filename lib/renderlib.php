@@ -7,9 +7,11 @@ require_once DOKU_INC . 'inc/parser/renderer.php';
 
 static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ','λ','μ','Ξ','Π','π','ρ','Σ','σ','Τ','τ','υ','Φ','φ','χ','Ψ','ψ','Ω','Ω','ω','≠','≤','≥','Ф','∑','∞');
 
-$RENDER_CLASS = array();
-
-
+    /**
+     * 
+     * Replace all invalid ocurrences in latex formulas
+     * @param string $texexp
+     */
     function filter_tex_sanitize_formula($texexp) {
         /// Check $texexp against blacklist (whitelisting could be more complete but also harder to maintain)
         $tex_blacklist = array(
@@ -27,6 +29,11 @@ $RENDER_CLASS = array();
         return  str_ireplace($tex_blacklist, 'forbiddenkeyword', $texexp);
     }
     
+    /**
+     * 
+     * Convert a text into instructions
+     * @param string $text
+     */
     function get_latex_instructions($text){
     
       //Call our customized function get_parsermodes
@@ -143,6 +150,11 @@ $RENDER_CLASS = array();
       return $modes;
     }
     
+    /**
+     * 
+     * Fill plugins var with own syntax plugins
+     * @param array $plugins
+     */
     function getPlugins(&$plugins){
         $dir = 'iocexportl/syntax';
         if ($dp = @opendir(DOKU_PLUGIN."$dir/")) {
@@ -155,10 +167,15 @@ $RENDER_CLASS = array();
             closedir($dp);
         }
     }
-    
+
+    /**
+     * 
+     * Renders a list of instruction to the specified output mode 
+     * @param string $mode
+     * @param array $instructions
+     * @param array $info
+     */
     function p_latex_render($mode,$instructions,&$info){
-        global $RENDER_CLASS;
-        
         if(is_null($instructions)) return '';
         
         require_once DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php';

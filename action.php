@@ -73,7 +73,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function counter(&$event) {
         if ($this->checkPerms() && $this->showcounts()){
-            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/lib.js"></script>';
+            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js"></script>';
         }
     }
 

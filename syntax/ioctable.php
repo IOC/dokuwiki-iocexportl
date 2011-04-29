@@ -111,7 +111,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['table_id'] = (isset($params['id']))?$params['id']:'';
                     $instructions = get_latex_instructions($text);
-                    //$renderer->doc .= p_render($mode, $instructions, $info);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);                
                     $_SESSION['table_id'] = '';                
                     $_SESSION['table_title'] = '';

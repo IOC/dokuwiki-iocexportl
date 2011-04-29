@@ -106,7 +106,6 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                       $text = preg_replace('/(\n)(\n  \*)/', '$1'.DOKU_LF.'@IOCRELATIONS@'.DOKU_LF.'$2', $text, 1);
                   }
                   $instructions = get_latex_instructions($text);
-                  //$renderer->doc .= p_render($mode, $instructions, $info);
                   $renderer->doc .= p_latex_render($mode, $instructions, $info);              
                   $_SESSION['quizmode'] = false;
                   break;
