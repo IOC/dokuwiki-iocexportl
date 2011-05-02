@@ -526,10 +526,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '\noalign{\vspace{-2mm}}\multicolumn{'.$this->max_cols.'}{c}{\tableheadrule}' . DOKU_LF;
             $this->doc .= '\endfoot' . DOKU_LF;
             $this->doc .= '\endlastfoot' . DOKU_LF;
-            $this->tableheader_end = false;
+//            $this->tableheader_end = false;
         }else{
             $this->doc .= '\\\\'.DOKU_LF;
+            if ($this->tableheader_end){
+                $this->doc .= '\hline'.DOKU_LF;
+            }
         }
+        $this->tableheader_end = false;
     }
 
     function tableheader_open($colspan = 1, $align = NULL, $rowspan = 1){
@@ -704,6 +708,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function code($text, $language=null, $filename=null) {
+        if (preg_match('/html/i', $language)){
+            $language = 'HTML'; 
+        }
         if(!$_SESSION['iocstl']){
             $this->doc .= '\hspace*{4mm}'. DOKU_LF;    	
             $this->doc .= '\begin{minipage}[c]{\textwidth+\marginparwidth}'. DOKU_LF;

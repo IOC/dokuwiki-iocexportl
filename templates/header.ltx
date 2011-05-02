@@ -28,6 +28,7 @@
 \usepackage{listings}%code environment
 \usepackage{dashrule}%customized rules
 \usepackage{paralist}%Used to show quiz solutions
+%\usepackage[scaled]{beramono}
 @IOCQRCODE@ %qrcodes
 
 % ***************** CUSTOMIZED COMMANDS *****************
@@ -187,7 +188,7 @@
 \newcommand{\numold}[1]{\fontfamily{pcr}\selectfont\tiny{#1}}
 \lstnewenvironment{csource}[1]
 	{\small
-	 \lstset{basicstyle=\ttfamily,
+	 \lstset{basicstyle=\fontfamily{fvm},%beramono
 			keywordstyle=\bfseries,
 			numbers=left,
 			inputencoding=utf8x,
