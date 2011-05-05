@@ -90,7 +90,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         switch ($state) {
           case DOKU_LEXER_ENTER :
                 $class = '';
-                if (!empty($data)){ 
+                if(!empty($data)){ 
                     $class = $data;
                 } 
                 //avoid hyphenation
@@ -98,9 +98,9 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 $this->tipus = $class;
                 break;
             case DOKU_LEXER_UNMATCHED :
-                if ($this->tipus === 'important'){
+                if($this->tipus === 'important'){
                     $renderer->doc .= '\textA{'.$this->_parse($data, $mode).'}';
-                }elseif ($this->tipus === 'complementari'){
+                }elseif($this->tipus === 'complementari'){
                     $matches = array();
                     preg_match('/^\n?(.*?)\n+/', $data, $matches);
                     $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
@@ -116,8 +116,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
                     $title = $this->_parse($matches[1], $mode);
                     $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
-                    $renderer->doc .= '\textX{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';                        
-                }elseif ($this->tipus === 'textG'){
+                    $renderer->doc .= '\textD{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';                        
+                }elseif($this->tipus === 'textG' || $this->tipus === 'textE'){
                     $matches = array();
                     preg_match('/^\n?(.*?)\n+/', $data, $matches);
                     $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
@@ -125,7 +125,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
                     }
                     $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                    $renderer->doc .= '\textG{'.$title.'}{'.$this->_parse($data, $mode).'}';
+                    $renderer->doc .= '\textX{'.$title.'}{'.$this->_parse($data, $mode).'}';
                 }else{
                     $renderer->doc .= $this->_parse($data, $mode);
                 }

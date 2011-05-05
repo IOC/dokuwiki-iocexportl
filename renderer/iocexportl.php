@@ -241,7 +241,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $max_width = '[width='.$width.'px]';
             $img_width = $width;
         }
-        if ($_SESSION['draft'] || $external){
+        if (true || $_SESSION['draft'] || $external){
             $img_aux = $this->_image_convert($src, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media');
         }else{
             $img_aux = DOKU_PLUGIN_LATEX_TMP . $this->tmp_dir . '/media/' . basename($src);
@@ -930,10 +930,17 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
 								'@IOCBACKSLASH@textless ','@IOCBACKSLASH@textgreater ','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl ', '-');
         $matches = array();
+        
         //Search mathematical formulas
+        //Math mode
         if (preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
             $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
             return ' \begin{math}'.filter_tex_sanitize_formula($text).'\end{math} ';
+        //Math inline mode    
+        }elseif (preg_match('/\$\n?([^\$]+)\n?\$/', $value, $matches)){
+            $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
+            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', $text, $value, 1);
+            return filter_tex_sanitize_formula($value);
         }
         if ($this->monospace){
             $value = str_ireplace($find, $replace, $value);

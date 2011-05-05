@@ -99,12 +99,12 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return true;
-        }elseif ($mode === 'iocexportl'){
+        }elseif($mode === 'iocexportl'){
             list($state, $data) = $indata;
             switch ($state) {
               case DOKU_LEXER_ENTER :
                     $class = '';
-                    if (!empty($data['class'])){ 
+                    if(!empty($data['class'])){ 
                         $class = $data['class'];
                     } 
                     //avoid hyphenation
@@ -112,9 +112,9 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                     $this->tipus = $class;
                     break;
                 case DOKU_LEXER_UNMATCHED :
-                    if ($this->tipus === 'textA'){
+                    if($this->tipus === 'textA'){
                         $renderer->doc .= '\textA{'.$this->_parse($data, $mode).'}';
-                    }elseif ($this->tipus === 'textB'){
+                    }elseif($this->tipus === 'textB'){
                         $matches = array();
                         preg_match('/^\n?(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
@@ -130,8 +130,8 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                         preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
                         $title = $this->_parse($matches[1], $mode);
                         $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textX{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';                        
-                    }elseif ($this->tipus === 'textG' || $this->tipus === 'textE'){
+                        $renderer->doc .= '\textD{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';                        
+                    }elseif($this->tipus === 'textG' || $this->tipus === 'textE'){
                         $matches = array();
                         preg_match('/^\n?(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
@@ -139,7 +139,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                             $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
                         }
                         $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textG{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}';
+                        $renderer->doc .= '\textX{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}';
                     }else{
                         $renderer->doc .= $this->_parse($data, $mode);
                     }

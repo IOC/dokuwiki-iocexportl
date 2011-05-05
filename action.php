@@ -12,7 +12,6 @@ if (!defined('DOKU_PLUGIN_TEMPLATES')) define('DOKU_PLUGIN_TEMPLATES',DOKU_PLUGI
 if (!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
 
 require_once(DOKU_PLUGIN.'action.php');
-//require_once(DOKU_PLUGIN.'renderer.php');
 
 class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
