@@ -29,7 +29,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $table = false;
     var $tableheader = false;
     var $tableheader_count = 0;//Only one header per table
-    var $tableheader_end = false;    
+    var $tableheader_end = false;
+    var $table_mcolumn = '';
     var $tmp_dir = 0;//Value of temp dir
 	var $id = '';
   
@@ -277,7 +278,16 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 					}
                 }
             }
+            //Inside table, images will be centered vertically
+            if ($this->table){
+                $this->doc .= '\parbox[c]{'.$img_width.'px}{';
+                
+            }
             $this->doc .= '\includegraphics'.$max_width.'{media/'.basename($img_aux).'}';
+            if ($this->table){
+                $this->doc .= '}';
+                
+            }            
 			//Close href
             if ($linking !== 'details'){
                 $this->doc .= '}';
@@ -398,7 +408,17 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($this->table && !empty($this->formatting)){
             $this->doc .= '}';
         }
-        $this->doc .= DOKU_LF.DOKU_LF;
+        if ($this->table){
+            if (!empty($this->table_mcolumn)){
+                $this->doc .= '}';
+            }
+            $this->doc .= '\\\\';
+            if (!empty($this->table_mcolumn)){
+                $this->doc .= $this->table_mcolumn;
+            }
+        }else{
+            $this->doc .= DOKU_LF.DOKU_LF;   
+        }
         $this->doc .= $this->formatting;
     }
 
@@ -480,6 +500,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->tableheader = true;
         $this->max_cols = $maxcols;
         $this->col_num = 1;
+        $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
         $this->doc .= '\begin{longtabu}{';
         for($i=0; $i < $maxcols; $i++){
@@ -489,13 +510,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!empty($_SESSION['table_title'])){
             $this->doc .= '\caption{'.$_SESSION['table_title'].
             			  '\label{'.$_SESSION['table_id'].'}'.
-            			  '\vspace*{-5mm}}\\\\'.DOKU_LF;
+            			  '\vspace*{-4mm}}\\\\'.DOKU_LF;
         }
         $this->doc .= '\hline'.DOKU_LF;
     }
 
     function table_close(){
         $this->table = false;
+        $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
         $this->doc .= '\hline'.DOKU_LF;
         $this->tableheader_count = 0;
         preg_match('/(?<=@IOCHEADERSTART@)([^@]*)(?=@IOCHEADEREND@)/',$this->doc, $matches);
@@ -518,15 +540,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         if ($this->tableheader_end && $this->tableheader_count === 1){
             $this->doc .= '@IOCHEADEREND@';
-            $this->doc .= '\\\\ \hline \endfirsthead'.DOKU_LF;
-            $this->doc .= '\caption[]{(Continuació)\vspace*{-5mm}} \\\\' . DOKU_LF;
+            $this->doc .= '\\\\ \hline \noalign{\vspace{1mm}} \endfirsthead'.DOKU_LF;
+            $this->doc .= '\caption[]{(Continuació)\vspace*{-4mm}} \\\\' . DOKU_LF;
             $this->doc .= '\hline' . DOKU_LF;
             $this->doc .= '@IOCHEADERBIS@ \\\\ \hline' . DOKU_LF;
             $this->doc .= '\endhead' . DOKU_LF;
             $this->doc .= '\noalign{\vspace{-2mm}}\multicolumn{'.$this->max_cols.'}{c}{\tableheadrule}' . DOKU_LF;
             $this->doc .= '\endfoot' . DOKU_LF;
             $this->doc .= '\endlastfoot' . DOKU_LF;
-//            $this->tableheader_end = false;
         }else{
             $this->doc .= '\\\\'.DOKU_LF;
             if ($this->tableheader_end){
@@ -537,16 +558,18 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tableheader_open($colspan = 1, $align = NULL, $rowspan = 1){
-        $align = 'l';
+        $align = 'p{\the\tabucolX * '.$colspan.'}';
         if($this->tableheader){
               $this->doc .= '@IOCHEADERSTART@';
               $this->tableheader = false;
         }
         $this->col_colspan = $colspan;
         if ($colspan > 1){
-            $this->doc .= '\multicolumn{'.$colspan.'}{'.$align.'}{';
+            $this->table_mcolumn = '\multicolumn{'.$colspan.'}{'.$align.'}{';
+            $this->doc .= $this->table_mcolumn;
         }else{
             $this->doc .= '\raggedright';
+            $this->table_mcolumn = '';
         }
         $this->doc .= '\textbf{';
         $this->formatting = '\textbf{';
@@ -567,12 +590,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablecell_open($colspan = 1, $align = NULL, $rowspan = 1){
-        $align = 'l';
+        $align = 'p{\the\tabucolX * '.$colspan.'}';
         $this->tableheader = false;
         if ($colspan > 1){
-            $this->doc .= '\multicolumn{'.$colspan.'}{'.$align.'}{';
+            $this->table_mcolumn = '\multicolumn{'.$colspan.'}{'.$align.'}{';
+            $this->doc .= $this->table_mcolumn;
+        }else{
+            $this->table_mcolumn = '';
         }
-        $this->col_colspan = ($colspan > 1)?$colspan:1;
+        $this->col_colspan = $colspan;
     }
 
     function tablecell_close(){
@@ -600,7 +626,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($_SESSION['quizmode']){
             $this->listo_open();
         }else{
-            $this->doc .= '\begin{itemize}'.DOKU_LF;
+            $this->doc .= '\nobreak\begin{itemize}'.DOKU_LF;
         }
     }
 
@@ -613,7 +639,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function listo_open() {
-        $this->doc .= '\begin{enumerate}'.DOKU_LF;
+        $this->doc .= '\nobreak\begin{enumerate}'.DOKU_LF;
     }
 
     function listo_close() {
@@ -692,7 +718,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
     function preformatted($text) {
         $this->doc .= '\codeinline ';
-        $text = str_ireplace(array('#','_'), array('\#','\_'), $text);
+        $text = str_ireplace(array('#','_','&'), array('\#','\_','\&'), $text);
         $this->_format_text($text);
     }
 

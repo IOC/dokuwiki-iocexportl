@@ -57,6 +57,7 @@ static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','
     }
     
     /**
+     * 
      * returns own parser syntax modes in correct order
      */
     function get_latex_parsermodes(){

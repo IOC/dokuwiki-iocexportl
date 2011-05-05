@@ -3,32 +3,30 @@
 \usepackage[mathletters]{ucs}%Extended characters
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{textcomp}       
+\usepackage{textcomp}%Extended characters
 \usepackage[catalan]{babel}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{longtable}
 \usepackage{tabu}
-\usepackage[table]{xcolor}
-\usepackage{hyperref}
+\usepackage[table]{xcolor}%Color inside tables
+\usepackage{hyperref}%Create hyperlinks
 \usepackage{fancyhdr}%Customized headers
 \usepackage[top=20mm, bottom=20mm, right=60mm, left=20mm]{geometry}
-\usepackage{eso-pic}
+\usepackage{eso-pic}%Add images inside document
 \usepackage{textpos}%Set text in a position 
-\usepackage{titlesec}
+\usepackage{titlesec}%Customize sections
 \usepackage{wallpaper}%Used in frontpage
-\usepackage{tgtermes}
-\usepackage{setspace}
-\usepackage{marginnote}
+\usepackage{tgtermes}%Gyre Termes font
+\usepackage{marginnote}%Notes on margins
 \usepackage{ulem}
 \usepackage[font={scriptsize,sf},labelfont={scriptsize,sf},textfont={scriptsize,sf},justification=justified,singlelinecheck=false]{caption}
 \usepackage{grffile}%Accept dots on filenames
 \usepackage{fixltx2e}%subscript, superscript
-\usepackage{setspace}
-\usepackage{listings}%code environment
-\usepackage{dashrule}%customized rules
+\usepackage{setspace}%Control over line spacing
+\usepackage{listings}%Code environment
+\usepackage{dashrule}%Customized rules
 \usepackage{paralist}%Used to show quiz solutions
-%\usepackage[scaled]{beramono}
 @IOCQRCODE@ %qrcodes
 
 % ***************** CUSTOMIZED COMMANDS *****************
@@ -53,11 +51,31 @@
 		}
 	\end{flushleft}
 }
-\newcommand{\textB}[2]{
+\newcommand{\textB}[3]{
+	\marginnote{
+			\begin{minipage}{\marginparwidth-4mm}
+				\centering
+				\parbox[c]{0.90\marginparwidth}{
+					\fontfamily{phv}
+					\selectfont
+					\small
+					\raggedright
+						\bfseries{#1}
+						\\
+						\normalfont
+						\small
+						#2
+				}
+			\end{minipage}
+	}[#3]
+}
+
+\newcommand{\textBold}[3]{
 	\begin{center}
+		#3 %used to insert \pagebreak
 		\par
 		\marginpar{
-			\vspace{4mm}
+			\vspace{\marginparsep}
 			\parbox{\marginparwidth}{
 				\titleB
 				#1
@@ -210,6 +228,8 @@
 					 {ò}{{\`o}}1
 					 {ï}{{\"i}}1
 					 {ü}{{\"u}}1
+					 {ñ}{{\~{n}}}1
+					 {’}{{\textquotesingle}}1
 					 {ç}{{\c{c}}}1
 		}
 	}
@@ -351,6 +371,8 @@
 
 %table row height
 \renewcommand{\arraystretch}{1.5}
+\setlength{\tabulinesep}{0.5mm}
 
 %change characters
 \DeclareUnicodeCharacter{2022}{·}%•
+

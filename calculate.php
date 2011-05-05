@@ -18,7 +18,12 @@ if (!checkPerms()) return false;
  session_start();
  countCharacters($path);
  session_destroy();
-
+    
+    /**
+    * 
+    * Count characters for the path indicated
+    * @param string $path
+    */
     function countCharacters($path){
         global $id;
 
@@ -28,7 +33,6 @@ if (!checkPerms()) return false;
             $instructions = get_latex_instructions($text);
             $clean_text = p_latex_render('ioccounter', $instructions, &$info);
             if (preg_match('/::IOCVERDINICI::/', $clean_text)){
-                //print_r($clean_text);
                 $matches = array();
                 preg_match_all('/(?<=::IOCVERDINICI::)(.*?)(?=::IOCVERDFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
                 $verd = '';
@@ -47,7 +51,10 @@ if (!checkPerms()) return false;
         echo json_encode($result);
     }
     
-    
+    /**
+     * 
+     * Check whether user has right acces level 
+     */
     function checkPerms() {
         global $id;
         global $USERINFO;

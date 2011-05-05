@@ -1,4 +1,10 @@
 <?php
+/**
+ * LaTeX Plugin: Generate Latex document
+ *
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Marc Català <mcatala@ioc.cat>
+ */
 
 if (!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/../../../');
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
@@ -25,7 +31,7 @@ if (!$exportallowed && !auth_isadmin()) return false;
 $time_start = microtime(true);
 
 $output_filename = str_replace(':','_',$id);
-if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf' ) return false;
+if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return false;
 if (!auth_isadmin() && $_POST['mode'] === 'zip') return false;
 
 if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
@@ -131,6 +137,12 @@ if ($_POST['mode'] === 'zip'){
 }
 removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
 
+    /**
+     * 
+     * Render frontpage
+     * @param string $latex
+     * @param array $data
+     */
     function renderFrontpage(&$latex, $data){
         global $tmp_dir;
         global $unitzero;
@@ -176,6 +188,13 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
     }
     
+    /**
+     * 
+     * Compile latex document to create a pdf file
+     * @param string $filename
+     * @param string $path
+     * @param string $text
+     */
     function createLatex($filename, $path, &$text){
         //Replace media relative URI's for absolute URI's
         $text = preg_replace('/\{media\//', '{'.$path.'/media/', $text);
@@ -197,11 +216,19 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
     }
     
+    /**
+     * 
+     * Returns pdf/zip file info 
+     * @param string $path
+     * @param string $filename
+     * @param string $type
+     */
     function returnData($path, $filename, $type){
         global $id;
         global $media_path;
         global $conf;
         global $time_start;
+        
         if (file_exists($path.'/'.$filename)){
             //Return pdf number pages
             if ($type === 'pdf'){
@@ -230,7 +257,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         echo json_encode($result);
     }
     
-    function createZip($filename,$path,&$text){
+    /**
+     * 
+     * Create a zip file with tex file and all media files 
+     * @param string $filename
+     * @param string $path
+     * @param string $text
+     */
+    function createZip($filename, $path, &$text){
         $zip = new ZipArchive;
         $res = $zip->open($path.'/'.$filename.'.zip', ZipArchive::CREATE);
         if ($res === TRUE) {
@@ -247,7 +281,13 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             showLogError($filename);
         }
     }
-    
+
+    /**
+     * 
+     * Returns log file on latex compilation
+     * @param string $path
+     * @param string $filename
+     */
     function showLogError($path, $filename){
         global $tmp_dir;
         global $conf;
@@ -262,6 +302,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
     }
     
+    /**
+     * 
+     * Fill files var with all media files stored on directory var
+     * @param string $directory
+     * @param string $files
+     */
     function getFiles($directory, &$files){
         if(!file_exists($directory) || !is_dir($directory)) {
                 return false;
@@ -269,7 +315,6 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             return false;
         } else {
             $directoryHandle = opendir($directory);
-        
             while ($contents = readdir($directoryHandle)) { 
                 if($contents != '.' && $contents != '..') {
                     if (preg_match('/.*?\.pdf|.*?\.png|.*?\.jpg/', $contents)){
@@ -281,14 +326,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 } 
             } 
             closedir($directoryHandle);
-
             return true;
         }
     }
     
 	/**
-     * Remove specified dir 
-     */   
+	 * 
+     * Remove specified dir
+     * @param string $directory
+     */
     function removeDir($directory) {
         if(!file_exists($directory) || !is_dir($directory)) { 
             return false; 
@@ -319,6 +365,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
     }
     
+    /**
+     * 
+     * Check whether user has right acces level 
+     */
     function checkPerms() {
         global $ID;
         global $USERINFO;
@@ -330,6 +380,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         return ($aclLevel >=  AUTH_UPLOAD);
       }
     
+    /**
+     * 
+     * Fill data var with wiki pages using a customized structure
+     * @param array $data
+     * @param boolean $struct
+     */
     function getPageNames(&$data, $struct = false){
         global $id;        
         global $conf;
@@ -379,7 +435,13 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
         }
     }
-    
+
+    /**
+     * 
+     * Fill data var with activities and return pages without it
+     * @param array $data
+     * @param string $pages
+     */
     function getActivities(&$data, $pages){
         global $id;
         
@@ -410,6 +472,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         return $pages;
     }
     
+    /**
+     * 
+     * Get and return uri wiki pages
+     */
     function getData(){
         global $id;
         global $unitzero;

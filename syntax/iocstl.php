@@ -119,19 +119,19 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                         preg_match('/^\n?(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
                         $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textB{'.$title.'}{'.$this->_parse($data, $mode).'}';
-                    }elseif($this->tipus === 'notaBreu'){ 
+                        $renderer->doc .= '\textB{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';
+                    }elseif($this->tipus === 'notaBreu' || $this->tipus === 'crida'){ 
                         $renderer->doc .= '\notaBreu{'.$this->_parse($data, $mode).'}';
                     }elseif($this->tipus === 'imgB'){
                         $renderer->doc .= '\bfseries{$data}';
-                        $renderer->doc .= '\textB{IMATGE B}{'.($this->_parse('{{'.$data.'}}', $mode)).'}';
-                    }elseif($this->tipus === 'textD' || $this->tipus === 'textE'){
+                        $renderer->doc .= '\textB{IMATGE B}{'.($this->_parse('{{'.$data.'}}', $mode)).'}{0mm}';
+                    }elseif($this->tipus === 'textD'){
                         $matches = array();
                         preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
                         $title = $this->_parse($matches[1], $mode);
                         $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textX{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';                        
-                    }elseif ($this->tipus === 'textG'){
+                        $renderer->doc .= '\textX{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';                        
+                    }elseif ($this->tipus === 'textG' || $this->tipus === 'textE'){
                         $matches = array();
                         preg_match('/^\n?(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
@@ -139,7 +139,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                             $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
                         }
                         $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textG{'.$title.'}{'.$this->_parse($data, $mode).'}';
+                        $renderer->doc .= '\textG{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}';
                     }else{
                         $renderer->doc .= $this->_parse($data, $mode);
                     }

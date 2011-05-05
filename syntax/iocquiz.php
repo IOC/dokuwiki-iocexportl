@@ -160,7 +160,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
               if ($this->class !== 'choice'){
                   $renderer->listitem_open(1);
               }
-              $renderer->doc .= $sol;//.'\hspace{2mm}';
+              $renderer->doc .= '\textit{'.$sol.'}';//.'\hspace{2mm}';
               if ($key < $count-1){
                   $renderer->doc .= $separator.'\hspace{1mm}';
               }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Example Action Plugin:   Example Component.
+ * Action Plugin:   iocexportl.
  * @license    GPL (http://www.gnu.org/licenses/gpl.html)
  * @author     Marc Català 		<mcatala@ioc.cat>
  */
@@ -19,41 +19,15 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     var $exportallowed = false;
     var $id = '';
 
-    function getInfo() {
-        return array(
-                'author' => 'Marc Català',
-                'email'  => 'mcatala@ioc.cat',
-                'date'   => '18-01-2011',
-                'name'   => 'Export Form Plugin',
-                'desc'   => 'Creates an export form to create latex document',
-                'url'    => 'http://ioc.gencat.cat',
-                );
-    }
-
     function register(&$controller) {
         global $ACT;
         if ($ACT === 'show'){
-            //$controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE',  $this, '_jquery');
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'showform', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'counter', array());
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
     }
     
-		/**
-         * Hook js script into page headers.
-         */
-        function _jquery(&$event, $param) {
-        	global $ACT;
-		    if ($ACT === 'show'){ 
-				   $event->data['script'][] = array(
-				                        'type'    => 'text/javascript',
-				                        'charset' => 'utf-8',
-				                        '_data'   => '',
-				                        'src'     => $this->getConf('jquery_url'));
-			}
-	    }
-   
     function showform(&$event){
 	    global $conf;
         global $INFO;
@@ -88,7 +62,6 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     function checkPerms() {
         global $ID;
         global $USERINFO;
-        //$QUERY = trim($_REQUEST['id']);
         $ID    = getID();
         $user = $_SERVER['REMOTE_USER'];
         $groups = $USERINFO['grps'];
@@ -99,12 +72,6 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     
     function isExportPage(){
         return preg_match('/:pdfindex$/', $this->id, $matches);        
-/*        $file = wikiFN($this->id);
-        if (@file_exists($file)) {
-            $data = io_grep($file,'/^~~EXPORTFORM[^\r\n]*?~~/',0,true);
-            return !empty($data);
-        }
-        return false;*/
     }
 
     function getform(){
