@@ -133,13 +133,15 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '\textD{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';                        
                     }elseif($this->tipus === 'textG' || $this->tipus === 'textE'){
                         $matches = array();
-                        preg_match('/^\n?(.*?)\n+/', $data, $matches);
+                        preg_match('/^\n+(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
                         if (empty($title)){
                             $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
+                        }else{
+                            $title = $renderer->_xmlEntities($title);
                         }
-                        $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textX{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}';
+                        $data = preg_replace('/^\n+(.*?)\n+/', '', $data);
+                        $renderer->doc .= '\textX{'.$title.'}{'.$this->_parse($data, $mode).'}';
                     }else{
                         $renderer->doc .= $this->_parse($data, $mode);
                     }

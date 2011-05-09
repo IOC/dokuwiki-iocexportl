@@ -16,20 +16,21 @@ require_once DOKU_INC.'inc/parser/renderer.php';
  */
 class renderer_plugin_iocexportl extends Doku_Renderer {
     
-    var $code = false;
+    var $code = FALSE;
     var $col_colspan;
     var $col_num = 1;
-    var $endimg = false;
+    static $convert = FALSE;//convert images to imgext
+    var $endimg = FALSE;
     var $formatting = '';    
-    var $hr_width = 375;    
-    var $imgext = '.pdf';//Format to convert images
+    static $hr_width = 375;    
+    static $imgext = '.pdf';//Format to convert images
     var $max_cols = 0;
-    var $monospace = false;
-    var $p_width = 360;//415.12572;
-    var $table = false;
-    var $tableheader = false;
+    var $monospace = FALSE;
+    static $p_width = 360;//415.12572;
+    var $table = FALSE;
+    var $tableheader = FALSE;
     var $tableheader_count = 0;//Only one header per table
-    var $tableheader_end = false;
+    var $tableheader_end = FALSE;
     var $table_mcolumn = '';
     var $tmp_dir = 0;//Value of temp dir
 	var $id = '';
@@ -203,8 +204,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($width && $height){
             $resize = "-resize $width"."x"."$height";
         }
-        exec("convert $img $resize $imgdest".$this->imgext);
-        return $imgdest.$this->imgext;
+        exec("convert $img $resize $imgdest".self::$imgext);
+        return $imgdest.self::$imgext;
       }
       
      /**
@@ -234,14 +235,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($_SESSION['imgB']){
             $max_width = '[width=35mm]';
             $img_width = false;
-        }elseif ($width > $this->p_width){
+        }elseif ($width > self::$p_width){
             $max_width = '[width=\textwidth]';
             $img_width = false;
         }else{
             $max_width = '[width='.$width.'px]';
             $img_width = $width;
         }
-        if (true || $_SESSION['draft'] || $external){
+        if (self::$convert || $_SESSION['draft'] || $external){
             $img_aux = $this->_image_convert($src, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media');
         }else{
             $img_aux = DOKU_PLUGIN_LATEX_TMP . $this->tmp_dir . '/media/' . basename($src);
@@ -265,7 +266,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $vspace = '\vspace*{-4mm}';
                 if (!$_SESSION['imgB']){
                     if ($img_width){
-                        $hspace = (($this->p_width - $img_width) >> 1) - 23;
+                        $hspace = ((self::$p_width - $img_width) >> 1) - 23;
                     }
                 $this->doc .= '\hspace*{'.$hspace.'pt}\parbox[c]{'.$title_width.'}{\caption{'.$this->_xmlEntities($title[0]);
 				if (!empty($_SESSION['figlabel'])){
@@ -273,7 +274,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 				}
 				$this->doc .= '}}'.$vspace.DOKU_LF;
                 }else{
-					if(empty($title[1])){
+					if (empty($title[1])){
 						$title[1] = $title[0];
 					}
                 }
@@ -313,7 +314,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     $hspace = '\marginparwidth';
 					$vspace = '\vspace{-4mm}';
                 }
-                $this->doc .=  '\raggedright\parbox[c]{'.$hspace.'}{\scriptsize\textsf{\begin{flushright}'.$vspace.$this->_xmlEntities($title[1]).'\end{flushright}}}';
+                $this->doc .=  '\raggedright\parbox[c]{'.$hspace.'}{\textsf{\tiny\begin{flushright}'.$vspace.$this->_xmlEntities($title[1]).'\end{flushright}}}';
                 
             }
             if (!$this->table && !$_SESSION['imgB'] && !$_SESSION['video_url']){
@@ -396,7 +397,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$this->code){
             $this->doc .= '\begin{center}'.DOKU_LF;
         }
-        $this->doc .= '\line(1,0){'.$this->hr_width.'}'.DOKU_LF;
+        $this->doc .= '\line(1,0){'.self::$hr_width.'}'.DOKU_LF;
         if (!$this->code){
             $this->doc .= '\end{center}'.DOKU_LF;
         } else {
@@ -409,13 +410,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '}';
         }
         if ($this->table){
-            if (!empty($this->table_mcolumn)){
+/*            if (!empty($this->table_mcolumn)){
                 $this->doc .= '}';
-            }
-            $this->doc .= '\\\\';
-            if (!empty($this->table_mcolumn)){
+            }*/
+            $this->doc .= '\break ';
+/*            if (!empty($this->table_mcolumn)){
                 $this->doc .= $this->table_mcolumn;
             }
+*/            
         }else{
             $this->doc .= DOKU_LF.DOKU_LF;   
         }
@@ -502,9 +504,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->col_num = 1;
         $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
-        $this->doc .= '\begin{longtabu}{';
+        $this->doc .= '\begin{longtabu}[t]{';
         for($i=0; $i < $maxcols; $i++){
-            $this->doc .= 'X[l] ';
+            $this->doc .= 'X[-1,l] ';
         }
         $this->doc .= '}';
         if (!empty($_SESSION['table_title'])){
@@ -521,9 +523,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc .= '\hline'.DOKU_LF;
         $this->tableheader_count = 0;
         preg_match('/(?<=@IOCHEADERSTART@)([^@]*)(?=@IOCHEADEREND@)/',$this->doc, $matches);
-        $header = $matches[1];
         $this->doc = preg_replace('/@IOCHEADERSTART@|@IOCHEADEREND@/','', $this->doc);        
-        $this->doc = preg_replace('/@IOCHEADERBIS@/',$header, $this->doc, 1);        
+        $this->doc = preg_replace('/@IOCHEADERBIS@/',isset($matches[1])?$matches[1]:'', $this->doc, 1);
         $this->doc .= '\tabuphantomline';
         $this->doc .= '\end{longtabu}'.DOKU_LF;
         $this->doc .= '\normalfont\normalsize'.DOKU_LF;
@@ -571,13 +572,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '\raggedright';
             $this->table_mcolumn = '';
         }
-        $this->doc .= '\textbf{';
+        $this->doc .= '\parbox[t]{\linewidth}{\raggedright ';
         $this->formatting = '\textbf{';
+        $this->doc .= $this->formatting;
     }
 
     function tableheader_close(){
         $this->formatting = '';
-        $this->doc .= '}';
+        $this->doc .= '}';//close format
+        $this->doc .= '}';//close parbox        
         $col_num_aux = ($this->col_colspan > 1)?$this->col_num + ($this->col_colspan-1):$this->col_num;
         if ($this->col_colspan > 1){
             $this->doc .= '}';
@@ -599,13 +602,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->table_mcolumn = '';
         }
         $this->col_colspan = $colspan;
+        $this->doc .= '\parbox[t]{\linewidth}{\raggedright ';
     }
 
     function tablecell_close(){
         $col_num_aux = ($this->col_colspan > 1)?$this->col_num + $this->col_colspan:$this->col_num;
+        $this->doc .= '}';//close parbox        
         if ($this->col_colspan > 1) {
             $col_num_aux--;
-            $this->doc .= '} ';            
+            $this->doc .= '} ';//close multicolumn           
         }
         if ($col_num_aux < $this->max_cols){
             $this->doc .= ' & ';
@@ -930,7 +935,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
 								'@IOCBACKSLASH@textless ','@IOCBACKSLASH@textgreater ','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl ', '-');
         $matches = array();
-        
+        //Remove spaces only if we are inside a table
+        if ($this->table){
+            $value = trim($value);
+        }
         //Search mathematical formulas
         //Math mode
         if (preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
@@ -939,7 +947,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         //Math inline mode    
         }elseif (preg_match('/\$\n?([^\$]+)\n?\$/', $value, $matches)){
             $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', $text, $value, 1);
+            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '$'.$text.'$', $value, 1);
             return filter_tex_sanitize_formula($value);
         }
         if ($this->monospace){

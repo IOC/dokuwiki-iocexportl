@@ -17,22 +17,22 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 global $conf;
 
 $id = getID();
-$unitzero = false;
+$unitzero = FALSE;
 $tmp_dir = '';
 $media_path = 'lib/exe/fetch.php?media=';
-$exportallowed = false;
+$exportallowed = FALSE;
 $img_src = array('familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
 
-if (!checkPerms()) return false;
+if (!checkPerms()) return FALSE;
 
 $exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-if (!$exportallowed && !auth_isadmin()) return false;
+if (!$exportallowed && !auth_isadmin()) return FALSE;
 
-$time_start = microtime(true);
+$time_start = microtime(TRUE);
 
 $output_filename = str_replace(':','_',$id);
-if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return false;
-if (!auth_isadmin() && $_POST['mode'] === 'zip') return false;
+if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return FALSE;
+if (!auth_isadmin() && $_POST['mode'] === 'zip') return FALSE;
 
 if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     //read header
@@ -41,12 +41,12 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     $tmp_dir = rand();
     $_SESSION['tmp_dir'] = $tmp_dir;
     if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
-        mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, true);
-        mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media', 0775, true);
+        mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
+        mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media', 0775, TRUE);
     }
     if (!auth_isadmin()){
         $latex .= '\draft{Provisional}' . DOKU_LF;
-        $_SESSION['draft'] = true;
+        $_SESSION['draft'] = TRUE;
     }
     if (!file_exists(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx')){
         session_destroy();
@@ -57,7 +57,7 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     //FrontPage
     renderFrontpage($latex, $data);
     $latex .= '\frontpageparskip'.DOKU_LF;
-    $_SESSION['createbook'] = true;
+    $_SESSION['createbook'] = TRUE;
     //Render a non unit zero
     if (!$unitzero){
         $_SESSION['chapter'] = 1;
@@ -74,17 +74,17 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             $latex .= p_latex_render('iocexportl', $instructions, $info);            
             //render activities
             if (array_key_exists($page, $data[0]['activities'])){
-                $_SESSION['activities'] = true;
+                $_SESSION['activities'] = TRUE;
                 foreach ($data[0]['activities'][$page] as $act){
                     $text = io_readFile(wikiFN($act));
                     $instructions = get_latex_instructions($text);
                     $latex .= p_latex_render('iocexportl', $instructions, $info);                    
                 }
-                $_SESSION['activities'] = false;
+                $_SESSION['activities'] = FALSE;
             }
         }
     }else{//Render unit zero
-        $_SESSION['u0'] = true;
+        $_SESSION['u0'] = TRUE;
         $text = io_readFile(wikiFN($id));
         $text = preg_replace('/(\={6} .*? \={6}\n{2,}\={5} Meta \={5}\n{2,}( {2,4}\* \*\*\w+\*\*:.*\n?)+)/', '', $text);
         preg_match('/(?<=\={5} Credits \={5})\n+(.*?\n?)+(?=\={5} copyright \={5})/', $text, $matches);
@@ -203,9 +203,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         if ($_SESSION['qrcode']){
             $shell_escape = '-shell-escape';
         }
-        exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+        exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         if ($result === 0){
-            exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
             //One more to calculate correctly size tables
             exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         }
@@ -239,17 +239,17 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $dest = preg_replace('/:/', '/', $id);
             $dest = dirname($dest);
             if (!file_exists($conf['mediadir'].'/'.$dest)){
-                mkdir($conf['mediadir'].'/'.$dest, 0755, true);
+                mkdir($conf['mediadir'].'/'.$dest, 0755, TRUE);
             }
             $filename_dest = (auth_isadmin())?$filename:basename($filename, '.'.$type).'_draft.'.$type;
             copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename_dest);                
             $dest = preg_replace('/\//', ':', $dest);
-            $time_end = microtime(true);
+            $time_end = microtime(TRUE);
             $time = round($time_end - $time_start, 2);
             if ($type === 'pdf'){
-                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(true), $filename_dest, $filesize, $num_pages, $time);
+                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time);
             }else{
-                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(true), $filename_dest, $filesize, $time);
+                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time);
             } 
         }else{
             $result = 'Error en la creació del arixu: ' . $filename;
@@ -310,9 +310,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      */
     function getFiles($directory, &$files){
         if(!file_exists($directory) || !is_dir($directory)) {
-                return false;
+                return FALSE;
         } elseif(!is_readable($directory)) {
-            return false;
+            return FALSE;
         } else {
             $directoryHandle = opendir($directory);
             while ($contents = readdir($directoryHandle)) { 
@@ -326,7 +326,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 } 
             } 
             closedir($directoryHandle);
-            return true;
+            return TRUE;
         }
     }
     
@@ -337,9 +337,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      */
     function removeDir($directory) {
         if(!file_exists($directory) || !is_dir($directory)) { 
-            return false; 
+            return FALSE; 
         } elseif(!is_readable($directory)) { 
-            return false; 
+            return FALSE; 
         } else { 
             $directoryHandle = opendir($directory); 
             
@@ -358,10 +358,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     
             if(file_exists($directory)) { 
                 if(!rmdir($directory)) { 
-                    return false; 
+                    return FALSE; 
                 } 
             } 
-            return true; 
+            return TRUE; 
         }
     }
     
@@ -386,14 +386,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param array $data
      * @param boolean $struct
      */
-    function getPageNames(&$data, $struct = false){
+    function getPageNames(&$data, $struct = FALSE){
         global $id;        
         global $conf;
 
         $data['intro'] = array();
         $data['pageid'] = array();
         if (!$struct){
-            $exists = false;
+            $exists = FALSE;
             $file = wikiFN($id);
             if (@file_exists($file)) {
                 $matches = array();
@@ -485,7 +485,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $data[1] = array();
         $file = wikiFN($id);
         if (@file_exists($file)) {
-            $info = io_grep($file,'/(?<=\={6} )[^\=]*/',0,true);
+            $info = io_grep($file, '/(?<=\={6} )[^\=]*/', 0, TRUE);
             $data[1]['nomcomplert'] = $info[0][0];
             $text = io_readFile($file);
             $info = array();
@@ -500,11 +500,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
             //get page names
             if (key_exists('familia', $data[1])){
-                $unitzero = true;
+                $unitzero = TRUE;
             }else{
                 getPageNames($data[0]);
             }
             return $data;
         }
-        return false;
+        return FALSE;
     }
