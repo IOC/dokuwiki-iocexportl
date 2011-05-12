@@ -31,7 +31,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $tableheader = FALSE;
     var $tableheader_count = 0;//Only one header per table
     var $tableheader_end = FALSE;
-    var $table_mcolumn = '';
     var $tmp_dir = 0;//Value of temp dir
 	var $id = '';
   
@@ -54,7 +53,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * Make multiple instances of this class
      */
     function isSingleton(){
-        return false;
+        return FALSE;
     }
 
     function reset(){
@@ -79,8 +78,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->tmp_dir = $_SESSION['tmp_dir'];
         }
         if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir)){
-            mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, true);
-            mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, true);
+            mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
+            mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
         }
         copy(DOKU_PLUGIN.'iocexportl/templates/background.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/background.pdf');
 
@@ -112,28 +111,28 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      */
     function _initialize_globals(){
         if (!isset($_SESSION['activities'])){
-            $_SESSION['activities'] = false;
+            $_SESSION['activities'] = FALSE;
         }
         if (!isset($_SESSION['chapter'])){
             $_SESSION['chapter'] = 1;
         }
         if (!isset($_SESSION['createbook'])){
-            $_SESSION['createbook'] = false;
+            $_SESSION['createbook'] = FALSE;
         }
         if (!isset($_SESSION['draft'])){
-            $_SESSION['draft'] = false;
+            $_SESSION['draft'] = FALSE;
         }
         if (!isset($_SESSION['figlabel'])){
             $_SESSION['figlabel'] = '';
         }
         if (!isset($_SESSION['imgB'])){
-            $_SESSION['imgB'] = false;
+            $_SESSION['imgB'] = FALSE;
         }
         if (!isset($_SESSION['qrcode'])){
-            $_SESSION['qrcode'] = false;
+            $_SESSION['qrcode'] = FALSE;
         }        
         if (!isset($_SESSION['quizmode'])){
-            $_SESSION['quizmode'] = false;
+            $_SESSION['quizmode'] = FALSE;
         }
         if (!isset($_SESSION['table_id'])){
             $_SESSION['table_id'] = '';
@@ -142,10 +141,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $_SESSION['table_title'] = '';
         }
         if (!isset($_SESSION['u0'])){
-            $_SESSION['u0'] = false;
+            $_SESSION['u0'] = FALSE;
         }
         if (!isset($_SESSION['video_url'])){
-            $_SESSION['video_url'] = false;
+            $_SESSION['video_url'] = FALSE;
         }
     }
 
@@ -168,7 +167,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
           $cleanid = $this->info['current_file_id'];
         }  
         else {
-          $cleanid = noNS(cleanID($this->info['current_id'], true));
+          $cleanid = noNS(cleanID($this->info['current_id'], TRUE));
         }
         $this->doc .= "\label{" . md5($cleanid) . "}";
         if (isset($this->info['current_file_id'])){ 
@@ -234,10 +233,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         if ($_SESSION['imgB']){
             $max_width = '[width=35mm]';
-            $img_width = false;
-        }elseif ($width > self::$p_width){
+            $img_width = FALSE;
+        }elseif (!$this->table && $width > self::$p_width){
             $max_width = '[width=\textwidth]';
-            $img_width = false;
+            $img_width = FALSE;
         }else{
             $max_width = '[width='.$width.'px]';
             $img_width = $width;
@@ -268,7 +267,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     if ($img_width){
                         $hspace = ((self::$p_width - $img_width) >> 1) - 23;
                     }
-                $this->doc .= '\hspace*{'.$hspace.'pt}\parbox[c]{'.$title_width.'}{\caption{'.$this->_xmlEntities($title[0]);
+                $this->doc .= '\hspace*{'.$hspace.'pt}\parbox[t]{'.$title_width.'}{\caption{'.trim($this->_xmlEntities($title[0]));
 				if (!empty($_SESSION['figlabel'])){
 	                $this->doc .= '\label{'.$_SESSION['figlabel'].'}';					
 				}
@@ -281,7 +280,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             //Inside table, images will be centered vertically
             if ($this->table){
-                $this->doc .= '\parbox[c]{'.$img_width.'px}{';
+//                $this->doc .= '\parbox[t]{\linewidth}{';
+                $this->doc .= '\resizebox{\linewidth}{!}{';
                 
             }
             $this->doc .= '\includegraphics'.$max_width.'{media/'.basename($img_aux).'}';
@@ -314,14 +314,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     $hspace = '\marginparwidth';
 					$vspace = '\vspace{-4mm}';
                 }
-                $this->doc .=  '\raggedright\parbox[c]{'.$hspace.'}{\textsf{\tiny\begin{flushright}'.$vspace.$this->_xmlEntities($title[1]).'\end{flushright}}}';
+                $this->doc .=  '\raggedright\parbox[c]{'.$hspace.'}{\textsf{\tiny\begin{flushright}'.$vspace.trim($this->_xmlEntities($title[1])).'\end{flushright}}}';
                 
             }
             if (!$this->table && !$_SESSION['imgB'] && !$_SESSION['video_url']){
                 $this->doc .= '\end{'.$align.'}';
                 $this->doc .= '\end{figure}';
             }
-            $this->endimg = true;
+            $this->endimg = TRUE;
         }else{
             $this->doc .= '\textcolor{red}{\textbf{File '. $this->_xmlEntities(basename($src)).' does not exist.}}';
         }
@@ -353,7 +353,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$this->endimg){
             $this->doc .= DOKU_LF;
         }else{
-            $this->endimg = false;
+            $this->endimg = FALSE;
         }
         $this->doc .= DOKU_LF;
     }
@@ -401,7 +401,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$this->code){
             $this->doc .= '\end{center}'.DOKU_LF;
         } else {
-            $this->code = false;
+            $this->code = FALSE;
         }
     }
 
@@ -410,14 +410,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '}';
         }
         if ($this->table){
-/*            if (!empty($this->table_mcolumn)){
-                $this->doc .= '}';
-            }*/
             $this->doc .= '\break ';
-/*            if (!empty($this->table_mcolumn)){
-                $this->doc .= $this->table_mcolumn;
-            }
-*/            
         }else{
             $this->doc .= DOKU_LF.DOKU_LF;   
         }
@@ -461,13 +454,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function monospace_open() {
-        $this->monospace = true;
+        $this->monospace = TRUE;
         $this->doc .= '\texttt{';
     }
 
     function monospace_close() {
         $this->doc .= '}';
-        $this->monospace = false;
+        $this->monospace = FALSE;
     }
 
     function subscript_open() {
@@ -498,13 +491,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * Tables
      */
     function table_open($maxcols = NULL, $numrows = NULL){
-        $this->table = true;
-        $this->tableheader = true;
+        $this->table = TRUE;
+        $this->tableheader = TRUE;
         $this->max_cols = $maxcols;
         $this->col_num = 1;
         $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
-        $this->doc .= '\begin{longtabu}[t]{';
+        $this->doc .= '\begin{longtabu}{';
         for($i=0; $i < $maxcols; $i++){
             $this->doc .= 'X[-1,l] ';
         }
@@ -518,7 +511,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function table_close(){
-        $this->table = false;
+        $this->table = FALSE;
         $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
         $this->doc .= '\hline'.DOKU_LF;
         $this->tableheader_count = 0;
@@ -537,7 +530,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function tablerow_close(){
         if ($this->tableheader_end){ 
             $this->tableheader_count += 1;
-            $this->tableheader = true;
+            $this->tableheader = TRUE;
         }
         if ($this->tableheader_end && $this->tableheader_count === 1){
             $this->doc .= '@IOCHEADEREND@';
@@ -555,22 +548,20 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $this->doc .= '\hline'.DOKU_LF;
             }
         }
-        $this->tableheader_end = false;
+        $this->tableheader_end = FALSE;
     }
 
     function tableheader_open($colspan = 1, $align = NULL, $rowspan = 1){
         $align = 'p{\the\tabucolX * '.$colspan.'}';
         if($this->tableheader){
               $this->doc .= '@IOCHEADERSTART@';
-              $this->tableheader = false;
+              $this->tableheader = FALSE;
         }
         $this->col_colspan = $colspan;
         if ($colspan > 1){
-            $this->table_mcolumn = '\multicolumn{'.$colspan.'}{'.$align.'}{';
-            $this->doc .= $this->table_mcolumn;
+            $this->doc .= '\multicolumn{'.$colspan.'}{'.$align.'}{';
         }else{
-            $this->doc .= '\raggedright';
-            $this->table_mcolumn = '';
+            $this->doc .= '\raggedright ';
         }
         $this->doc .= '\parbox[t]{\linewidth}{\raggedright ';
         $this->formatting = '\textbf{';
@@ -589,25 +580,23 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
            $this->doc .= '& ';
         }
        $this->col_num += $this->col_colspan;
-       $this->tableheader_end = true;
+       $this->tableheader_end = TRUE;
     }
 
     function tablecell_open($colspan = 1, $align = NULL, $rowspan = 1){
         $align = 'p{\the\tabucolX * '.$colspan.'}';
-        $this->tableheader = false;
+        $this->tableheader = FALSE;
         if ($colspan > 1){
-            $this->table_mcolumn = '\multicolumn{'.$colspan.'}{'.$align.'}{';
-            $this->doc .= $this->table_mcolumn;
-        }else{
-            $this->table_mcolumn = '';
+            $this->doc .= '\multicolumn{'.$colspan.'}{'.$align.'}{';
         }
         $this->col_colspan = $colspan;
+        $this->doc .= '\raisebox{-\height}{';
         $this->doc .= '\parbox[t]{\linewidth}{\raggedright ';
     }
 
     function tablecell_close(){
         $col_num_aux = ($this->col_colspan > 1)?$this->col_num + $this->col_colspan:$this->col_num;
-        $this->doc .= '}';//close parbox        
+        $this->doc .= '}}';//close parbox and raisebox   
         if ($this->col_colspan > 1) {
             $col_num_aux--;
             $this->doc .= '} ';//close multicolumn           
@@ -694,11 +683,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function doublequoteopening() {
-        $this->doc .= '"';
+        $this->doc .= "''";
     }
 
     function doublequoteclosing() {
-        $this->doc .= '"';
+        $this->doc .= "''";
     }
 
     function php($text, $wrapper='dummy') {
@@ -779,14 +768,21 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->_latexAddImage($file, $width, $height, $align, $title, $linking);
         }elseif($type === 'appli' && !$_SESSION['u0']){
             if (preg_match('/\.pdf$/', $src)){
+                $_SESSION['qrcode'] = TRUE;
                 $src = $this->_xmlEntities(DOKU_URL.'lib/exe/fetch.php?media='.$src);
+                qrcode_media_url($this, $src, $title, 'pdf');
+                /*
                 $this->doc .= '\begin{mediaurl}{'.$src.'}';
-                $_SESSION['video_url'] = true;
+                $_SESSION['video_url'] = TRUE;
+                $this->doc .= '\parbox[c]{\linewidth}{\raggedright ';                
                 $this->_latexAddImage(DOKU_PLUGIN . 'iocexportl/templates/pdf.png','32',null,null,null,$src);
-                $_SESSION['video_url'] = false;
+                $this->doc .= '}';
+                $_SESSION['video_url'] = FALSE;
                 $this->doc .= '& \hspace{-2mm}';
+                $this->doc .= '\parbox[c]{\linewidth}{\raggedright ';
                 $this->externallink($src, $title);
-                $this->doc .= '\end{mediaurl}';
+                $this->doc .= '}';                
+                $this->doc .= '\end{mediaurl}';*/
             }
         }else{
             if (!$_SESSION['u0']){
@@ -810,7 +806,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 fwrite($tmp_img, $img);
                 fclose($tmp_img);
 				//Add and convert image to pdf
-                $this->_latexAddImage($tmp_name, $width, $height, $align, $title, $linking, true);
+                $this->_latexAddImage($tmp_name, $width, $height, $align, $title, $linking, TRUE);
             }
         }else{
             $this->externallink($src, $title);
@@ -907,7 +903,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function _getLinkTitle($title, $default, & $isImage, $id=null) {
         global $conf;
         
-        $isImage = false;
+        $isImage = FALSE;
         if ( is_null($title) ) {
             if ($conf['useheading'] && $id) {
                 $heading = p_get_first_heading($id);
@@ -919,7 +915,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         } else if ( is_string($title) ) {
             return $this->_latexEntities($title);
         } else if ( is_array($title) ) {
-            $isImage = true;
+            $isImage = TRUE;
             if (isset($title['caption'])) {
                 $title['title'] = $title['caption'];
             } else {
@@ -947,7 +943,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         //Math inline mode    
         }elseif (preg_match('/\$\n?([^\$]+)\n?\$/', $value, $matches)){
             $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '$'.$text.'$', $value, 1);
+            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '$ '.$text.' $', $value, 1);
             return filter_tex_sanitize_formula($value);
         }
         if ($this->monospace){

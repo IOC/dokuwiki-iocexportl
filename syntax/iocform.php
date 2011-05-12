@@ -64,8 +64,8 @@ class syntax_plugin_iocexportl_iocform extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'xhtml') return true;
-        return false; // do nothing -> everything is handled in action component
+        if ($mode !== 'xhtml') return TRUE;
+        return FALSE; // do nothing -> everything is handled in action component
     }
 
 }

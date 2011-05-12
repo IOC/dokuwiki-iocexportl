@@ -86,22 +86,22 @@ class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'iocexportl') return false;
+        if ($mode !== 'iocexportl') return FALSE;
         list ($state, $text, $params) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER : 
 				break;
             case DOKU_LEXER_UNMATCHED :
-                $_SESSION['imgB'] = true;
+                $_SESSION['imgB'] = TRUE;
                 $instructions = get_latex_instructions($text);            
                 $renderer->doc .= '\imgB{';
                 $renderer->doc .= p_latex_render($mode, $instructions, $info);                
                 $renderer->doc .= '}'.DOKU_LF;
-                $_SESSION['imgB'] = false;
+                $_SESSION['imgB'] = FALSE;
                 break;
             case DOKU_LEXER_EXIT : 
                 break;
         }
-        return true;
+        return TRUE;
     }
 }

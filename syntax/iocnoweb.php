@@ -70,8 +70,8 @@ class syntax_plugin_iocexportl_iocnoweb extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $indata) {
-        if ($mode !== 'iocexportl' && $mode !== 'ioccounter') return false;
-        return true;
+        if ($mode !== 'iocexportl' && $mode !== 'ioccounter') return FALSE;
+        return TRUE;
     }        
 
 }

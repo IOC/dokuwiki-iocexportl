@@ -89,7 +89,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
               case DOKU_LEXER_EXIT :
                   break;
             }
-            return true;
+            return TRUE;
         }elseif($mode === 'iocexportl'){
             list($state, $text) = $data;
             switch ($state) {
@@ -107,7 +107,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                   }
                   $instructions = get_latex_instructions($text);
                   $renderer->doc .= p_latex_render($mode, $instructions, $info);              
-                  $_SESSION['quizmode'] = false;
+                  $_SESSION['quizmode'] = FALSE;
                   break;
               case DOKU_LEXER_EXIT :
                   if ($this->class === 'relations'){
@@ -118,9 +118,9 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                   unset($_SESSION['quizsol']);     
                   break;
             }
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
     
     function getsolutions($text){
@@ -186,7 +186,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
           //Sort solutions
           sort($sol);          
           foreach ($aux as $s){
-              $pos = array_search($s, $sol, true);
+              $pos = array_search($s, $sol, TRUE);
               array_push($_SESSION['quizsol'],chr(ord('a')+$pos));
           }
           $text = '\optrelations{'.DOKU_LF;

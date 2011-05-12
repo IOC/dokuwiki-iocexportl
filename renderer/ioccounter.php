@@ -36,7 +36,7 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
      * Make multiple instances of this class
      */
     function isSingleton(){
-        return false;
+        return FALSE;
     }
     
     function reset(){

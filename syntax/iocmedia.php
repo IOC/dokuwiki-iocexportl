@@ -18,8 +18,8 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 
-    var $vimeo = 'http://player.vimeo.com/video/@VIDEO@';
-    var $youtube = 'http://www.youtube.com/watch?v=@VIDEO@';
+    static $vimeo = 'http://player.vimeo.com/video/@VIDEO@';
+    static $youtube = 'http://www.youtube.com/watch?v=@VIDEO@';
 
    /**
     * Get an associative array with plugin info.
@@ -80,27 +80,33 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $indata) {
-        if ($mode !== 'iocexportl') return false;
+        if ($mode !== 'iocexportl') return FALSE;
         list($data, $site, $url, $title) = $indata;
         if ($site === 'imgb'){
-            $_SESSION['imgB'] = true;
+            $_SESSION['imgB'] = TRUE;
             $instructions = get_latex_instructions($data);            
             $renderer->doc .= '\imgB{';
             $renderer->doc .= p_latex_render($mode, $instructions, $info);            
             $renderer->doc .= '}'.DOKU_LF;
-            $_SESSION['imgB'] = false;
+            $_SESSION['imgB'] = FALSE;
         }elseif($site === 'vimeo' || $site === 'youtube'){
-            $_SESSION['qrcode'] = true;
-            $type = ($site === 'vimeo')?$this->vimeo:$this->youtube;
+            $_SESSION['qrcode'] = TRUE;
+            $type = ($site === 'vimeo')?self::$vimeo:self::$youtube;
             $data = preg_replace('/@VIDEO@/', $url, $type);
+            qrcode_media_url($renderer, $data, $title, $site);
+            /*
             $renderer->doc .= '\begin{mediaurl}{'.$renderer->_xmlEntities($data).'}';
-            $_SESSION['video_url'] = true;
+            $_SESSION['video_url'] = TRUE;
+            $this->doc .= '\parbox[c]{\linewidth}{\raggedright ';                   
             $renderer->_latexAddImage(DOKU_PLUGIN . 'iocexportl/templates/'.$site.'.png','32',null,null,null,$data);
-            $_SESSION['video_url'] = false;
+            $this->doc .= '}';
+            $_SESSION['video_url'] = FALSE;
             $renderer->doc .= '& \hspace{-2mm}';
+            $this->doc .= '\parbox[c]{\linewidth}{\raggedright ';            
             $renderer->externallink($data,$title);
-            $renderer->doc .= '\end{mediaurl}';
+            $this->doc .= '}';
+            $renderer->doc .= '\end{mediaurl}';*/
         }
-        return true;
+        return TRUE;
     }
 }

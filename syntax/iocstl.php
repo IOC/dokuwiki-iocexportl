@@ -98,7 +98,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
               case DOKU_LEXER_EXIT :
                   break;
             }
-            return true;
+            return TRUE;
         }elseif($mode === 'iocexportl'){
             list($state, $data) = $indata;
             switch ($state) {
@@ -118,29 +118,38 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                         $matches = array();
                         preg_match('/^\n?(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
+                        if (empty($title)){
+                            $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
+                        }else{
+                            $title = $renderer->_xmlEntities($title);
+                        }
                         $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textB{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';
+                        $renderer->doc .= '\textB{'.$title.'}{'.$this->_parse($data, $mode).'}';
                     }elseif($this->tipus === 'notaBreu' || $this->tipus === 'crida'){ 
                         $renderer->doc .= '\notaBreu{'.$this->_parse($data, $mode).'}';
                     }elseif($this->tipus === 'imgB'){
-                        $renderer->doc .= '\bfseries{$data}';
-                        $renderer->doc .= '\textB{IMATGE B}{'.($this->_parse('{{'.$data.'}}', $mode)).'}{0mm}';
+                        $renderer->doc .= '\textB{IMATGE B}{'.($this->_parse('{{'.$data.'}}', $mode)).'}';
                     }elseif($this->tipus === 'textD'){
                         $matches = array();
                         preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
                         $title = $this->_parse($matches[1], $mode);
+                        if (empty($title)){
+                            $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
+                        }else{
+                            $title = $renderer->_xmlEntities($title);
+                        }
                         $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textD{'.$renderer->_xmlEntities($title).'}{'.$this->_parse($data, $mode).'}{0mm}';                        
+                        $renderer->doc .= '\textD{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';                        
                     }elseif($this->tipus === 'textG' || $this->tipus === 'textE'){
                         $matches = array();
-                        preg_match('/^\n+(.*?)\n+/', $data, $matches);
+                        preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
                         $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
                         if (empty($title)){
                             $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
                         }else{
                             $title = $renderer->_xmlEntities($title);
                         }
-                        $data = preg_replace('/^\n+(.*?)\n+/', '', $data);
+                        $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
                         $renderer->doc .= '\textX{'.$title.'}{'.$this->_parse($data, $mode).'}';
                     }else{
                         $renderer->doc .= $this->_parse($data, $mode);
@@ -152,17 +161,17 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                     $this->tipus = '';
                     break;
             }
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 
     function _parse($text, $mode){
         $info = array();
-        $_SESSION['iocstl'] = true;
+        $_SESSION['iocstl'] = TRUE;
         $instructions = get_latex_instructions($text);
         $text = p_latex_render($mode, $instructions, $info);        
-        $_SESSION['iocstl'] = false;
+        $_SESSION['iocstl'] = FALSE;
         return preg_replace('/\n\n/', '', $text);
     }
 }

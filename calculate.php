@@ -13,7 +13,7 @@ require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 $id = getID(); 
-if (!checkPerms()) return false;
+if (!checkPerms()) return FALSE;
  $path = wikiFN($id);
  session_start();
  countCharacters($path);

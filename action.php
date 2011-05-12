@@ -15,7 +15,7 @@ require_once(DOKU_PLUGIN.'action.php');
 
 class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
-    var $exportallowed = false;
+    var $exportallowed = FALSE;
     var $id = '';
 
     function register(&$controller) {
@@ -33,15 +33,15 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
 		$this->id = getID();
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->isExportPage()) return false;
-        if ($event->data != 'show') return false;
-        if (!$INFO['writable']) return false;
-        if (!$this->checkPerms()) return false;
+        if (!$this->isExportPage()) return FALSE;
+        if ($event->data != 'show') return FALSE;
+        if (!$INFO['writable']) return FALSE;
+        if (!$this->checkPerms()) return FALSE;
         //Always admin can export
         if ($this->exportallowed || auth_isadmin()){
 	        echo $this->getform();
         }
-        return true;
+        return TRUE;
     }
 
     function counter(&$event) {
@@ -136,7 +136,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 'close'  => ':',
                                 ),                                
                         ),
-            'block'  => true,
+            'block'  => TRUE,
         );
     }
 }

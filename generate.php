@@ -50,7 +50,7 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     }
     if (!file_exists(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx')){
         session_destroy();
-        return false;                
+        return FALSE;                
     }
     //get all pages and activitites
     $data = getData();
@@ -149,7 +149,6 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $img_src;
         
         $name_length = 30;
-        $credit_length = 61;
         $pos_credit = 21.4;
         if ($unitzero){
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
@@ -164,26 +163,18 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             copy(DOKU_PLUGIN.'iocexportl/templates/'.$img_src[$family], DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media/'.$img_src[$family]);
             $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$img_src[$family], $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
+            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);
             $size = strlen(trim($data[1]['nomcomplert']));
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
-            if (strlen(trim($data[1]['creditnom'])) > $credit_length){
-                $inc = 0;
-            }else{
-                $inc = 0.3;
-            }
-            $latex = preg_replace('/@IOC_EXPORT_POS_CICLENOM@/', '1cm,'.strval($pos_credit + $inc).'cm', $latex, 1);
+            $latex = preg_replace('/@IOC_EXPORT_POS_CICLENOM@/', '1cm,'.$pos_credit.'cm', $latex, 1);
             $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $data[1]['ciclenom'], $latex);
         }else{
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx');
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
+            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);            
             $size = strlen(trim($data[1]['nomcomplert']));
             $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', $data[1]['autor'], $latex, 1);
-            if (strlen(trim($data[1]['creditnom'])) > $credit_length){
-                $inc = 0;
-            }else{
-                $inc = 0.3;
-            }
-            $latex = preg_replace('/@IOC_EXPORT_POS_CREDITNOM@/', '1cm,'.strval($pos_credit + $inc).'cm', $latex, 1);
+            $latex = preg_replace('/@IOC_EXPORT_POS_CREDITNOM@/', '1cm,'.$pos_credit.'cm', $latex, 1);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditnom'], $latex);
         }
     }
@@ -210,7 +201,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         }
         if ($result !== 0){
-            showLogError($path, $filename);
+            getLogError($path, $filename);
         }else{
             returnData($path, $filename.'.pdf', 'pdf');
         }
@@ -242,6 +233,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 mkdir($conf['mediadir'].'/'.$dest, 0755, TRUE);
             }
             $filename_dest = (auth_isadmin())?$filename:basename($filename, '.'.$type).'_draft.'.$type;
+            //Replace log extension to txt, that allow navigators open this file
+            if ($type === 'log'){
+                $filename_dest = preg_replace('/\.log$/', '.txt', $filename_dest, 1);
+            }
             copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename_dest);                
             $dest = preg_replace('/\//', ':', $dest);
             $time_end = microtime(TRUE);
@@ -278,7 +273,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $zip->close();
             returnData($path, $filename.'.zip', 'zip');
         }else{
-            showLogError($filename);
+            getLogError($filename);
         }
     }
 
@@ -288,7 +283,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $path
      * @param string $filename
      */
-    function showLogError($path, $filename){
+    function getLogError($path, $filename){
         global $tmp_dir;
         global $conf;
         $output = array();
@@ -398,7 +393,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             if (@file_exists($file)) {
                 $matches = array();
                 $txt =  io_readFile($file);
-                preg_match_all('/(?<=\={5} toc \={5})\n+(\s{2,4}\*\s\[\[.*?\]\]\n?)+/i', $txt, $matches);
+                preg_match_all('/(?<=\={5} toc \={5})\n+(\s{2,4}\*\s+\[\[.*?\]\]\n?)+/i', $txt, $matches);
                 $pages = implode('\n', $matches[0]);
                 //get exercises and activities
                 $pages = getActivities($data, $pages);
@@ -448,17 +443,17 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $matches = array();
         $data['activities'] = array();
         //return all pages with activities
-        preg_match_all('/\s{2}\*\s\[\[.*?\]\]\n(\s{4}\*\s\[\[.*?\]\]\n?)+/', $pages, $matches);
+        preg_match_all('/\s{2}\*\s+\[\[.*?\]\]\n(\s{4}\*\s+\[\[.*?\]\]\n?)+/', $pages, $matches);
         foreach ($matches[0] as $match){
             //return page namespace
-            preg_match('/\s{2}\*\s\[\[([^|]+).*?\]\]/', $match, $ret);
+            preg_match('/\s{2}\*\s+\[\[([^|]+).*?\]\]/', $match, $ret);
             if (!isset($ret[1])){
                 continue;
             }else{
                 $masterid = $ret[1];
                 resolve_pageid(getNS($id),$masterid,$exists);
                 //return all activities for active page
-                preg_match_all('/\s{4}\*\s\[\[([^|]+).*?\]\]/', $match, $ret);
+                preg_match_all('/\s{4}\*\s+\[\[([^|]+).*?\]\]/', $match, $ret);
                 foreach ($ret[1] as $r){
                     if (!isset($data['activities'][$masterid])){
                         $data['activities'][$masterid] = array();
@@ -468,7 +463,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
         }
         //remove activities and exercises
-        $pages = preg_replace('/    \*\s\[\[.*?\]\]\n?/', '', $pages);
+        $pages = preg_replace('/    \*\s+\[\[.*?\]\]\n?/', '', $pages);
         return $pages;
     }
     

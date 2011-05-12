@@ -85,7 +85,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
     * output
     */
     function render($mode, &$renderer, $indata) {
-        if ($mode !== 'iocexportl') return false;
+        if ($mode !== 'iocexportl') return FALSE;
         list($state, $data) = $indata;
         switch ($state) {
           case DOKU_LEXER_ENTER :
@@ -136,15 +136,15 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                 $this->tipus = '';
                 break;
         }
-        return true;
+        return TRUE;
     }
 
     function _parse($text, $mode){
         $info = array();
-        $_SESSION['iocstl'] = true;
+        $_SESSION['iocstl'] = TRUE;
         $instructions = get_latex_instructions($text);
         $text = p_latex_render($mode, $instructions, $info);
-        $_SESSION['iocstl'] = false;
+        $_SESSION['iocstl'] = FALSE;
         return preg_replace('/\n\n/', '', $text);
     }
 }

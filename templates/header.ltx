@@ -27,6 +27,7 @@
 \usepackage{listings}%Code environment
 \usepackage{dashrule}%Customized rules
 \usepackage{paralist}%Used to show quiz solutions
+\usepackage{marginfix}%Used to avoid marginpars overlapping
 @IOCQRCODE@ %qrcodes
 
 % ***************** CUSTOMIZED COMMANDS *****************
@@ -51,11 +52,12 @@
 		}
 	\end{flushleft}
 }
-\newcommand{\textB}[3]{
-	\marginnote{
+\newcommand{\textB}[2]{
+	\marginpar{
 			\begin{minipage}{\marginparwidth-4mm}
 				\centering
 				\parbox[c]{0.90\marginparwidth}{
+					\marginspacingline
 					\fontfamily{phv}
 					\selectfont
 					\small
@@ -67,38 +69,9 @@
 						#2
 				}
 			\end{minipage}
-	}[#3]
+	}
 }
 
-\newcommand{\textBold}[3]{
-	\begin{center}
-		#3 %used to insert \pagebreak
-		\par
-		\marginpar{
-			\vspace{\marginparsep}
-			\parbox{\marginparwidth}{
-				\titleB
-				#1
-				\normalsize
-			}
-		}
-		\begin{minipage}{0.9\textwidth}
-			\colorbox{colbodyB}{
-				\centering
-				\parbox{0.95\textwidth}{
-					\centering
-					\vspace*{2mm}
-					\parbox[c]{0.85\textwidth}{
-						\bodyB
-						#2
-						\normalfont
-					}
-					\vspace*{2mm}
-				}
-			}
-		\end{minipage}
-	\end{center}
-}
 \newcommand{\textX}[2]{
 	\begin{center}
 		\par
@@ -123,54 +96,44 @@
 }
 \newcommand{\notaBreu}[1]{
 	\marginpar{
-		\fcolorbox{black}{colbodyB}{
-			\begin{minipage}{\marginparwidth-4mm}
-				\vspace*{2mm}
-		        \centering
-				\parbox[c]{0.90\marginparwidth}{
-					\raggedright
-		        	\fontfamily{phv}
-					\selectfont{
-						\small{#1}
-					}
-				}
-				\vspace*{2mm}
-			\end{minipage}
+		\parbox[c]{0.95\marginparwidth}{
+			\rule{\marginparwidth}{.2mm}
+	        \flushleft
+			\marginspacingline
+        	\fontfamily{phv}
+			\selectfont
+			\vspace*{-2mm}
+			\small{#1}
+			\defaultspacingline
+			\rule{\marginparwidth}{.2mm}
 		}
 	}
 }
 \newcommand{\textD}[3]{
 	\marginnote{
-		\colorbox{colheadB}{
-			\begin{minipage}[c]{\marginparwidth-4mm}\vspace*{2mm}
-				\centering
-				\parbox[c]{0.90\marginparwidth}{
-					\fontfamily{phv}
-					\selectfont
-					\small
-					\raggedright
-					\bfseries
-					\textcolor{white}{
-						#1
-						\vspace*{2mm}
-					}
-				}
-			\end{minipage}
-		}
-		\\
-		\colorbox{colbodyB}{
-			\begin{minipage}{\marginparwidth-4mm}\vspace*{2mm}
-				\centering
-				\parbox[c]{0.90\marginparwidth}{
-					\fontfamily{phv}
-					\selectfont
-					\small
-					\raggedright
-						#2
-					\vspace*{2mm}
-				}
-			\end{minipage}
-		}
+		\marginspacingline
+		\rule[-2mm]{\marginparwidth}{.2mm}
+		\begin{minipage}{\marginparwidth-4mm}
+			\flushleft
+			\fontfamily{phv}
+			\selectfont
+			\small
+			\textbf{#1}
+		\end{minipage}
+		\begin{minipage}{\marginparwidth-4mm}\vspace*{1mm}
+			\rule{\marginparwidth}{.2mm}\vspace*{1mm}
+			\centering
+			\parbox[c]{0.90\marginparwidth}{
+				\fontfamily{phv}
+				\selectfont
+				\small
+				\raggedright
+					#2
+				\vspace*{1mm}
+			}
+		\end{minipage}
+		\rule{\marginparwidth}{.2mm}
+		\defaultspacingline
 	}[#3]
 }
 \newcommand{\imgB}[1]{
@@ -199,6 +162,15 @@
 \newcommand{\creditspacingline}{
 \renewcommand{\baselinestretch}{1.3}
 }
+
+\newcommand{\marginspacingline}{
+\renewcommand{\baselinestretch}{.9}
+}
+
+\newcommand{\headerspacingline}{
+\renewcommand{\baselinestretch}{.2}
+}
+
 \newcommand{\frontpageparskip}{
 \setlength{\parskip}{2ex}
 }
@@ -252,7 +224,7 @@
 			 \end{pspicture}
 		}
 		\begin{minipage}[c][30mm]{\textwidth}
-		\begin{tabular}[h]{b{32px}p{\textwidth}}
+		\begin{tabular}[h]{m{32px}m{\textwidth}}
 	}
 	{
 		\end{tabular}\\
@@ -338,7 +310,7 @@
 \pagestyle{fancy}
 \lhead{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_CREDIT@}}}
 \chead{}%no page number in toc page
-\rhead{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT@}}}
+\rhead{\headerspacingline\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT_H@}}}
 \lfoot{}
 \cfoot{}
 \rfoot{}
@@ -348,12 +320,12 @@
 	\fancyhf{}
 	\fancyhead[LO]{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_CREDIT@}}}
 	\fancyhead[CO]{}%no page number in toc page
-	\fancyhead[RO]{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT@}}}
+	\fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT_H@}}}
 	\fancyfoot[RO]{}
 }
 
-\setlength{\headheight}{13.6pt}
-
+%Header height
+\setlength{\headheight}{15.04pt}
 
 \definecolor{lightgray}{gray}{0.8}
 \definecolor{hardgray}{gray}{0.6}
@@ -377,5 +349,5 @@
 \setlength{\tabulinesep}{0.5mm}
 
 %change characters
-\DeclareUnicodeCharacter{2022}{·}%•
+%\DeclareUnicodeCharacter{2022}{·}%•
 

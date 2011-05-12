@@ -70,7 +70,7 @@ class syntax_plugin_iocexportl_iocgroc extends DokuWiki_Syntax_Plugin {
      * Create output
      */
     function render($mode, &$renderer, $data) {
-        if ($mode !== 'iocexportl' && $mode !== 'ioccounter') return false;
+        if ($mode !== 'iocexportl' && $mode !== 'ioccounter') return FALSE;
         list ($state, $text) = $data;
         switch ($state) {
             case DOKU_LEXER_ENTER :
@@ -82,6 +82,6 @@ class syntax_plugin_iocexportl_iocgroc extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_EXIT :
                 break;
         }
-        return true;
+        return TRUE;
     }
 }

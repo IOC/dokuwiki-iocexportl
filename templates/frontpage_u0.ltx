@@ -13,7 +13,7 @@
 \begin{textblock*}{20mm}(16.2cm,-1.35cm)
 	\includegraphics[height=21mm,width=21mm]{@IOC_EXPORT_IMGFAMILIA@}
 \end{textblock*}
-\begin{textblock*}{140mm}(1cm,11cm)
+\begin{textblock*}{145mm}(1cm,11cm)
 	\raggedright\noindent\fontfamily{phv}\selectfont
 	\Huge
 	@IOC_EXPORT_NOMCOMPLERT@\\
@@ -21,10 +21,12 @@
 	\Large 
 	@IOC_EXPORT_CREDIT@
 \end{textblock*}
-\begin{textblock*}{140mm}(@IOC_EXPORT_POS_CICLENOM@)
-	\raggedright\noindent\fontfamily{phv}\selectfont
-	\huge\bfseries
-	\textcolor{white}{@IOC_EXPORT_CICLENOM@}
+\begin{textblock*}{145mm}(@IOC_EXPORT_POS_CICLENOM@)
+	\parbox[c][10mm]{145mm}{
+		\raggedright\noindent\fontfamily{phv}\selectfont
+		\huge\bfseries
+		\textcolor{white}{@IOC_EXPORT_CICLENOM@}
+	}
 \end{textblock*}
 \end{spacing}
 \hyphenpenalty=1000
@@ -34,7 +36,7 @@
 	\fancyhf{}
 	\fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
 	\fancyhead[CO]{\fontfamily{phv}\selectfont\tiny\thepage}
-	\fancyhead[RO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT@}
+	\fancyhead[RO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
 	\fancyfoot[RO]{}
 }
 \chead{\fontfamily{phv}\selectfont{\tiny{\thepage}}}

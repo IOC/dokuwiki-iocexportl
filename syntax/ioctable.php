@@ -101,7 +101,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_EXIT : 
                     break;
             }
-            return true;
+            return TRUE;
         }elseif ($mode === 'iocexportl'){
             list ($state, $text, $title, $params) = $data;
             switch ($state) {
@@ -118,8 +118,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_EXIT : 
                     break;
             }
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 }

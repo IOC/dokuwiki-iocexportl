@@ -31,6 +31,27 @@ static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','
     
     /**
      * 
+     * Prints media url and generate a valid qrcode
+     * @param string $url
+     * @param string $title
+     * @param string $type
+     */
+    function qrcode_media_url(&$renderer, $url, $title, $type){
+        $renderer->doc .= '\begin{mediaurl}{'.$url.'}';
+        $_SESSION['video_url'] = TRUE;
+        $renderer->doc .= '\parbox[c]{\linewidth}{\raggedright ';                
+        $renderer->_latexAddImage(DOKU_PLUGIN . 'iocexportl/templates/'.$type.'.png','32',null,null,null,$url);
+        $renderer->doc .= '}';
+        $_SESSION['video_url'] = FALSE;
+        $renderer->doc .= '& \hspace{-2mm}';
+        $renderer->doc .= '\parbox[c]{\linewidth}{\raggedright ';            
+        $renderer->externallink($url, $title);
+        $renderer->doc .= '}';
+        $renderer->doc .= '\end{mediaurl}';
+    }
+    
+    /**
+     * 
      * Convert a text into instructions
      * @param string $text
      */
@@ -159,7 +180,7 @@ static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','
     function getPlugins(&$plugins){
         $dir = 'iocexportl/syntax';
         if ($dp = @opendir(DOKU_PLUGIN."$dir/")) {
-            while (false !== ($component = readdir($dp))) {
+            while (FALSE !== ($component = readdir($dp))) {
                 if (substr($component,0,1) == '.' || strtolower(substr($component, -4)) != ".php") continue;
                 if (is_file(DOKU_PLUGIN."$dir/$component")) {
                     array_push($plugins,substr($component, 0, -4));
