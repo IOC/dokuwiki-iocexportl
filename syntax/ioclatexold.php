@@ -3,7 +3,7 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
- 
+
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -23,7 +23,7 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
+
     /**
      * What kind of syntax are we?
      */
@@ -52,11 +52,11 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
     function connectTo($mode) {
         $this->Lexer->addEntryPattern('<latex.*?>(?=.*?</latex>)', $mode, 'plugin_iocexportl_ioclatexold');
     }
-    
+
     function postConnect() {
         $this->Lexer->addExitPattern('</latex>', 'plugin_iocexportl_ioclatexold');
     }
-    
+
     /**
      * Handle the match
      */
@@ -70,7 +70,7 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         global $symbols;
-        
+
         if ($mode === 'ioccounter'){
             list ($state, $text) = $data;
             switch ($state) {
@@ -86,7 +86,7 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
         }elseif ($mode === 'iocexportl'){
             list ($state, $text) = $data;
             switch ($state) {
-                case DOKU_LEXER_ENTER : 
+                case DOKU_LEXER_ENTER :
                     $renderer->doc .= ' \begin{center}'. DOKU_LF;
                     $renderer->doc .= '\begin{math}';
                     break;
@@ -97,7 +97,7 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
     				$text = clean_reserved_symbols($text);
                     $renderer->doc .= filter_tex_sanitize_formula($text);
                     break;
-                case DOKU_LEXER_EXIT : 
+                case DOKU_LEXER_EXIT :
                     $renderer->doc .= '\end{math} '. DOKU_LF;
                     $renderer->doc .= '\end{center}' . DOKU_LF.DOKU_LF;
                     break;

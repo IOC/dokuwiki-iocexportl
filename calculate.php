@@ -8,19 +8,19 @@
 
 if (!defined('DOKU_INC')) define('DOKU_INC',dirname(__FILE__).'/../../../');
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-                    
+
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-$id = getID(); 
+$id = getID();
 if (!checkPerms()) return FALSE;
  $path = wikiFN($id);
  session_start();
  countCharacters($path);
  session_destroy();
-    
+
     /**
-    * 
+    *
     * Count characters for the path indicated
     * @param string $path
     */
@@ -49,10 +49,10 @@ if (!checkPerms()) return FALSE;
         }
         echo json_encode($result);
     }
-    
+
     /**
-     * 
-     * Check whether user has right acces level 
+     *
+     * Check whether user has right acces level
      */
     function checkPerms() {
         global $id;

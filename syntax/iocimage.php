@@ -3,7 +3,7 @@
  * Image Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
- 
+
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -11,7 +11,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 
 class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
-    
+
     /**
      * return some info
      */
@@ -25,7 +25,7 @@ class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
+
     /**
      * What kind of syntax are we?
      */
@@ -46,18 +46,18 @@ class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
     function getSort(){
         return 513;
     }
-    
+
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
         $this->Lexer->addEntryPattern('::image:\n(?=.*?\n:::)', $mode, 'plugin_iocexportl_iocimage');
     }
-    
+
     function postConnect() {
         $this->Lexer->addExitPattern('\n:::', 'plugin_iocexportl_iocimage');
     }
-    
+
     /**
      * Handle the match
      */
@@ -67,7 +67,7 @@ class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
 		$id = '';
 		$params = array();
         switch ($state) {
-            case DOKU_LEXER_ENTER : 
+            case DOKU_LEXER_ENTER :
                 break;
             case DOKU_LEXER_UNMATCHED :
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
@@ -76,7 +76,7 @@ class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
                 }
                 $match = preg_replace('/\s{2}:\w+:.*?\n/', '',  $match);
                 break;
-            case DOKU_LEXER_EXIT : 
+            case DOKU_LEXER_EXIT :
                 break;
         }
         return array($state, $match, $params);
@@ -89,17 +89,17 @@ class syntax_plugin_iocexportl_iocimage extends DokuWiki_Syntax_Plugin {
         if ($mode !== 'iocexportl') return FALSE;
         list ($state, $text, $params) = $data;
         switch ($state) {
-            case DOKU_LEXER_ENTER : 
+            case DOKU_LEXER_ENTER :
 				break;
             case DOKU_LEXER_UNMATCHED :
                 $_SESSION['imgB'] = TRUE;
-                $instructions = get_latex_instructions($text);            
+                $instructions = get_latex_instructions($text);
                 $renderer->doc .= '\imgB{';
-                $renderer->doc .= p_latex_render($mode, $instructions, $info);                
+                $renderer->doc .= p_latex_render($mode, $instructions, $info);
                 $renderer->doc .= '}'.DOKU_LF;
                 $_SESSION['imgB'] = FALSE;
                 break;
-            case DOKU_LEXER_EXIT : 
+            case DOKU_LEXER_EXIT :
                 break;
         }
         return TRUE;

@@ -26,7 +26,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
     }
-    
+
     function showform(&$event){
 	    global $conf;
         global $INFO;
@@ -50,14 +50,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
     }
 
-   
+
     function showcounts(){
         global $conf;
         $this->id = getID();
         $counter = (isset($conf['plugin']['iocexportl']['counter']) && $conf['plugin']['iocexportl']['counter']);
         return $counter && preg_match('/:(pdfindex|htmlindex)$/', $this->id, $matches);
     }
-    
+
     function checkPerms() {
         global $ID;
         global $USERINFO;
@@ -68,9 +68,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         // AUTH_ADMIN, AUTH_READ,AUTH_EDIT,AUTH_CREATE,AUTH_UPLOAD,AUTH_DELETE
         return ($aclLevel >=  AUTH_UPLOAD);
       }
-    
+
     function isExportPage(){
-        return preg_match('/:pdfindex$/', $this->id, $matches);        
+        return preg_match('/:pdfindex$/', $this->id, $matches);
     }
 
     function getform(){
@@ -92,10 +92,10 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 	    $ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
         return $ret;
     }
-    
+
     /**
      * Inserts the toolbar button
-     */    
+     */
     function ioctoolbar_buttons(& $event, $param) {
         $event->data[] = array (
             'type'   => 'picker',
@@ -118,7 +118,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 'key'    => '2',
                                 'open'   => ':figure:',
                                 'close'  => ':',
-                                ),                                
+                                ),
                            array(
                                 'type'   => 'format',
                                 'title'  => $this->getLang('table_btn'),
@@ -134,7 +134,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 'key'    => '4',
                                 'open'   => ':table:',
                                 'close'  => ':',
-                                ),                                
+                                ),
                         ),
             'block'  => TRUE,
         );

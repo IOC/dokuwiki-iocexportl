@@ -3,7 +3,7 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
- 
+
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -23,7 +23,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
+
     /**
      * What kind of syntax are we?
      */
@@ -52,11 +52,11 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
     function connectTo($mode) {
         $this->Lexer->addEntryPattern('\$\$\n?(?=.*?\n?\$\$)', $mode, 'plugin_iocexportl_ioclatex');
     }
-    
+
     function postConnect() {
         $this->Lexer->addExitPattern('\$\$', 'plugin_iocexportl_ioclatex');
     }
-    
+
     /**
      * Handle the match
      */
@@ -94,7 +94,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
     				$text = preg_replace('/\\\\\\\\/', '\\\\break', $text);
                     $renderer->doc .= filter_tex_sanitize_formula($text);
                     break;
-                case DOKU_LEXER_EXIT : 
+                case DOKU_LEXER_EXIT :
                     $renderer->doc .= '\end{math} '. DOKU_LF;
                     $renderer->doc .= '\end{center}' . DOKU_LF.DOKU_LF;
                     break;

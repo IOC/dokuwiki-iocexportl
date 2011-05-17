@@ -14,8 +14,8 @@ require_once DOKU_INC.'inc/parser/renderer.php';
  * The Renderer
  */
 class renderer_plugin_ioccounter extends Doku_Renderer {
-    
-	// Tag verd content 
+
+	// Tag verd content
     var $verd = '';
 
     /**
@@ -38,12 +38,12 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
     function isSingleton(){
         return FALSE;
     }
-    
+
     function reset(){
         $this->doc = '';
         $this->verd = '';
     }
-    
+
     /**
      * Initialize the rendering
      */
@@ -65,9 +65,9 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
         $this->doc = preg_replace('/ {2,}/',' ',$this->doc);//Replace two or more spaces for one
         $this->doc = preg_replace('/ $/','',$this->doc);//Remove last space
     }
-    
+
     function smiley($smiley) {}
-      
+
     function render_TOC() { return ''; }
 
     function toc_additem($id, $text, $level) {}
@@ -185,7 +185,7 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
     function php($text, $wrapper='dummy') {
         $this->doc .= $text;
     }
-    
+
     function phpblock($text) {
         $this->doc .= $text;
     }
@@ -193,7 +193,7 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
     function html($text, $wrapper='dummy') {
         $this->doc .= $text;
     }
-    
+
     function htmlblock($text) {
         $this->doc .= $text;
     }
@@ -234,12 +234,12 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
     }
 
     function locallink($hash, $name = NULL){}
-    
+
     function interwikilink($match, $name = NULL, $wikiName, $wikiUri) {}
-    
+
     function windowssharelink($url, $name = NULL) {}
-    
+
     function emaillink($address, $name = NULL) {}
-    
+
     function rss ($url,$params){}
 }

@@ -3,18 +3,18 @@
  * Plugin iocstl : add a IOC class to a content
  *
  * Syntax: <iocstl textStyle>content</iocstl>
- * 
+ *
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @version    27/01/2011
  */
- 
+
 if(!defined('DOKU_INC')) die();
- 
+
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
- 
+
 
 class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
 
@@ -33,23 +33,23 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
-    function getType(){ 
-        return 'container'; 
+
+    function getType(){
+        return 'container';
     }
-    
-    function getPType(){ 
-        return 'block'; 
+
+    function getPType(){
+        return 'block';
     } //stack, block, normal
-    
-    function getSort(){ 
-        return 514; 
+
+    function getSort(){
+        return 514;
     }
-    
+
     function getAllowedTypes(){
        return array('container');
     }
- 
+
     /**
      * Connect pattern to lexer
      */
@@ -59,7 +59,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
     function postConnect() {
         $this->Lexer->addExitPattern('</iocstl>','plugin_iocexportl_iocstl');
     }
- 
+
     /**
      * Handle the match
      */
@@ -73,10 +73,10 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                 $opt['class'] = $class;
                 if (!empty($nump)) $opt['nump'] = $nump;
                 return array($state, $opt);
-            
+
             case DOKU_LEXER_UNMATCHED :
                 return array($state, $match);
-            
+
             default:
                 return array($state);
         }
@@ -104,9 +104,9 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
             switch ($state) {
               case DOKU_LEXER_ENTER :
                     $class = '';
-                    if(!empty($data['class'])){ 
+                    if(!empty($data['class'])){
                         $class = $data['class'];
-                    } 
+                    }
                     //avoid hyphenation
                     $renderer->doc .= '\hyphenpenalty=100000'.DOKU_LF;
                     $this->tipus = $class;
@@ -125,7 +125,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                         }
                         $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
                         $renderer->doc .= '\textB{'.$title.'}{'.$this->_parse($data, $mode).'}';
-                    }elseif($this->tipus === 'notaBreu' || $this->tipus === 'crida'){ 
+                    }elseif($this->tipus === 'notaBreu' || $this->tipus === 'crida'){
                         $renderer->doc .= '\notaBreu{'.$this->_parse($data, $mode).'}';
                     }elseif($this->tipus === 'imgB'){
                         $renderer->doc .= '\textB{IMATGE B}{'.($this->_parse('{{'.$data.'}}', $mode)).'}';
@@ -139,7 +139,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
                             $title = $renderer->_xmlEntities($title);
                         }
                         $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
-                        $renderer->doc .= '\textD{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';                        
+                        $renderer->doc .= '\textD{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';
                     }elseif($this->tipus === 'textG' || $this->tipus === 'textE'){
                         $matches = array();
                         preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
@@ -170,7 +170,7 @@ class syntax_plugin_iocexportl_iocstl extends DokuWiki_Syntax_Plugin {
         $info = array();
         $_SESSION['iocstl'] = TRUE;
         $instructions = get_latex_instructions($text);
-        $text = p_latex_render($mode, $instructions, $info);        
+        $text = p_latex_render($mode, $instructions, $info);
         $_SESSION['iocstl'] = FALSE;
         return preg_replace('/\n\n/', '', $text);
     }

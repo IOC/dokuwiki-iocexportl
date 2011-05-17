@@ -1,11 +1,11 @@
 <?php
 /**
  * Nota tag Syntax Plugin
- * 
+ *
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
- 
+
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -25,7 +25,7 @@ class syntax_plugin_iocexportl_iocnota extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
+
     /**
      * What kind of syntax are we?
      */
@@ -54,11 +54,11 @@ class syntax_plugin_iocexportl_iocnota extends DokuWiki_Syntax_Plugin {
     function connectTo($mode) {
         $this->Lexer->addEntryPattern('<nota.*?>(?=.*?</nota>)', $mode, 'plugin_iocexportl_iocnota');
     }
-    
+
     function postConnect() {
         $this->Lexer->addExitPattern('</nota>', 'plugin_iocexportl_iocnota');
     }
-    
+
     /**
      * Handle the match
      */

@@ -3,7 +3,7 @@
  * Latex Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
  */
- 
+
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -25,7 +25,7 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
+
     /**
      * What kind of syntax are we?
      */
@@ -46,23 +46,23 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
     function getSort(){
         return 513;
     }
-    
+
     function getAllowedTypes(){
         return array('baseonly');
     }
-    
-    
+
+
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
         $this->Lexer->addEntryPattern('<verd>(?=.*?</verd>)', $mode, 'plugin_iocexportl_iocverd');
     }
-    
+
     function postConnect() {
         $this->Lexer->addExitPattern('</verd>', 'plugin_iocexportl_iocverd');
     }
-    
+
     /**
      * Handle the match
      */
@@ -95,7 +95,7 @@ class syntax_plugin_iocexportl_iocverd extends DokuWiki_Syntax_Plugin {
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
-                    $renderer->doc .= p_latex_render($mode, $instructions, $info);                
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
                     break;

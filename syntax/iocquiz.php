@@ -5,12 +5,12 @@
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
- 
+
 if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
- 
+
 
 class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
 
@@ -28,19 +28,19 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
-    function getType(){ 
-        return 'container'; 
+
+    function getType(){
+        return 'container';
     }
-    
-    function getPType(){ 
-        return 'block'; 
+
+    function getPType(){
+        return 'block';
     } //stack, block, normal
-    
-    function getSort(){ 
-        return 514; 
+
+    function getSort(){
+        return 514;
     }
-    
+
     function getAllowedTypes(){
        return array('container');
     }
@@ -53,7 +53,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
     function postConnect() {
         $this->Lexer->addExitPattern('</quiz>','plugin_iocexportl_iocquiz');
     }
- 
+
     /**
      * Handle the match
      */
@@ -64,10 +64,10 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_ENTER :
                 $class = trim(substr($match,5,-1));
                 return array($state, $class);
-            
+
             case DOKU_LEXER_UNMATCHED :
                 return array($state, $match);
-            
+
             default:
                 return array($state);
         }
@@ -100,13 +100,13 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                   //convert unnumered lists to numbered
                   $_SESSION['quizmode'] = $this->class;
                   if ($this->class !== 'complete' && $this->class !== 'relations'){
-                     $text = $this->getsolutions($text);     
+                     $text = $this->getsolutions($text);
                   }
                   if ($this->class === 'relations'){
                       $text = preg_replace('/(\n)(\n  \*)/', '$1'.DOKU_LF.'@IOCRELATIONS@'.DOKU_LF.'$2', $text, 1);
                   }
                   $instructions = get_latex_instructions($text);
-                  $renderer->doc .= p_latex_render($mode, $instructions, $info);              
+                  $renderer->doc .= p_latex_render($mode, $instructions, $info);
                   $_SESSION['quizmode'] = FALSE;
                   break;
               case DOKU_LEXER_EXIT :
@@ -114,15 +114,15 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                       $this->printoptions($renderer);
                   }
                   $this->printsolutions($renderer);
-                  $this->class='';         
-                  unset($_SESSION['quizsol']);     
+                  $this->class='';
+                  unset($_SESSION['quizsol']);
                   break;
             }
             return TRUE;
         }
         return FALSE;
     }
-    
+
     function getsolutions($text){
         $matches = array();
         $_SESSION['quizsol'] = array();
@@ -139,13 +139,13 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
         }elseif ($this->class === 'vf'){
             preg_match_all('/  \*.*?\((V|F)\)/', $text, $matches);
             foreach ($matches[1] as $match){
-                array_push($_SESSION['quizsol'], $match);    
+                array_push($_SESSION['quizsol'], $match);
             }
             $text = preg_replace('/(  \*.*?)\((V|F)\)/', '$1', $text);
         }
         return $text;
     }
-    
+
     function printsolutions($renderer){
         if (!empty($_SESSION['quizsol'])){
             $renderer->doc .= '\rotatebox[origin=c]{180}{'.DOKU_LF;
@@ -164,7 +164,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
               if ($key < $count-1){
                   $renderer->doc .= $separator.'\hspace{1mm}';
               }
-              
+
             }
             if ($this->class !== 'choice'){
                 $renderer->doc .= '\end{inparaenum}'.DOKU_LF;
@@ -173,7 +173,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             unset ($_SESSION['quizsol']);
        }
     }
-    
+
     function printoptions($renderer){
       if (!empty($_SESSION['quizsol'])){
           $sol = array();
@@ -184,7 +184,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
           }
           $_SESSION['quizsol'] = array();
           //Sort solutions
-          sort($sol);          
+          sort($sol);
           foreach ($aux as $s){
               $pos = array_search($s, $sol, TRUE);
               array_push($_SESSION['quizsol'],chr(ord('a')+$pos));
@@ -195,7 +195,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
               $text .= '\mbox{';
               $text .= '\item ';
               $text .= $s .'}';
-              if ($key < $count-1){ 
+              if ($key < $count-1){
               	$text .= '\hspace{5mm}';
               }
           }

@@ -10,7 +10,7 @@ static $reserved_symbols = array('#', '$', '%', '&', '~');
 static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
 
     /**
-     * 
+     *
      * Replace all invalid ocurrences in latex formulas
      * @param string $texexp
      */
@@ -27,12 +27,12 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
             '\let', '\futurelet','\else','\fi','\chardef','\makeatletter','\afterground',
             '\noexpand','\line','\mathcode','\item','\section','\mbox','\declarerobustcommand'
         );
-    
+
         return  str_ireplace($tex_blacklist, 'forbiddenkeyword', $texexp);
     }
-    
+
     /**
-     * 
+     *
      * Replace all reserved symbols
      * @param string $text
      */
@@ -41,9 +41,9 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
         global $replacement_symbols;
         return str_ireplace($reserved_symbols, $replacement_symbols, $text);
     }
-    
+
     /**
-     * 
+     *
      * Prints media url and generate a valid qrcode
      * @param string $url
      * @param string $title
@@ -52,68 +52,68 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
     function qrcode_media_url(&$renderer, $url, $title, $type){
         $renderer->doc .= '\begin{mediaurl}{'.$url.'}';
         $_SESSION['video_url'] = TRUE;
-        $renderer->doc .= '\parbox[c]{\linewidth}{\raggedright ';                
+        $renderer->doc .= '\parbox[c]{\linewidth}{\raggedright ';
         $renderer->_latexAddImage(DOKU_PLUGIN . 'iocexportl/templates/'.$type.'.png','32',null,null,null,$url);
         $renderer->doc .= '}';
         $_SESSION['video_url'] = FALSE;
         $renderer->doc .= '& \hspace{-2mm}';
-        $renderer->doc .= '\parbox[c]{\linewidth}{\raggedright ';            
+        $renderer->doc .= '\parbox[c]{\linewidth}{\raggedright ';
         $renderer->externallink($url, $title);
         $renderer->doc .= '}';
         $renderer->doc .= '\end{mediaurl}';
     }
-    
+
     /**
-     * 
+     *
      * Convert a text into instructions
      * @param string $text
      */
     function get_latex_instructions($text){
-    
+
       //Call our customized function get_parsermodes
       $modes = get_latex_parsermodes();
-    
+
       // Create the parser
       $Parser = new Doku_Parser();
-    
+
       // Add the Handler
       $Parser->Handler = new Doku_Handler();
-    
+
       //add modes to parser
       foreach($modes as $mode){
         $Parser->addMode($mode['mode'],$mode['obj']);
       }
-    
+
       // Do the parsing
       trigger_event('PARSER_WIKITEXT_PREPROCESS', $text);
       $p = $Parser->parse($text);
       return $p;
     }
-    
+
     /**
-     * 
+     *
      * returns own parser syntax modes in correct order
      */
     function get_latex_parsermodes(){
       global $conf;
-    
+
       //reuse old data
       static $modes = null;
       if($modes != null){
         return $modes;
       }
-    
+
       //import parser classes and mode definitions
       require_once DOKU_INC . 'inc/parser/parser.php';
-    
+
       // we now collect all syntax modes and their objects, then they will
       // be sorted and added to the parser in correct order
       $modes = array();
-    
+
       // add own syntax plugins
       $pluginlist = array();
       getPlugins($pluginlist);
-          
+
       if(count($pluginlist)){
         global $PARSER_MODES;
         $obj = null;
@@ -131,7 +131,7 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
           unset($obj); //remove the reference
         }
       }
-    
+
       // add default modes
       $std_modes = array('listblock','preformatted','notoc','nocache',
                          'header','table','linebreak','footnote','hr',
@@ -151,7 +151,7 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
                      'obj'  => $obj
                    );
       }
-    
+
       // add formatting modes
       $fmt_modes = array('strong','emphasis','underline','monospace',
                          'subscript','superscript','deleted');
@@ -163,7 +163,7 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
                      'obj'  => $obj
                    );
       }
-    
+
       // add modes which need files
       $obj     = new Doku_Parser_Mode_smiley(array_keys(getSmileys()));
       $modes[] = array('sort' => $obj->getSort(), 'mode' => 'smiley','obj'  => $obj );
@@ -171,22 +171,22 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
       $modes[] = array('sort' => $obj->getSort(), 'mode' => 'acronym','obj'  => $obj );
       $obj     = new Doku_Parser_Mode_entity(array_keys(getEntities()));
       $modes[] = array('sort' => $obj->getSort(), 'mode' => 'entity','obj'  => $obj );
-    
-    
+
+
       // add optional camelcase mode
       if($conf['camelcase']){
         $obj     = new Doku_Parser_Mode_camelcaselink();
         $modes[] = array('sort' => $obj->getSort(), 'mode' => 'camelcaselink','obj'  => $obj );
       }
-    
+
       //sort modes
       usort($modes,'p_sort_modes');
-    
+
       return $modes;
     }
-    
+
     /**
-     * 
+     *
      * Fill plugins var with own syntax plugins
      * @param array $plugins
      */
@@ -204,37 +204,37 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
     }
 
     /**
-     * 
-     * Renders a list of instruction to the specified output mode 
+     *
+     * Renders a list of instruction to the specified output mode
      * @param string $mode
      * @param array $instructions
      * @param array $info
      */
     function p_latex_render($mode,$instructions,&$info){
         if(is_null($instructions)) return '';
-        
+
         require_once DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php';
         $class = "renderer_plugin_".$mode;
         $Renderer = new $class;
-        
+
         if (is_null($Renderer)) return null;
-    
+
         $Renderer->reset();
-    
+
         $Renderer->smileys = getSmileys();
         $Renderer->entities = getEntities();
         $Renderer->acronyms = getAcronyms();
         $Renderer->interwiki = getInterwiki();
-    
+
         // Loop through the instructions
         foreach ( $instructions as $instruction ) {
             // Execute the callback against the Renderer
             call_user_func_array(array(&$Renderer, $instruction[0]),$instruction[1]);
         }
-    
+
         //set info array
         $info = $Renderer->info;
-    
+
         // Post process and return the output
         $data = array($mode,& $Renderer->doc);
         trigger_event('RENDERER_CONTENT_POSTPROCESS',$data);

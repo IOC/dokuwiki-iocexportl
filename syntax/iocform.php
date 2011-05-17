@@ -3,7 +3,7 @@
  * Example Syntax Plugin:   Example Component.
  * @author     Eduard Diaz <edudiaz@scopia.es>
  */
- 
+
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
@@ -23,7 +23,7 @@ class syntax_plugin_iocexportl_iocform extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://www.scopia.es',
         );
     }
- 
+
     /**
      * What kind of syntax are we?
      */
@@ -56,8 +56,8 @@ class syntax_plugin_iocexportl_iocform extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){ 
-        return array($match, $state, $pos); 
+    function handle($match, $state, $pos, &$handler){
+        return array($match, $state, $pos);
     }
 
     /**

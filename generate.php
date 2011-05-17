@@ -50,7 +50,7 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     }
     if (!file_exists(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx')){
         session_destroy();
-        return FALSE;                
+        return FALSE;
     }
     //get all pages and activitites
     $data = getData();
@@ -65,20 +65,20 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
         foreach ($data[0]['intro'] as $page){
             $text = io_readFile(wikiFN($page));
             $instructions = get_latex_instructions($text);
-            $latex .= p_latex_render('iocexportl', $instructions, $info);            
+            $latex .= p_latex_render('iocexportl', $instructions, $info);
         }
         //Content
         foreach ($data[0]['pageid'] as $page){
             $text = io_readFile(wikiFN($page));
             $instructions = get_latex_instructions($text);
-            $latex .= p_latex_render('iocexportl', $instructions, $info);            
+            $latex .= p_latex_render('iocexportl', $instructions, $info);
             //render activities
             if (array_key_exists($page, $data[0]['activities'])){
                 $_SESSION['activities'] = TRUE;
                 foreach ($data[0]['activities'][$page] as $act){
                     $text = io_readFile(wikiFN($act));
                     $instructions = get_latex_instructions($text);
-                    $latex .= p_latex_render('iocexportl', $instructions, $info);                    
+                    $latex .= p_latex_render('iocexportl', $instructions, $info);
                 }
                 $_SESSION['activities'] = FALSE;
             }
@@ -93,21 +93,21 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
             $matches[0] = preg_replace('/\n{2,3}/', '@IOCBR@', $matches[0]);
             $instructions = get_latex_instructions($matches[0]);
-            $latex .= p_latex_render('iocexportl', $instructions, $info);            
+            $latex .= p_latex_render('iocexportl', $instructions, $info);
             $latex = preg_replace('/@IOCBR@/', DOKU_LF.DOKU_LF.'\vspace*{5mm} ', $latex);
             $text = preg_replace('/(\={5} Credits \={5}\n{2,}(.*?\n?)+)(?=\={5} copyright \={5})/', '', $text);
             preg_match('/(?<=\={5} copyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
             if (isset($matches[0])){
                 $latex .= '\vfill'.DOKU_LF;
                 $instructions = get_latex_instructions($matches[0]);
-                $latex .= p_latex_render('iocexportl', $instructions, $info);                
+                $latex .= p_latex_render('iocexportl', $instructions, $info);
                 $text = preg_replace('/\={5} copyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
                 preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
                 if (isset($matches[0])){
                     $latex .= '\renewcommand{\baselinestretch}{1.9}\tiny'.DOKU_LF;
                     $matches[0] = preg_replace('/(http.*)/', DOKU_LF.DOKU_LF.'$1', $matches[0]);
                     $instructions = get_latex_instructions($matches[0]);
-                    $latex .= p_latex_render('iocexportl', $instructions, $info);                    
+                    $latex .= p_latex_render('iocexportl', $instructions, $info);
                     $text = preg_replace('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', '', $text);
                 }
             }
@@ -116,10 +116,10 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
         $latex .= '\defaultspacingpar\defaultspacingline' . DOKU_LF;
         $latex .= '\normalfont\normalsize' . DOKU_LF;
         $instructions = get_latex_instructions($text);
-        $latex .= p_latex_render('iocexportl', $instructions, $info);        
+        $latex .= p_latex_render('iocexportl', $instructions, $info);
     }
-    //replace IOCQRCODE 
-    $qrcode = '';        
+    //replace IOCQRCODE
+    $qrcode = '';
     if ($_SESSION['qrcode']){
         $qrcode = '\usepackage{pst-barcode,auto-pst-pdf}';
     }
@@ -138,7 +138,7 @@ if ($_POST['mode'] === 'zip'){
 removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
 
     /**
-     * 
+     *
      * Render frontpage
      * @param string $latex
      * @param array $data
@@ -147,7 +147,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $tmp_dir;
         global $unitzero;
         global $img_src;
-        
+
         $name_length = 30;
         $pos_credit = 21.4;
         if ($unitzero){
@@ -171,16 +171,16 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }else{
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx');
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
-            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);            
+            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);
             $size = strlen(trim($data[1]['nomcomplert']));
             $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', $data[1]['autor'], $latex, 1);
             $latex = preg_replace('/@IOC_EXPORT_POS_CREDITNOM@/', '1cm,'.$pos_credit.'cm', $latex, 1);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditnom'], $latex);
         }
     }
-    
+
     /**
-     * 
+     *
      * Compile latex document to create a pdf file
      * @param string $filename
      * @param string $path
@@ -206,10 +206,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             returnData($path, $filename.'.pdf', 'pdf');
         }
     }
-    
+
     /**
-     * 
-     * Returns pdf/zip file info 
+     *
+     * Returns pdf/zip file info
      * @param string $path
      * @param string $filename
      * @param string $type
@@ -219,7 +219,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $media_path;
         global $conf;
         global $time_start;
-        
+
         if (file_exists($path.'/'.$filename)){
             //Return pdf number pages
             if ($type === 'pdf'){
@@ -237,7 +237,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             if ($type === 'log'){
                 $filename_dest = preg_replace('/\.log$/', '.txt', $filename_dest, 1);
             }
-            copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename_dest);                
+            copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename_dest);
             $dest = preg_replace('/\//', ':', $dest);
             $time_end = microtime(TRUE);
             $time = round($time_end - $time_start, 2);
@@ -245,16 +245,16 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time);
             }else{
                 $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time);
-            } 
+            }
         }else{
             $result = 'Error en la creació del arixu: ' . $filename;
         }
         echo json_encode($result);
     }
-    
+
     /**
-     * 
-     * Create a zip file with tex file and all media files 
+     *
+     * Create a zip file with tex file and all media files
      * @param string $filename
      * @param string $path
      * @param string $text
@@ -278,7 +278,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     }
 
     /**
-     * 
+     *
      * Returns log file on latex compilation
      * @param string $path
      * @param string $filename
@@ -287,7 +287,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $tmp_dir;
         global $conf;
         $output = array();
-        
+
         if(auth_isadmin()){
             returnData($path, $filename.'.log', 'log');
         }else{
@@ -296,9 +296,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             returnData($path, $filename.'.log', 'log');
         }
     }
-    
+
     /**
-     * 
+     *
      * Fill files var with all media files stored on directory var
      * @param string $directory
      * @param string $files
@@ -310,7 +310,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             return FALSE;
         } else {
             $directoryHandle = opendir($directory);
-            while ($contents = readdir($directoryHandle)) { 
+            while ($contents = readdir($directoryHandle)) {
                 if($contents != '.' && $contents != '..') {
                     if (preg_match('/.*?\.pdf|.*?\.png|.*?\.jpg/', $contents)){
                         $path = $directory . "/" . $contents;
@@ -318,51 +318,51 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                             array_push($files, $path);
                         }
                     }
-                } 
-            } 
+                }
+            }
             closedir($directoryHandle);
             return TRUE;
         }
     }
-    
+
 	/**
-	 * 
+	 *
      * Remove specified dir
      * @param string $directory
      */
     function removeDir($directory) {
-        if(!file_exists($directory) || !is_dir($directory)) { 
-            return FALSE; 
-        } elseif(!is_readable($directory)) { 
-            return FALSE; 
-        } else { 
-            $directoryHandle = opendir($directory); 
-            
-            while ($contents = readdir($directoryHandle)) { 
-                if($contents != '.' && $contents != '..') { 
-                    $path = $directory . "/" . $contents; 
-                    
-                    if(is_dir($path)) { 
-                        removeDir($path); 
-                    } else { 
-                        unlink($path); 
-                    } 
-                } 
-            } 
-            closedir($directoryHandle); 
-    
-            if(file_exists($directory)) { 
-                if(!rmdir($directory)) { 
-                    return FALSE; 
-                } 
-            } 
-            return TRUE; 
+        if(!file_exists($directory) || !is_dir($directory)) {
+            return FALSE;
+        } elseif(!is_readable($directory)) {
+            return FALSE;
+        } else {
+            $directoryHandle = opendir($directory);
+
+            while ($contents = readdir($directoryHandle)) {
+                if($contents != '.' && $contents != '..') {
+                    $path = $directory . "/" . $contents;
+
+                    if(is_dir($path)) {
+                        removeDir($path);
+                    } else {
+                        unlink($path);
+                    }
+                }
+            }
+            closedir($directoryHandle);
+
+            if(file_exists($directory)) {
+                if(!rmdir($directory)) {
+                    return FALSE;
+                }
+            }
+            return TRUE;
         }
     }
-    
+
     /**
-     * 
-     * Check whether user has right acces level 
+     *
+     * Check whether user has right acces level
      */
     function checkPerms() {
         global $ID;
@@ -374,15 +374,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         // AUTH_ADMIN, AUTH_READ,AUTH_EDIT,AUTH_CREATE,AUTH_UPLOAD,AUTH_DELETE
         return ($aclLevel >=  AUTH_UPLOAD);
       }
-    
+
     /**
-     * 
+     *
      * Fill data var with wiki pages using a customized structure
      * @param array $data
      * @param boolean $struct
      */
     function getPageNames(&$data, $struct = FALSE){
-        global $id;        
+        global $id;
         global $conf;
 
         $data['intro'] = array();
@@ -412,7 +412,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 }
             }
         }else{
-            $result = array(); 
+            $result = array();
             preg_match('/(\w+:)+pdf:\w+\b/', $id, $result);
             $ns = preg_replace('/:/' ,'/', $result[0]);
             search($result,$conf['datadir'],'search_index', null, $ns);
@@ -432,14 +432,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     }
 
     /**
-     * 
+     *
      * Fill data var with activities and return pages without it
      * @param array $data
      * @param string $pages
      */
     function getActivities(&$data, $pages){
         global $id;
-        
+
         $matches = array();
         $data['activities'] = array();
         //return all pages with activities
@@ -466,9 +466,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $pages = preg_replace('/    \*\s+\[\[.*?\]\]\n?/', '', $pages);
         return $pages;
     }
-    
+
     /**
-     * 
+     *
      * Get and return uri wiki pages
      */
     function getData(){

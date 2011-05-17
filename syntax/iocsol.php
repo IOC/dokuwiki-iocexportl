@@ -5,12 +5,12 @@
  * @author     Marc Català <mcatala@ioc.cat>
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
- 
+
 if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
- 
+
 
 class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
 
@@ -27,19 +27,19 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
- 
-    function getType(){ 
-        return 'formatting'; 
+
+    function getType(){
+        return 'formatting';
     }
-    
-    function getPType(){ 
-        return 'normal'; 
+
+    function getPType(){
+        return 'normal';
     } //stack, block, normal
-    
-    function getSort(){ 
-        return 513; 
+
+    function getSort(){
+        return 513;
     }
-    
+
     function getAllowedTypes() {
         return array('formatting');
     }
@@ -52,7 +52,7 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
     function postConnect() {
         $this->Lexer->addExitPattern('</sol>','plugin_iocexportl_iocsol');
     }
- 
+
     /**
      * Handle the match
      */
@@ -88,7 +88,7 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                       $_SESSION['quizsol'] = array();
                   }
                   $instructions = get_latex_instructions($text);
-                  $sol = p_latex_render($mode, $instructions, $info);              
+                  $sol = p_latex_render($mode, $instructions, $info);
                   array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
                   if($_SESSION['quizmode'] !== 'relations'){
                       $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
