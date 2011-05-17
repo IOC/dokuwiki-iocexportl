@@ -94,6 +94,7 @@ class syntax_plugin_iocexportl_ioclatexold extends DokuWiki_Syntax_Plugin {
                     $text = str_ireplace($symbols, ' (INVALID CHARACTER) ', $text);
     				//replace \\ (not supported in math mode) by \break
     				$text = preg_replace('/\\\\\\\\/', '\\\\break', $text);
+    				$text = clean_reserved_symbols($text);
                     $renderer->doc .= filter_tex_sanitize_formula($text);
                     break;
                 case DOKU_LEXER_EXIT : 

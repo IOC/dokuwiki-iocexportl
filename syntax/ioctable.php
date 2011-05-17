@@ -110,8 +110,17 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['table_id'] = (isset($params['id']))?$params['id']:'';
+                    if (isset($params['large'])){
+                        $renderer->doc .= '\begin{landscape}'.DOKU_LF;
+                    }
                     $instructions = get_latex_instructions($text);
-                    $renderer->doc .= p_latex_render($mode, $instructions, $info);                
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    if (isset($params['footer'])) {
+                        $renderer->doc .=  '\raggedright\parbox[c]{\linewidth}{\textsf{\tiny\begin{flushright}\vspace*{-20mm}'.trim($renderer->_xmlEntities($params['footer'])).'\end{flushright}}}';                        
+                    }
+                    if (isset($params['large'])){
+                        $renderer->doc .= '\end{landscape}'.DOKU_LF;
+                    }
                     $_SESSION['table_id'] = '';                
                     $_SESSION['table_title'] = '';
                     break;

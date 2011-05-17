@@ -46,7 +46,6 @@ if (!checkPerms()) return FALSE;
             }
         }else{
             $result = null;
-            $result = 'ERROR';
         }
         echo json_encode($result);
     }

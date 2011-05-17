@@ -6,6 +6,8 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once DOKU_INC . 'inc/parser/renderer.php';
 
 static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ','λ','μ','Ξ','Π','π','ρ','Σ','σ','Τ','τ','υ','Φ','φ','χ','Ψ','ψ','Ω','Ω','ω','≠','≤','≥','Ф','∑','∞');
+static $reserved_symbols = array('#', '$', '%', '&', '~');
+static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~');
 
     /**
      * 
@@ -27,6 +29,17 @@ static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','
         );
     
         return  str_ireplace($tex_blacklist, 'forbiddenkeyword', $texexp);
+    }
+    
+    /**
+     * 
+     * Replace all reserved symbols
+     * @param string $text
+     */
+    function clean_reserved_symbols($text){
+        global $reserved_symbols;
+        global $replacement_symbols;
+        return str_ireplace($reserved_symbols, $replacement_symbols, $text);
     }
     
     /**

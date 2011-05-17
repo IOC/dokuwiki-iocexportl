@@ -194,11 +194,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         if ($_SESSION['qrcode']){
             $shell_escape = '-shell-escape';
         }
-        exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+        @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         if ($result === 0){
-            exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
             //One more to calculate correctly size tables
-            exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            @exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         }
         if ($result !== 0){
             getLogError($path, $filename);
@@ -223,7 +223,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         if (file_exists($path.'/'.$filename)){
             //Return pdf number pages
             if ($type === 'pdf'){
-                $num_pages = exec("pdfinfo " . $path . "/" . $filename . " | awk '/Pages/ {print $2}'");
+                $num_pages = @exec("pdfinfo " . $path . "/" . $filename . " | awk '/Pages/ {print $2}'");
             }
             $filesize = filesize($path . "/" . $filename);
             $filesize = filesize_h($filesize);
@@ -291,7 +291,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         if(auth_isadmin()){
             returnData($path, $filename.'.log', 'log');
         }else{
-            exec('tail -n 20 '.$path.'/'.$filename.'.log;', $output);
+            @exec('tail -n 20 '.$path.'/'.$filename.'.log;', $output);
             io_saveFile($path.'/'.filename.'.log', implode(DOKU_LF, $output));
             returnData($path, $filename.'.log', 'log');
         }

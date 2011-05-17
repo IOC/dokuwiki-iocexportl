@@ -28,6 +28,7 @@
 \usepackage{dashrule}%Customized rules
 \usepackage{paralist}%Used to show quiz solutions
 \usepackage{marginfix}%Used to avoid marginpars overlapping
+\usepackage{lscape}%Landscape mode
 @IOCQRCODE@ %qrcodes
 
 % ***************** CUSTOMIZED COMMANDS *****************
@@ -291,7 +292,7 @@
 \newcommand{\headingnumbers}{
 	\titleformat{\chapter}[display]
 	{\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\large \thechapter.\ }
-	\titlespacing*{\chapter}{0pt}{-20pt}{60pt}
+	\titlespacing*{\chapter}{0pt}{-45pt}{60pt}
 	\titleformat{\section}[display]
 	{\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries \thesection\ }
 	\titleformat{\subsection}[display]
@@ -351,3 +352,5 @@
 %change characters
 %\DeclareUnicodeCharacter{2022}{·}%•
 
+%Avoid blank spaces at bottom page
+\raggedbottom

@@ -19,11 +19,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $code = FALSE;
     var $col_colspan;
     var $col_num = 1;
-    static $convert = FALSE;//convert images to imgext
+    static $convert = FALSE;//convert images to $imgext
     var $endimg = FALSE;
-    var $formatting = '';    
-    static $hr_width = 375;    
+    var $formatting = '';
+    static $hr_width = 375;
     static $imgext = '.pdf';//Format to convert images
+    static $img_max_table = 99;//Image max width inside tables
     var $max_cols = 0;
     var $monospace = FALSE;
     static $p_width = 360;//415.12572;
@@ -33,8 +34,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     var $tableheader_end = FALSE;
     var $tmp_dir = 0;//Value of temp dir
 	var $id = '';
-  
-    
+
+
     /**
      * Return version info
      */
@@ -203,7 +204,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($width && $height){
             $resize = "-resize $width"."x"."$height";
         }
-        exec("convert $img $resize $imgdest".self::$imgext);
+        @exec("convert $img $resize $imgdest".self::$imgext);
         return $imgdest.self::$imgext;
       }
       
@@ -279,13 +280,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 }
             }
             //Inside table, images will be centered vertically
-            if ($this->table){
+            if ($this->table && $width > self::$img_max_table){
 //                $this->doc .= '\parbox[t]{\linewidth}{';
                 $this->doc .= '\resizebox{\linewidth}{!}{';
-                
             }
             $this->doc .= '\includegraphics'.$max_width.'{media/'.basename($img_aux).'}';
-            if ($this->table){
+            if ($this->table && $width > self::$img_max_table){
                 $this->doc .= '}';
                 
             }            
@@ -712,7 +712,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
     function preformatted($text) {
         $this->doc .= '\codeinline ';
-        $text = str_ireplace(array('#','_','&'), array('\#','\_','\&'), $text);
+//        $text = str_ireplace(array('#','_','&','$'), array('\#','\_','\&','\$'), $text);
+        $text = clean_reserved_symbols($text);
         $this->_format_text($text);
     }
 
@@ -845,6 +846,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * Add external link
      */
     function externallink($url, $title = NULL) {
+        $url = $this->_xmlEntities($url);
         if (!$title){
             $this->doc .= '\url{'.$url.'}';
         } else {
@@ -935,16 +937,20 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($this->table){
             $value = trim($value);
         }
-        //Search mathematical formulas
-        //Math mode
-        if (preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
-            $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-            return ' \begin{math}'.filter_tex_sanitize_formula($text).'\end{math} ';
-        //Math inline mode    
-        }elseif (preg_match('/\$\n?([^\$]+)\n?\$/', $value, $matches)){
-            $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '$ '.$text.' $', $value, 1);
-            return filter_tex_sanitize_formula($value);
+        if (!$this->monospace){
+            //Search mathematical formulas
+            //Math mode
+            if (preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
+                $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
+                $text = clean_reserved_symbols($text);
+                return ' \begin{math}'.filter_tex_sanitize_formula($text).'\end{math} ';
+            //Math inline mode    
+            }elseif (preg_match('/\$\n?([^\$]+)\n?\$/', $value, $matches)){
+                $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
+                $text = clean_reserved_symbols($text);
+                $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '$ '.$text.' $', $value, 1);
+                return filter_tex_sanitize_formula($value);
+            }
         }
         if ($this->monospace){
             $value = str_ireplace($find, $replace, $value);
