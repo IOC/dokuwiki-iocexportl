@@ -228,7 +228,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
         }
         if (!$_SESSION['u0']){
-            $align = 'center';
+            $align = 'centering';
         }else{//Unit 0
             $align = 'flushleft';
         }
@@ -252,8 +252,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         if (file_exists($img_aux)){
             if (!$this->table && !$_SESSION['imgB'] && !$_SESSION['video_url']){
-                $this->doc .= '\begin{figure}[H]'.DOKU_LF;
-                $this->doc .= '\begin{'.$align.'}'.DOKU_LF;
+                $this->doc .= '\begin{figure}[h]'.DOKU_LF;
+//                $this->doc .= '\begin{'.$align.'}'.DOKU_LF;
+                $this->doc .= '\\' . $align . DOKU_LF;
             }
             if ($linking !== 'details'){
                 $this->doc .= '\href{'.$linking.'}{';
@@ -297,7 +298,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 }
             }
             if (!$this->table && !$_SESSION['imgB'] && !$_SESSION['video_url']){
-                $this->doc .= '\\\\';
+                //$this->doc .= '\\\\';
             }
             if (!$_SESSION['video_url']){
                 $this->doc .= DOKU_LF;
@@ -318,7 +319,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
             }
             if (!$this->table && !$_SESSION['imgB'] && !$_SESSION['video_url']){
-                $this->doc .= '\end{'.$align.'}';
+//                $this->doc .= '\end{'.$align.'}';
                 $this->doc .= '\end{figure}';
             }
             $this->endimg = TRUE;
@@ -712,7 +713,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
     function preformatted($text) {
         $this->doc .= '\codeinline ';
-//        $text = str_ireplace(array('#','_','&','$'), array('\#','\_','\&','\$'), $text);
         $text = clean_reserved_symbols($text);
         $this->_format_text($text);
     }
@@ -744,14 +744,16 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '\end{csource}'.DOKU_LF;
             $this->doc .= '\end{minipage}'.DOKU_LF.DOKU_LF;
         }else{
-            $this->doc .= '\hspace*{\\fill}\\\\\\\\'. DOKU_LF;
+            $this->doc .= '\hspace*{\\fill}\\linebreak\\linebreak'. DOKU_LF;
             $this->doc .= '\hspace*{4mm}'. DOKU_LF;
-            $this->doc .= '\begin{minipage}[c]{.8\textwidth}'. DOKU_LF;
+            $this->doc .= '\begin{minipage}[c]{.85\textwidth}'. DOKU_LF;
             if ( !$language ) {
                 $this->doc .= '\begin{csource}{language=}^^J'.DOKU_LF;
             } else {
                 $this->doc .= '\begin{csource}{language='.$language.'}'.DOKU_LF;
             }
+            $text = preg_replace('/\\\\/', '\\\\\\\\', $text);
+            $text = preg_replace('/%/', '\\%', $text);
             $this->doc .=  $this->_format_text($text) . '^^J';
             $this->doc .= '\end{csource}'.DOKU_LF;
             $this->doc .= '\end{minipage}'.DOKU_LF;
@@ -942,12 +944,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             //Math mode
             if (preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
                 $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-                $text = clean_reserved_symbols($text);
+    			$text = preg_replace('/(\$)/', '\\\\$1', $text);
                 return ' \begin{math}'.filter_tex_sanitize_formula($text).'\end{math} ';
             //Math inline mode
             }elseif (preg_match('/\$\n?([^\$]+)\n?\$/', $value, $matches)){
                 $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-                $text = clean_reserved_symbols($text);
+    			$text = preg_replace('/(\$)/', '\\\\$1', $text);
                 $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '$ '.$text.' $', $value, 1);
                 return filter_tex_sanitize_formula($value);
             }

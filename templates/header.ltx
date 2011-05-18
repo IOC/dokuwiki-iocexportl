@@ -179,18 +179,18 @@
 \newcommand{\numold}[1]{\fontfamily{pcr}\selectfont\tiny{#1}}
 \lstnewenvironment{csource}[1]
 	{\small
-	 \lstset{basicstyle=\fontfamily{fvm},%beramono
+	 \lstset{basicstyle=\fontfamily{fvm}\selectfont,%beramono
 			keywordstyle=\bfseries,
 			numbers=left,
 			inputencoding=utf8x,
-			extendedchars=\true,
+			extendedchars=false,
 			numberstyle=\numold,
-			breaklines=\true,
+			breaklines=true,
 			frame=lines,
 			framexleftmargin=0.5em,
 			framexrightmargin=0.5em,
 			backgroundcolor=\color[rgb]{0.97,0.97,0.97},
-			showstringspaces=\false,
+			showstringspaces=false,
 			#1,
 			literate={é}{{\'e}}1
 					 {í}{{\'i}}1

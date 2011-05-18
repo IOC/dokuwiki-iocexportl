@@ -33,7 +33,6 @@ $time_start = microtime(TRUE);
 $output_filename = str_replace(':','_',$id);
 if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return FALSE;
 if (!auth_isadmin() && $_POST['mode'] === 'zip') return FALSE;
-
 if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     //read header
     $latex = io_readFile(DOKU_PLUGIN_TEMPLATES.'header.ltx');
@@ -86,8 +85,8 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     }else{//Render unit zero
         $_SESSION['u0'] = TRUE;
         $text = io_readFile(wikiFN($id));
-        $text = preg_replace('/(\={6} .*? \={6}\n{2,}\={5} Meta \={5}\n{2,}( {2,4}\* \*\*\w+\*\*:.*\n?)+)/', '', $text);
-        preg_match('/(?<=\={5} Credits \={5})\n+(.*?\n?)+(?=\={5} copyright \={5})/', $text, $matches);
+        $text = preg_replace('/(\={6} .*? \={6}\n{2,}\={5} [M|m]eta \={5}\n{2,}( {2,4}\* \*\*\w+\*\*:.*\n?)+)/', '', $text);
+        preg_match('/(?<=\={5} [C|c]redits \={5})\n+(.*?\n?)+(?=\={5} [C|c]opyright \={5})/', $text, $matches);
         if (isset($matches[0])){
             $latex .= '\creditspacingpar\scriptsize\credits' . DOKU_LF;
             $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
@@ -95,13 +94,13 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             $instructions = get_latex_instructions($matches[0]);
             $latex .= p_latex_render('iocexportl', $instructions, $info);
             $latex = preg_replace('/@IOCBR@/', DOKU_LF.DOKU_LF.'\vspace*{5mm} ', $latex);
-            $text = preg_replace('/(\={5} Credits \={5}\n{2,}(.*?\n?)+)(?=\={5} copyright \={5})/', '', $text);
+            $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
             preg_match('/(?<=\={5} copyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
             if (isset($matches[0])){
                 $latex .= '\vfill'.DOKU_LF;
                 $instructions = get_latex_instructions($matches[0]);
                 $latex .= p_latex_render('iocexportl', $instructions, $info);
-                $text = preg_replace('/\={5} copyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
+                $text = preg_replace('/\={5} [C|c]opyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
                 preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
                 if (isset($matches[0])){
                     $latex .= '\renewcommand{\baselinestretch}{1.9}\tiny'.DOKU_LF;
@@ -148,8 +147,6 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $unitzero;
         global $img_src;
 
-        $name_length = 30;
-        $pos_credit = 21.4;
         if ($unitzero){
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
             $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', $data[1]['familia'], $latex);
@@ -166,7 +163,6 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);
             $size = strlen(trim($data[1]['nomcomplert']));
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
-            $latex = preg_replace('/@IOC_EXPORT_POS_CICLENOM@/', '1cm,'.$pos_credit.'cm', $latex, 1);
             $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $data[1]['ciclenom'], $latex);
         }else{
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx');
@@ -174,7 +170,6 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);
             $size = strlen(trim($data[1]['nomcomplert']));
             $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', $data[1]['autor'], $latex, 1);
-            $latex = preg_replace('/@IOC_EXPORT_POS_CREDITNOM@/', '1cm,'.$pos_credit.'cm', $latex, 1);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditnom'], $latex);
         }
     }
@@ -393,7 +388,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             if (@file_exists($file)) {
                 $matches = array();
                 $txt =  io_readFile($file);
-                preg_match_all('/(?<=\={5} toc \={5})\n+(\s{2,4}\*\s+\[\[.*?\]\]\n?)+/i', $txt, $matches);
+                preg_match_all('/(?<=\={5} [T|t]oc \={5})\n+(\s{2,4}\*\s+\[\[.*?\]\]\n?)+/i', $txt, $matches);
                 $pages = implode('\n', $matches[0]);
                 //get exercises and activities
                 $pages = getActivities($data, $pages);
@@ -484,7 +479,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $data[1]['nomcomplert'] = $info[0][0];
             $text = io_readFile($file);
             $info = array();
-            preg_match_all('/(?<=\={5} Meta \={5}\n\n)\n*( {2,4}\* \*\*\w+\*\*:.*\n?)+/', $text, $info, PREG_SET_ORDER);
+            preg_match_all('/(?<=\={5} [M|m]eta \={5}\n\n)\n*( {2,4}\* \*\*\w+\*\*:.*\n?)+/', $text, $info, PREG_SET_ORDER);
             if (!empty($info[0][0])){
                 $text = $info[0][0];
                 preg_match_all('/ {2,4}\* \*\*(\w+)\*\*:(.*)/m', $text, $info, PREG_SET_ORDER);
