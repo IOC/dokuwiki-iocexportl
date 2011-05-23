@@ -38,17 +38,16 @@
 \newcommand{\codeinline}{\renewcommand{\ttdefault}{fi4}}%inconsolata
 \newcommand{\titleB}{\fontfamily{phv}\fontsize{8}{9.6}\selectfont\raggedright\bfseries}
 \newcommand{\bodyB}{\fontsize{9}{10.8}\selectfont}
-\newenvironment{titleG}{\fontfamily{phv}\fontsize{8}{9.6}\selectfont\bfseries}{\vspace*{-2mm} \\ \normalfont}
+\newenvironment{titleG}{\raggedright\begin{spacing}{1.2}\fontfamily{phv}\fontsize{8}{9.6}\selectfont\bfseries}{\vspace{-2mm}\linebreak\end{spacing}\normalfont}
 \newenvironment{bodyG}{\begin{spacing}{1.2}\fontfamily{phv}\fontsize{8}{9.6}\selectfont}{\end{spacing}\normalfont}
 \newcommand{\textA}[1]{
-		\vspace*{-3ex}
 	\begin{flushleft}
 		\colorbox{lightgray}{
 			\begin{minipage}{0.98\textwidth}
-				\vspace*{2mm}
+				\vspace{2mm}
 				\centering
 				\parbox[c]{0.95\textwidth}{#1}
-				\vspace*{2mm}
+				\vspace{2mm}
 			\end{minipage}
 		}
 	\end{flushleft}
@@ -80,7 +79,7 @@
 			\centering
 			\parbox{0.95\textwidth}{
 				\centering
-				\vspace*{2mm}
+				\vspace{2mm}
 				\parbox[c]{0.9\textwidth}{
 					\begin{titleG}
 						#1
@@ -90,7 +89,7 @@
 					\end{bodyG}
 					\normalfont
 				}
-				\vspace*{2mm}
+				\vspace{2mm}
 			}
 		\end{minipage}
 	\end{center}
@@ -103,7 +102,7 @@
 			\marginspacingline
         	\fontfamily{phv}
 			\selectfont
-			\vspace*{-2mm}
+			\vspace{1mm}
 			\small{#1}
 			\defaultspacingline
 			\rule{\marginparwidth}{.2mm}
@@ -121,8 +120,8 @@
 			\small
 			\textbf{#1}
 		\end{minipage}
-		\begin{minipage}{\marginparwidth-4mm}\vspace*{1mm}
-			\rule{\marginparwidth}{.2mm}\vspace*{1mm}
+		\begin{minipage}{\marginparwidth-4mm}\vspace{1mm}
+			\rule{\marginparwidth}{.2mm}\vspace{1mm}
 			\centering
 			\parbox[c]{0.90\marginparwidth}{
 				\fontfamily{phv}
@@ -130,7 +129,7 @@
 				\small
 				\raggedright
 					#2
-				\vspace*{1mm}
+				\vspace{1mm}
 			}
 		\end{minipage}
 		\rule{\marginparwidth}{.2mm}
@@ -245,7 +244,7 @@
 	\begin{minipage}{0.9\textwidth}
 		\centering
 		\framebox[0.95\textwidth][c]{
-			\vspace*{2mm}
+			\vspace{2mm}
 			\parbox[c]{0.85\textwidth}{
 				\centering
 				\begin{inparaenum}[\bfseries a) ]
@@ -254,7 +253,7 @@
 					\normalfont
 				\end{inparaenum}
 			}
-			\vspace*{2mm}
+			\vspace{2mm}
 		}
 	\end{minipage}
 	\end{center}
@@ -352,5 +351,23 @@
 %change characters
 %\DeclareUnicodeCharacter{2022}{·}%•
 
-%Avoid blank spaces at bottom page
-\raggedbottom
+%Avoid adjust text at the bottom page
+%\raggedbottom
+
+%space left on top and bottom of an in-text float.
+\setlength{\intextsep}{3ex}
+%space above caption
+\setlength{\abovecaptionskip}{-0.5mm}
+%space below caption
+\setlength{\belowcaptionskip}{-0.5mm}
+%space before maths
+\setlength{\abovedisplayskip}{1ex}
+%space after maths
+\setlength{\belowdisplayskip}{1ex}
+%space between first item and preceding paragraph.
+\setlength{\topsep}{0mm}
+%extra space added to \topsep when environment starts a new paragraph.
+\setlength{\partopsep}{0mm}
+%space between successive items.
+\setlength{\itemsep}{0pt}
+

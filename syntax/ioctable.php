@@ -116,7 +116,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     if (isset($params['footer'])) {
-                        $renderer->doc .=  '\raggedright\parbox[c]{\linewidth}{\textsf{\tiny\begin{flushright}\vspace*{-20mm}'.trim($renderer->_xmlEntities($params['footer'])).'\end{flushright}}}';
+                        $renderer->doc .=  '\raggedright\parbox[c]{\linewidth}{\textsf{\tiny\begin{flushright}\vspace{-20mm}'.trim($renderer->_xmlEntities($params['footer'])).'\end{flushright}}}';
                     }
                     if (isset($params['large'])){
                         $renderer->doc .= '\end{landscape}'.DOKU_LF;

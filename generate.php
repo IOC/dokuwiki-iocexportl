@@ -93,7 +93,7 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             $matches[0] = preg_replace('/\n{2,3}/', '@IOCBR@', $matches[0]);
             $instructions = get_latex_instructions($matches[0]);
             $latex .= p_latex_render('iocexportl', $instructions, $info);
-            $latex = preg_replace('/@IOCBR@/', DOKU_LF.DOKU_LF.'\vspace*{5mm} ', $latex);
+            $latex = preg_replace('/@IOCBR@/', DOKU_LF.DOKU_LF.'\vspace{5mm} ', $latex);
             $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
             preg_match('/(?<=\={5} copyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
             if (isset($matches[0])){
@@ -216,6 +216,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $time_start;
 
         if (file_exists($path.'/'.$filename)){
+            $error = '';
             //Return pdf number pages
             if ($type === 'pdf'){
                 $num_pages = @exec("pdfinfo " . $path . "/" . $filename . " | awk '/Pages/ {print $2}'");
@@ -228,9 +229,13 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 mkdir($conf['mediadir'].'/'.$dest, 0755, TRUE);
             }
             $filename_dest = (auth_isadmin())?$filename:basename($filename, '.'.$type).'_draft.'.$type;
-            //Replace log extension to txt, that allow navigators open this file
+            //Replace log extension to txt, and show where error is
             if ($type === 'log'){
                 $filename_dest = preg_replace('/\.log$/', '.txt', $filename_dest, 1);
+                $error = io_grep($path.'/'.$filename, '/^!/', 1);
+                $line = io_grep($path.'/'.$filename, '/^l.\d+/', 1);
+                preg_match('/\d+/', $line[0], $matches);
+                $error = preg_replace('/!/', '('.$matches[0].') ', $error);
             }
             copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename_dest);
             $dest = preg_replace('/\//', ':', $dest);
@@ -239,7 +244,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             if ($type === 'pdf'){
                 $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time);
             }else{
-                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time);
+                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time, $error);
             }
         }else{
             $result = 'Error en la creació del arixu: ' . $filename;
