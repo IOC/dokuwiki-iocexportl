@@ -46,11 +46,11 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
     function getSort(){
         return 512;
     }
-
+/*
     function getAllowedTypes(){
         return array('baseonly');
     }
-
+*/
 
     /**
      * Connect pattern to lexer
@@ -96,6 +96,19 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return TRUE;
+        }elseif ($mode === 'xhtml'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = p_get_instructions($text);
+                    $renderer->doc .= p_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
                     break;

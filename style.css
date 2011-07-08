@@ -1,11 +1,98 @@
-div.dokuwiki .bar img{
+/* Export form
+-------------------------------------------------------------------------------*/
+.iocexport{
+border: 1px dotted #A7D7F9;
+padding:3px;
+}
+
+div.dokuwiki .iocexport img{
 	vertical-align: middle;
 }
 
-div.dokuwiki .bar form input{
+div.dokuwiki .iocexport span{
 	vertical-align: middle;
 }
 
+div.dokuwiki .iocexport form input{
+	vertical-align: middle;
+}
+
+.missing_header{
+ color:red;
+}
+
+/* Toolbar
+-------------------------------------------------------------------------------*/
 .ioctoolbar{
 width:auto !important;
+}
+
+/* html styles
+-------------------------------------------------------------------------------*/
+.iocfigure{
+	margin:5mm 0px;
+}
+
+.ioctable{
+	margin:5mm 0px;
+}
+
+.ioctext{
+	margin:5mm 0px;
+	background: url("img/ioctext.png") no-repeat scroll left 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+}
+
+.ioctextl{
+	margin:5mm 0px;
+	background: url("img/ioctextl.png") no-repeat scroll 1mm 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+}
+
+.iocquote{
+	margin:5mm 0px;
+	background: url("img/iocquote.png") no-repeat scroll 1mm 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+}
+
+.iocexemple{
+	margin:5mm 0px;
+	background: url("img/ioctextl.png") no-repeat scroll 1mm 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+}
+
+.iocimportant{
+	margin:5mm 0px;
+	background: url("img/iocimportant.png") no-repeat scroll 1mm 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+}
+
+.iocreference{
+	margin:5mm 0px;
+	background: url("img/iocreference.png") no-repeat scroll 1mm 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+}
+
+.ioctext p, .ioctextl p, .iocquote p, .iocexemple p, .iocimportant p, .iocreference p{
+	margin-bottom:0px !important;
+}
+
+.ioctext pre, .ioctextl pre, .iocquote pre, .iocexemple pre{
+	margin-bottom:0px !important;
+}
+
+.ioctitle{
+	font-weight:bold;
 }

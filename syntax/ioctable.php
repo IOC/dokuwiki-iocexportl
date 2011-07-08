@@ -2,6 +2,12 @@
 /**
  * Table Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
+ * syntax
+ * 	::table:id
+   	  :title:
+   	  :footer:
+      :large: (bool)
+	:::
  */
 
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
@@ -11,6 +17,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
 
+    var $id;
     /**
      * return some info
      */
@@ -63,12 +70,12 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
      */
     function handle($match, $state, $pos, &$handler){
         $matches = array();
-		$title = '';
+		$id = '';
 		$params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
                 if (preg_match('/::table:(.*?)\n/', $match, $matches)){
-					$title = $matches[1];
+					$id = $matches[1];
                 }
                 break;
             case DOKU_LEXER_UNMATCHED :
@@ -81,7 +88,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             case DOKU_LEXER_EXIT :
                 break;
         }
-        return array($state, $match, $title, $params);
+        return array($state, $match, $id, $params);
     }
 
     /**
@@ -89,44 +96,89 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         if ($mode === 'ioccounter'){
-            list ($state, $text, $title, $params) = $data;
+            list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-                        $renderer->doc .= $title;
                     break;
                 case DOKU_LEXER_UNMATCHED :
+                    $renderer->doc .= (isset($params['title']))?$params['title']:'';
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $renderer->doc .= (isset($params['footer']))?$params['footer']:'';
                     break;
                 case DOKU_LEXER_EXIT :
                     break;
             }
             return TRUE;
         }elseif ($mode === 'iocexportl'){
-            list ($state, $text, $title, $params) = $data;
+            list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-    				$_SESSION['table_title'] = $title;
+                    $this->id = trim($id);
                     break;
                 case DOKU_LEXER_UNMATCHED :
-                    $_SESSION['table_id'] = (isset($params['id']))?$params['id']:'';
+                    $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
+                    $_SESSION['table_footer'] = (isset($params['footer']) && !isset($params['large']))?trim($renderer->_xmlEntities($params['footer'])):'';
+                    $_SESSION['table_id'] = $this->id;
                     if (isset($params['large'])){
+                        $renderer->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{}{\hspace*{-\marginparwidth}\hspace*{-11mm}}'.DOKU_LF;
+                        $renderer->doc .= '\parbox[c]{\marginparwidth+\marginparsep}{'.DOKU_LF;
+                        $_SESSION['table_large'] = TRUE;
+                    }elseif (isset($params['small'])){
+                        $_SESSION['table_small'] = TRUE;
+                        $renderer->doc .= '\begin{SCtable}[1][h]'.DOKU_LF;
+                    }elseif (isset($params['vertical'])){
                         $renderer->doc .= '\begin{landscape}'.DOKU_LF;
                     }
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    if (isset($params['footer'])) {
-                        $renderer->doc .=  '\raggedright\parbox[c]{\linewidth}{\textsf{\tiny\begin{flushright}\vspace{-20mm}'.trim($renderer->_xmlEntities($params['footer'])).'\end{flushright}}}';
+                    if (isset($params['footer']) && isset($params['large'])) {
+                        $hspace = '[\textwidth+\marginparwidth+10mm]';
+                        $vspace = '\vspace{4mm}';
+                        $renderer->doc .=  $vspace.'\tablefooterlarge'.$hspace.'{'.trim($renderer->_xmlEntities($params['footer'])).'}';
                     }
                     if (isset($params['large'])){
+                        $renderer->doc .= '}'.DOKU_LF;
+                    }elseif (isset($params['vertical'])){
                         $renderer->doc .= '\end{landscape}'.DOKU_LF;
+                    }elseif (isset($params['small'])){
+                        $renderer->doc .= '\end{SCtable}'.DOKU_LF;
                     }
+                    $renderer->doc .= '\vspace{-2ex}\par'.DOKU_LF;
                     $_SESSION['table_id'] = '';
                     $_SESSION['table_title'] = '';
+                    $_SESSION['table_footer'] = '';
+                    $_SESSION['table_large'] = FALSE;
+                    $_SESSION['table_small'] = FALSE;
                     break;
                 case DOKU_LEXER_EXIT :
+                    $this->id = '';
                     break;
             }
+            return TRUE;
+        }elseif ($mode === 'xhtml'){
+            list ($state, $text, $id, $params) = $data;
+            switch ($state) {
+                    case DOKU_LEXER_ENTER :
+                        $renderer->doc .= '<div class="ioctable">';
+                        $renderer->doc .= '<a name="'.$id.'">';
+                        $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
+                        $renderer->doc .= '</a>';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
+                        if (isset($params['title'])){
+                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
+                        }
+                        if (isset($params['footer'])){
+                        $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
+                        }
+                        $instructions = p_get_instructions($text);
+                        $renderer->doc .= p_render($mode, $instructions, $info);
+                        $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_EXIT :
+                        break;
+                }
             return TRUE;
         }
         return FALSE;

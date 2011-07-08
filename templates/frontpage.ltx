@@ -5,15 +5,20 @@
 %FrontPage
 \hyphenpenalty=100000
 \begin{spacing}{0.8}
-\begin{textblock*}{145mm}(1cm,11cm)
+\begin{textblock*}{145mm}(1cm,7,6cm)
 	\raggedright\noindent\fontfamily{phv}\selectfont
 	\Huge 
 	@IOC_EXPORT_NOMCOMPLERT@\\
 	\vspace{10mm}
+	\begin{spacing}{1}
 	\Large
 	@IOC_EXPORT_AUTOR@
+	\end{spacing}
+	\vspace{.6em}
+	\normalsize
+	@IOC_EXPORT_EXTRA@
 \end{textblock*}
-\begin{textblock*}{145mm}(10mm,214mm)
+\begin{textblock*}{145mm}(10mm,219mm)
 	\parbox[c][10mm]{145mm}{
 	\raggedright\noindent\fontfamily{phv}\selectfont
 	\huge\bfseries
@@ -22,6 +27,10 @@
 \end{textblock*}
 \end{spacing}
 \hyphenpenalty=1000
+%Empty page
+\newpage
+\thispagestyle{empty}
+\mbox{}
 \newpage
 %TOC
 \newgeometry{top=20mm, bottom=20mm, right=20mm, left=20mm}

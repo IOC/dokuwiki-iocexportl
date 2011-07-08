@@ -21,14 +21,22 @@ $unitzero = FALSE;
 $tmp_dir = '';
 $media_path = 'lib/exe/fetch.php?media=';
 $exportallowed = FALSE;
-$img_src = array('familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
+$meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia');
+$img_src = array('familyicon_administracio.png','familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
+$ioclanguage = array('CA' => 'catalan', 'DE' => 'german', 'EN' => 'english','ES' => 'catalan','FR' => 'frenchb','IT' => 'italian');
+$ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
+//Due listings problems whith header it's necessary to replace extended characters
+$ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç');
+$end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}');
 
 if (!checkPerms()) return FALSE;
-
 $exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
 if (!$exportallowed && !auth_isadmin()) return FALSE;
 
 $time_start = microtime(TRUE);
+
+//get seccions to export
+$toexport = explode(',',$_POST['toexport']);
 
 $output_filename = str_replace(':','_',$id);
 if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return FALSE;
@@ -53,10 +61,16 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     }
     //get all pages and activitites
     $data = getData();
+
     //FrontPage
     renderFrontpage($latex, $data);
     $latex .= '\frontpageparskip'.DOKU_LF;
     $_SESSION['createbook'] = TRUE;
+    //Sets default language
+    $lang = preg_replace('/\n/', '', $_POST['ioclanguage']);
+    $language = empty($_POST['ioclanguage'])?$ioclanguage['CA']:$ioclanguage[$lang];
+    $latex = preg_replace('/@IOCLANGUAGE@/', $language, $latex, 1);
+    $latex = preg_replace('/@IOCLANGCONTINUE@/', $ioclangcontinue[$lang], $latex, 1);
     //Render a non unit zero
     if (!$unitzero){
         $_SESSION['chapter'] = 1;
@@ -68,6 +82,10 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
         }
         //Content
         foreach ($data[0]['pageid'] as $page){
+            //Check whether this page has to be exported
+            if (!in_array($page, $toexport)){
+                continue;
+            }
             $text = io_readFile(wikiFN($page));
             $instructions = get_latex_instructions($text);
             $latex .= p_latex_render('iocexportl', $instructions, $info);
@@ -75,6 +93,10 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             if (array_key_exists($page, $data[0]['activities'])){
                 $_SESSION['activities'] = TRUE;
                 foreach ($data[0]['activities'][$page] as $act){
+                    //Check whether this page has to be exported
+                    if (!in_array($act, $toexport)){
+                        continue;
+                    }
                     $text = io_readFile(wikiFN($act));
                     $instructions = get_latex_instructions($text);
                     $latex .= p_latex_render('iocexportl', $instructions, $info);
@@ -85,28 +107,32 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
     }else{//Render unit zero
         $_SESSION['u0'] = TRUE;
         $text = io_readFile(wikiFN($id));
-        $text = preg_replace('/(\={6} .*? \={6}\n{2,}\={5} [M|m]eta \={5}\n{2,}( {2,4}\* \*\*\w+\*\*:.*\n?)+)/', '', $text);
+        $text = preg_replace('/(\={6} ?.*? ?\={6}\n{2,}\={5} [M|m]eta \={5}\n{2,}( {2,4}\* \*\*[^\*]+\*\*:.*\n?)+)/', '', $text);
         preg_match('/(?<=\={5} [C|c]redits \={5})\n+(.*?\n?)+(?=\={5} [C|c]opyright \={5})/', $text, $matches);
         if (isset($matches[0])){
-            $latex .= '\creditspacingpar\scriptsize\credits' . DOKU_LF;
+            $latex .= '\creditspacingline\creditspacingpar\scriptsize' . DOKU_LF;
             $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
-            $matches[0] = preg_replace('/\n{2,3}/', '@IOCBR@', $matches[0]);
+            $matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
             $instructions = get_latex_instructions($matches[0]);
             $latex .= p_latex_render('iocexportl', $instructions, $info);
-            $latex = preg_replace('/@IOCBR@/', DOKU_LF.DOKU_LF.'\vspace{5mm} ', $latex);
+            $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
             $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
             preg_match('/(?<=\={5} copyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
             if (isset($matches[0])){
+				$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
                 $latex .= '\vfill'.DOKU_LF;
                 $instructions = get_latex_instructions($matches[0]);
                 $latex .= p_latex_render('iocexportl', $instructions, $info);
+				$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
                 $text = preg_replace('/\={5} [C|c]opyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
                 preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
                 if (isset($matches[0])){
-                    $latex .= '\renewcommand{\baselinestretch}{1.9}\tiny'.DOKU_LF;
+                    $latex .= '\creditspacingline\creditspacingpar\tiny\par\vspace{2ex}'.DOKU_LF.DOKU_LF;
                     $matches[0] = preg_replace('/(http.*)/', DOKU_LF.DOKU_LF.'$1', $matches[0]);
+					$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
                     $instructions = get_latex_instructions($matches[0]);
                     $latex .= p_latex_render('iocexportl', $instructions, $info);
+					$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
                     $text = preg_replace('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', '', $text);
                 }
             }
@@ -146,31 +172,39 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $tmp_dir;
         global $unitzero;
         global $img_src;
+        global $ini_characters;
+        global $end_characters;
 
         if ($unitzero){
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
             $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', $data[1]['familia'], $latex);
-            if (preg_match('/electricitat/i', $data[1]['familia'])){
+            if (preg_match('/administraci/i', $data[1]['familia'])){
                 $family = 0;
-            }elseif (preg_match('/socioculturals/', $data[1]['familia'])){
+            }elseif (preg_match('/electricitat/i', $data[1]['familia'])){
                 $family = 1;
-            }else{
+            }elseif (preg_match('/socioculturals/', $data[1]['familia'])){
                 $family = 2;
+            }else{
+                $family = 3;
             }
             copy(DOKU_PLUGIN.'iocexportl/templates/'.$img_src[$family], DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media/'.$img_src[$family]);
             $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$img_src[$family], $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
-            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);
-            $size = strlen(trim($data[1]['nomcomplert']));
+            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
             $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $data[1]['ciclenom'], $latex);
         }else{
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx');
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
-            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],70,'\break ')), $latex);
-            $size = strlen(trim($data[1]['nomcomplert']));
-            $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', $data[1]['autor'], $latex, 1);
-            $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditnom'], $latex);
+            $header_nomcomplert = str_replace($ini_characters, $end_characters, $data[1]['nomcomplert']);
+            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
+            $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', $data[1]['autoria'], $latex, 1);
+            if (!isset($data[1]['extra'])){
+                $data[1]['extra'] = '';
+            }
+            $latex = preg_replace('/@IOC_EXPORT_EXTRA@/', $data[1]['extra'], $latex, 1);
+            $header_creditnom = str_replace($ini_characters, $end_characters, $data[1]['creditnom']);
+            $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $header_creditnom, $latex);
         }
     }
 
@@ -393,11 +427,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             if (@file_exists($file)) {
                 $matches = array();
                 $txt =  io_readFile($file);
-                preg_match_all('/(?<=\={5} [T|t]oc \={5})\n+(\s{2,4}\*\s+\[\[.*?\]\]\n?)+/i', $txt, $matches);
+                preg_match_all('/(?<=\={5} [T|t]oc \={5})\n+(\s{2,4}\*\s+\[\[[^\]]+\]\] *\n?)+/i', $txt, $matches);
                 $pages = implode('\n', $matches[0]);
                 //get exercises and activities
                 $pages = getActivities($data, $pages);
-                preg_match_all('/\[\[([^|]+).*?\]\]+/', $pages, $matches);
+                preg_match_all('/\[\[([^|]+).*?\]\] */', $pages, $matches);
                 $counter = 0;
                 foreach ($matches[1] as $page){
                     resolve_pageid(getNS($id),$page,$exists);
@@ -443,7 +477,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $matches = array();
         $data['activities'] = array();
         //return all pages with activities
-        preg_match_all('/\s{2}\*\s+\[\[.*?\]\]\n(\s{4}\*\s+\[\[.*?\]\]\n?)+/', $pages, $matches);
+        preg_match_all('/\s{2}\*\s+\[\[.*?\]\]\n(\s{4}\*\s+\[\[.*?\]\] *\n?)+/', $pages, $matches);
         foreach ($matches[0] as $match){
             //return page namespace
             preg_match('/\s{2}\*\s+\[\[([^|]+).*?\]\]/', $match, $ret);
@@ -474,23 +508,31 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     function getData(){
         global $id;
         global $unitzero;
+        global $meta_params;
 
         $data = array();
         $data[0] = array();
         $data[1] = array();
         $file = wikiFN($id);
+        $inf = NULL;
         if (@file_exists($file)) {
             $info = io_grep($file, '/(?<=\={6} )[^\=]*/', 0, TRUE);
             $data[1]['nomcomplert'] = $info[0][0];
             $text = io_readFile($file);
             $info = array();
-            preg_match_all('/(?<=\={5} [M|m]eta \={5}\n\n)\n*( {2,4}\* \*\*\w+\*\*:.*\n?)+/', $text, $info, PREG_SET_ORDER);
+            preg_match_all('/(?<=\={5} [M|m]eta \={5}\n\n)\n*( {2,4}\* \*\*.*?\*\*:.*\n?)+/', $text, $info, PREG_SET_ORDER);
             if (!empty($info[0][0])){
                 $text = $info[0][0];
-                preg_match_all('/ {2,4}\* \*\*(\w+)\*\*:(.*)/m', $text, $info, PREG_SET_ORDER);
+                preg_match_all('/ {2,4}\* (\*\*(.*?)\*\*:)(.*)/m', $text, $info, PREG_SET_ORDER);
                 foreach ($info as $i){
-                    $key = trim($i[1]);
-                    $data[1][$key] = trim($i[2]);
+                    $key = trim($i[2]);
+                    if (in_array($key, $meta_params)){
+                        $data[1][$key] = trim($i[3]);
+                    }else{
+                        $instructions = get_latex_instructions(trim($i[1].$i[3]));
+                        $latex = p_latex_render('iocexportl', $instructions, $inf);
+                        $data[1]['extra'] = $latex;
+                    }
                 }
             }
             //get page names

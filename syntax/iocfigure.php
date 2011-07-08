@@ -2,6 +2,12 @@
 /**
  * Figure Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
+ * 	::figure:id
+  	  :title:
+  	  :footer:
+  	  :copyright:
+  	  :license:
+	:::
  */
 
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../').'/');
@@ -94,8 +100,12 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                 case DOKU_LEXER_ENTER : break;
                 case DOKU_LEXER_UNMATCHED :
+                    $_SESSION['figure'] = TRUE;
+                    $renderer->doc .= (isset($params['title']))?$params['title']:'';
+                    $renderer->doc .= (isset($params['footer']))?$params['footer']:'';
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $_SESSION['figure'] = FALSE;
                     break;
                 case DOKU_LEXER_EXIT :
                     break;
@@ -105,12 +115,18 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-    				$_SESSION['figlabel'] = $renderer->_xmlEntities($id);
+    				$_SESSION['figlabel'] = trim($renderer->_xmlEntities($id));
     				break;
                 case DOKU_LEXER_UNMATCHED :
+                    $_SESSION['figure'] = TRUE;
+                    $_SESSION['figtitle'] = (isset($params['title']))?$params['title']:'';
+                    $_SESSION['figfooter'] = (isset($params['footer']))?$params['footer']:'';
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    $_SESSION['figure'] = FALSE;
     				$_SESSION['figlabel'] = '';
+    				$_SESSION['figtitle'] = '';
+    				$_SESSION['figfooter'] = '';
                     break;
                 case DOKU_LEXER_EXIT :
                     if (isset($params['footer'])){
@@ -118,6 +134,30 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                     }
                     break;
             }
+            return TRUE;
+        }elseif ($mode === 'xhtml'){
+            list ($state, $text, $id, $params) = $data;
+            switch ($state) {
+                    case DOKU_LEXER_ENTER :
+                        $renderer->doc .= '<div class="iocfigure">';
+                        $renderer->doc .= '<a name="'.$id.'">';
+                        $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
+                        $renderer->doc .= '</a>';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
+                        if (isset($params['title'])){
+                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
+                        }
+                        if (isset($params['footer'])){
+                            $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
+                        }
+                        $instructions = p_get_instructions($text);
+                        $renderer->doc .= p_render($mode, $instructions, $info);
+                        $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_EXIT :
+                        break;
+                }
             return TRUE;
         }
         return FALSE;

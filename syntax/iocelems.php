@@ -49,15 +49,11 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         return 514;
     }
 
-    function getAllowedTypes(){
-       return array('container');
-    }
-
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('::(?:image|text|note|reference|quote|important|example):.*?\n(?=.*?\n:::)',$mode,'plugin_iocexportl_iocelems');
+        $this->Lexer->addEntryPattern('::(?:text|note|reference|quote|important|example):.*?\n+(?=.*?\n:::)',$mode,'plugin_iocexportl_iocelems');
     }
     function postConnect() {
         $this->Lexer->addExitPattern('\n:::','plugin_iocexportl_iocelems');
@@ -68,83 +64,128 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
      */
 
     function handle($match, $state, $pos, &$handler){
-        $opt = array();
+        $matches = array();
+		$params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                return array($state, $match);
-
+                break;
             case DOKU_LEXER_UNMATCHED :
-                return array($state, $match);
-
-            default:
-                return array($state);
+                preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
+                foreach($matches as $m){
+                    $params[$m[1]] = $m[2];
+                }
+                $match = preg_replace('/\s{2}:\w+:.*?\n/', '',  $match);
+                break;
+            case DOKU_LEXER_EXIT :
+                break;
         }
+        return array($state, $match, $params);
     }
 
    /**
     * output
     */
     function render($mode, &$renderer, $indata) {
-        if ($mode !== 'iocexportl') return FALSE;
-        list($state, $data) = $indata;
-        switch ($state) {
-          case DOKU_LEXER_ENTER :
-                $class = '';
-                if(!empty($data)){
-                    $class = $data;
-                }
-                //avoid hyphenation
-                $renderer->doc .= '\hyphenpenalty=100000'.DOKU_LF;
-                $this->tipus = $class;
-                break;
-            case DOKU_LEXER_UNMATCHED :
-                if($this->tipus === 'important'){
-                    $renderer->doc .= '\textA{'.$this->_parse($data, $mode).'}';
-                }elseif($this->tipus === 'complementari'){
+        if($mode === 'ioccounter'){
+            list($state, $text, $params) = $indata;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  $renderer->doc .= (isset($params['title']))?$params['title']:'';
+                  $instructions = get_latex_instructions($text);
+                  $renderer->doc .= p_latex_render($mode,$instructions,$info);
+                  break;
+              case DOKU_LEXER_EXIT :
+                  break;
+            }
+            return TRUE;
+        }elseif ($mode === 'iocexportl'){
+            list($state, $data, $params) = $indata;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
                     $matches = array();
-                    preg_match('/^\n?(.*?)\n+/', $data, $matches);
-                    $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
-                    $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                    $renderer->doc .= '\textB{'.$title.'}{'.$this->_parse($data, $mode).'}';
-                }elseif($this->tipus === 'notaBreu'){
-                    $renderer->doc .= '\notaBreu{'.$this->_parse($data, $mode).'}';
-                }elseif($this->tipus === 'image'){
-                    $renderer->doc .= '\bfseries{$data}';
-                    $renderer->doc .= '\textB{IMATGE B}{'.($this->_parse('{{'.$data.'}}', $mode)).'}';
-                }elseif($this->tipus === 'exemple'){
-                    $matches = array();
-                    preg_match('/^\n{0,2}(.*?)\n+/', $data, $matches);
-                    $title = $this->_parse($matches[1], $mode);
-                    $data = preg_replace('/^\n{0,2}(.*?)\n+/', '', $data);
-                    $renderer->doc .= '\textD{'.$title.'}{'.$this->_parse($data, $mode).'}{0mm}';
-                }elseif($this->tipus === 'textG' || $this->tipus === 'textE'){
-                    $matches = array();
-                    preg_match('/^\n?(.*?)\n+/', $data, $matches);
-                    $title = preg_replace('/\\\\textbf{(.*?)}/', '$1', $this->_parse($matches[1], $mode));
-                    if (empty($title)){
-                        $title = '\textcolor{red}{\textbf{SENSE TÍTOL}}';
+                    //avoid hyphenation
+                    $renderer->doc .= '\hyphenpenalty=100000'.DOKU_LF;
+                    preg_match('/::([^:]*):/', $data, $matches);
+                    $this->tipus = (isset($matches[1]))?$matches[1]:'';
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    //IMPORTANT
+                    if($this->tipus === 'important'){
+                        $renderer->doc .= '\iocimportant{'.$this->_parse($data, $mode).'}';
+                    //TEXT
+                    }elseif($this->tipus === 'text'){
+                        if (isset($params['large'])){
+                            $this->tipus = 'ioctextl';
+                        }else{
+                            $this->tipus = 'ioctext';
+                        }
+                        $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
+                        $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
+                        $renderer->doc .= '\\'.$this->tipus.$offset.'{'.$title.'}{'.$this->_parse($data, $mode).'}';
+                    //NOTE
+                    }elseif($this->tipus === 'note'){
+                        $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
+                        $renderer->doc .= '\iocnote'.$offset.'{'.$this->_parse($data, $mode).'}';
+                    //QUOTE
+                    }elseif($this->tipus === 'quote'){
+                        $renderer->doc .= '\iocquote{'.$this->_parse($data, $mode).'}';
+                    //EXAMPLE
+                    }elseif($this->tipus === 'example'){
+                        $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
+                        $renderer->doc .= '\iocexample{'.$title.'}{'.$this->_parse($data, $mode).'}';
+                    //REFERENCE
+                    }elseif($this->tipus === 'reference'){
+                        $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
+                        $renderer->doc .= '\iocreference'.$offset.'{'.$this->_parse($data, $mode).'}';
+                    }else{
+                        $renderer->doc .= $this->_parse($data, $mode);
                     }
-                    $data = preg_replace('/^\n?(.*?)\n+/', '', $data);
-                    $renderer->doc .= '\textX{'.$title.'}{'.$this->_parse($data, $mode).'}';
-                }else{
-                    $renderer->doc .= $this->_parse($data, $mode);
-                }
-                break;
-            case DOKU_LEXER_EXIT :
-                //allow hyphenation
-                $renderer->doc .= '\hyphenpenalty=1000'.DOKU_LF;
-                $this->tipus = '';
-                break;
+                    break;
+                case DOKU_LEXER_EXIT :
+                    //allow hyphenation
+                    $renderer->doc .= '\hyphenpenalty=1000'.DOKU_LF;
+                    $this->tipus = '';
+                    break;
+            }
+            return TRUE;
+        }elseif ($mode === 'xhtml'){
+            list($state, $data, $params) = $indata;
+            switch ($state) {
+                    case DOKU_LEXER_ENTER :
+                        $matches = array();
+                        preg_match('/::([^:]*):/', $data, $matches);
+                        $this->tipus = (isset($matches[1]))?$matches[1]:'';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
+                        $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
+                        //TEXT LARGE
+                        if($this->tipus === 'text' && isset($params['large'])){
+                            $this->tipus = 'textl';
+                        }
+                        $renderer->doc .= '<div class="ioc'.$this->tipus.'">';
+                        if (!empty($title)){
+                            $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
+                        }
+                        $instructions = p_get_instructions($data);
+                        $renderer->doc .= p_render($mode, $instructions, $info);
+                        $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_EXIT :
+                        break;
+            }
+            return TRUE;
         }
-        return TRUE;
+        return FALSE;
     }
 
     function _parse($text, $mode){
         $info = array();
-        $_SESSION['iocstl'] = TRUE;
+        $_SESSION['iocelem'] = ($this->tipus === 'example' || $this->tipus === 'ioctextl' || $this->tipus === 'quote')?'textl':TRUE;
         $instructions = get_latex_instructions($text);
         $text = p_latex_render($mode, $instructions, $info);
-        $_SESSION['iocstl'] = FALSE;
-        return preg_replace('/\n\n/', '', $text);
+        $_SESSION['iocelem'] = FALSE;
+        return preg_replace('/(.*?)(\n*)$/', '$1', $text);
     }
 }

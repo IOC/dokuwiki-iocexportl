@@ -172,15 +172,25 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
         $this->doc .= $x.$y;
     }
 
-    function singlequoteopening() {}
+    function singlequoteopening() {
+        $this->doc .= "'";
+    }
 
-    function singlequoteclosing() {}
+    function singlequoteclosing() {
+        $this->doc .= "'";
+    }
 
-    function apostrophe() {}
+    function apostrophe() {
+        $this->doc .= "'";
+    }
 
-    function doublequoteopening() {}
+    function doublequoteopening() {
+        $this->doc .= '"';
+    }
 
-    function doublequoteclosing() {}
+    function doublequoteclosing() {
+        $this->doc .= '"';
+    }
 
     function php($text, $wrapper='dummy') {
         $this->doc .= $text;
@@ -215,7 +225,11 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
     }
 
     function internalmedia ($src, $title=null, $align=null, $width=null,
-                            $height=null, $cache=null, $linking=null) {}
+                            $height=null, $cache=null, $linking=null) {
+        if(!$_SESSION['figure']){
+            $this->doc .= $title;
+        }
+    }
 
     function externalmedia ($src, $title=NULL, $align=NULL, $width=NULL,
                             $height=NULL, $cache=NULL, $linking=NULL) {

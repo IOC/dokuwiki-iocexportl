@@ -100,6 +100,19 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return TRUE;
+        }elseif($mode === 'xhtml'){
+            list($state, $text) = $data;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  $instructions = p_get_instructions($text);
+                  $renderer->doc .= p_render($mode, $instructions, $info);
+                  break;
+              case DOKU_LEXER_EXIT :
+                  break;
+            }
+            return TRUE;
         }
         return FALSE;
     }

@@ -31,7 +31,7 @@ if (!checkPerms()) return FALSE;
             $text = io_readFile($path);
             $text = preg_replace('/<noprint>\n?<noweb>\n?(<verd>.*?<\/verd>)\n?<\/noweb>\n?<\/noprint>/', '$1',$text);
             $instructions = get_latex_instructions($text);
-            $clean_text = p_latex_render('ioccounter', $instructions, &$info);
+            $clean_text = p_latex_render('ioccounter', $instructions, $info);
             if (preg_match('/::IOCVERDINICI::/', $clean_text)){
                 $matches = array();
                 preg_match_all('/(?<=::IOCVERDINICI::)(.*?)(?=::IOCVERDFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
