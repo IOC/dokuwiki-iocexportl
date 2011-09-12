@@ -36,6 +36,7 @@
 \usepackage[safe]{tipa}%Used fonetical symbols
 \usepackage{amsmath}%Used for matrix environment
 \usepackage[leftcaption]{sidecap}
+\usepackage[official]{eurosym}%Euro currency symbol
 @IOCQRCODE@ %qrcodes
 
 % ***************** CUSTOMIZED COMMANDS *****************
@@ -50,10 +51,12 @@
 \newenvironment{examplebody}{\begin{spacing}{1.2}\defaultspacingpar\ioctextfont}{\end{spacing}\normalfont}
 \newcommand{\iocalignment}{\checkoddpage\ifthenelse{\boolean{oddpage}}{\raggedright}{\raggedleft}}
 \newcommand{\tablelargecaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=-62mm}}
+\newcommand{\tableiocelemcaption}{\captionsetup{font={scriptsize,bf},labelfont={scriptsize,sc},justification=raggedright,singlelinecheck=false,labelsep=period, margin=6mm}}
 \newcommand{\tablecaption}{\captionsetup{labelsep=period}}
 \newcommand{\tablesmallcaption}[1]{\captionsetup{labelsep=period, margin=(.5\linewidth-((\the\tabucolX+4mm) * #1)/2)}}
 \newcommand{\tablecaptioncontinue}{\captionsetup{labelsep=space}}
 \newcommand{\ioclangcontinue}{@IOCLANGCONTINUE@}
+\newcommand{\tableiocelemsize}{.9\textwidth}
 
 \newcommand{\iocimportant}[1]{
 	\begin{flushleft}
@@ -363,6 +366,9 @@
 	{\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries }
 	\titleformat{\subsection}[display]
 	{\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries }
+%	\titleformat{\paragraph}[display]
+%	{\normalfont\bfseries}{}{0pt}{\normalfont\normalsize\bfseries }
+%	\titlespacing*{\paragraph}{0pt}{*1}{3ex}
 }
 
 \newcommand{\headingnumbers}{
@@ -375,6 +381,9 @@
 	{\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\normalsize\bfseries \thesubsection\ }
 	\titleformat{\subsubsection}[display]
 	{\normalfont\bfseries}{}{0pt}{\fontfamily{phv}\selectfont\subsub\bfseries }
+%	\titleformat{\paragraph}[display]
+%	{\normalfont\bfseries}{}{0pt}{\normalfont\normalsize\bfseries }
+%	\titlespacing*{\paragraph}{0pt}{*1}{3ex}
 }
 
 %Customize links style 

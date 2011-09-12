@@ -115,6 +115,18 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+        }elseif ($mode === 'iocxhtml'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $renderer->doc .= $text;
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return TRUE;
         }
         return FALSE;
     }

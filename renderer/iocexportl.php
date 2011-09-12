@@ -138,6 +138,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!isset($_SESSION['figlabel'])){
             $_SESSION['figlabel'] = '';
         }
+        if (!isset($_SESSION['figlarge'])){
+            $_SESSION['figlarge'] = FALSE;
+        }
         if (!isset($_SESSION['figtitle'])){
             $_SESSION['figtitle'] = '';
         }
@@ -271,8 +274,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && $_SESSION['iocelem'] !== 'textl'){
             $max_width = '[width=35mm]';
             $img_width = FALSE;
-        }elseif (!$this->table && $width > self::$p_width && $_SESSION['iocelem'] !== 'textl'){
+        }elseif (!$this->table && $width > self::$p_width && $_SESSION['iocelem'] !== 'textl' && !$_SESSION['figlarge']){
             $max_width = '[width=\textwidth]';
+            $img_width = FALSE;
+        }elseif($_SESSION['figlarge']){
+            $max_width = '[width=\textwidth+\marginparwidth+\marginparsep]';
             $img_width = FALSE;
         }else{
             $max_width = '[width='.$width.'px]';
@@ -462,6 +468,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }elseif($_SESSION['activities']){
             $this->doc .= '\headingnumbers';
         }
+		//CAL ELIMINAR VARIABLE breakline al canviar el header de nivell 5!!!!!!!
         $breakline = ($level === 5)?"\hspace*{\\fill}\\\\":"";
         $this->doc .= '\hyphenpenalty=100000'.DOKU_LF;
         $this->doc .= "$token$chapternumber{" . $text . "}". $breakline .DOKU_LF;
@@ -589,6 +596,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $tablecaption = '\tablesmallcaption{'.$maxcols.'}';
             $col_width = '';
             $table_type = 'tabu';
+        }elseif($_SESSION['iocelem']){
+            $large = ' to \tableiocelemsize';
+            $tablecaption = '\tableiocelemcaption';
         }
         $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
         for($i=0; $i < $maxcols; $i++){
@@ -929,7 +939,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $text = preg_replace('/([%{}])/', '\\$1', $text);
             $this->doc .=  $this->_format_text($text) . '^^J';
             $this->doc .= '\end{csource}'.DOKU_LF;
-            $this->doc .= '\end{minipage}'.DOKU_LF;
+            $this->doc .= '\end{minipage}\linebreak'.DOKU_LF;
         }
     }
 

@@ -114,6 +114,19 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
                     break;
             }
             return TRUE;
+        }elseif ($mode === 'iocxhtml'){
+            list ($state, $text) = $data;
+            switch ($state) {
+                case DOKU_LEXER_ENTER :
+                    break;
+                case DOKU_LEXER_UNMATCHED :
+                    $instructions = get_latex_instructions($text);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                    break;
+                case DOKU_LEXER_EXIT :
+                    break;
+            }
+            return TRUE;
         }
         return FALSE;
     }

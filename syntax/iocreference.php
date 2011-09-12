@@ -62,8 +62,12 @@ class syntax_plugin_iocexportl_iocreference extends DokuWiki_Syntax_Plugin {
             list($state, $match) = $data;
             $renderer->doc .= $match;
             return TRUE;
-        }
-        elseif($mode === 'xhtml'){
+        }elseif($mode === 'xhtml'){
+            list($state, $match) = $data;
+            $match = preg_replace('/(:(?:figure|table):)([^:]+)(:)/','<a href="#$2">$2</a>',$match);
+            $renderer->doc .= $match;
+            return TRUE;
+        }elseif($mode === 'iocxhtml'){
             list($state, $match) = $data;
             $match = preg_replace('/(:(?:figure|table):)([^:]+)(:)/','<a href="#$2">$2</a>',$match);
             $renderer->doc .= $match;

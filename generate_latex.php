@@ -117,7 +117,7 @@ if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
             $latex .= p_latex_render('iocexportl', $instructions, $info);
             $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
             $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
-            preg_match('/(?<=\={5} copyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
+            preg_match('/(?<=\={5} [C|c]opyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
             if (isset($matches[0])){
 				$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
                 $latex .= '\vfill'.DOKU_LF;

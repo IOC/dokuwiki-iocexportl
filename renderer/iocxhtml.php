@@ -95,7 +95,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         //Check whether user can export
 		$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$exportallowed && !auth_isadmin()) die;
-
+/*
         if (!isset($_SESSION['tmp_dir'])){
             $this->tmp_dir = rand();
         }else{
@@ -109,7 +109,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             //copy(DOKU_PLUGIN.'iocexportl/templates/backgroundu0.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/backgroundu0.pdf');
         }else{
             //copy(DOKU_PLUGIN.'iocexportl/templates/background.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/background.pdf');
-        }
+        }*/
 
         //Global variables
         $this->_initialize_globals();
@@ -119,12 +119,47 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      * Closes the document
      */
     function document_end(){
-        $this->doc = preg_replace('/@IOCKEYSTART@/','\{', $this->doc);
+/*        $this->doc = preg_replace('/@IOCKEYSTART@/','\{', $this->doc);
         $this->doc = preg_replace('/@IOCKEYEND@/','\}', $this->doc);
         $this->doc = preg_replace('/@IOCBACKSLASH@/',"\\\\", $this->doc);
         $this->doc = preg_replace('/(textbf{)(\s*)(.*?)(\s*)(})/',"$1$3$5", $this->doc);
         $this->doc = preg_replace('/(raggedright)(\s{2,*})/',"$1 ", $this->doc);
-		$this->_create_refs();
+		$this->_create_refs();*/
+    }
+
+
+    /**
+     * Register a new edit section range
+     *
+     * @param $type  string The section type identifier
+     * @param $title string The section title
+     * @param $start int    The byte position for the edit start
+     * @return string A marker class for the starting HTML element
+     * @author Adrian Lang <lang@cosmocode.de>
+     */
+    public function startSectionEdit($start, $type, $title = null) {
+        static $lastsecid = 0;
+        $this->sectionedits[] = array(++$lastsecid, $start, $type, $title);
+        return 'sectionedit' . $lastsecid;
+    }
+
+    /**
+     * Finish an edit section range
+     *
+     * @param $end int The byte position for the edit end; null for the rest of
+                       the page
+     * @author Adrian Lang <lang@cosmocode.de>
+     */
+    public function finishSectionEdit($end = null) {
+        list($id, $start, $type, $title) = array_pop($this->sectionedits);
+        if (!is_null($end) && $end <= $start) {
+            return;
+        }
+        $this->doc .= "<!-- EDIT$id " . strtoupper($type) . ' ';
+        if (!is_null($title)) {
+            $this->doc .= '"' . str_replace('"', '', $title) . '" ';
+        }
+        $this->doc .= "[$start-" . (is_null($end) ? '' : $end) . '] -->';
     }
 
 
@@ -178,11 +213,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
 	/**
      * NOVA
-     */
+     *//*
     function _create_refs(){
 		$this->doc = preg_replace('/:figure:(.*?):/',"\\\\MakeLowercase{\\\\figurename}  \\\\ref{\\1}", $this->doc);
 		$this->doc = preg_replace('/:table:(.*?):/',"\\\\MakeLowercase{\\\\tablename}  \\\\ref{\\1}", $this->doc);
-    }
+    }*/
 
 	/**
      * NOVA
@@ -292,92 +327,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
         $this->_codeblock++;
     }
-    /**
-     * Renders internal and external media
-     *
-     * @author Andreas Gohr <andi@splitbrain.org>
-     */
-    function _media ($src, $title=NULL, $align=NULL, $width=NULL,
-                      $height=NULL, $cache=NULL, $render = true) {
 
-        $ret = '';
-
-        list($ext,$mime,$dl) = mimetype($src);
-        if(substr($mime,0,5) == 'image'){
-            // first get the $title
-            if (!is_null($title)) {
-                $title  = $this->_xmlEntities($title);
-            }elseif($ext == 'jpg' || $ext == 'jpeg'){
-                //try to use the caption from IPTC/EXIF
-                require_once(DOKU_INC.'inc/JpegMeta.php');
-                $jpeg =new JpegMeta(mediaFN($src));
-                if($jpeg !== false) $cap = $jpeg->getTitle();
-                if($cap){
-                    $title = $this->_xmlEntities($cap);
-                }
-            }
-            if (!$render) {
-                // if the picture is not supposed to be rendered
-                // return the title of the picture
-                if (!$title) {
-                    // just show the sourcename
-                    $title = $this->_xmlEntities(basename(noNS($src)));
-                }
-                return $title;
-            }
-            //add image tag
-            $ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
-            $ret .= ' class="media'.$align.'"';
-
-            // make left/right alignment for no-CSS view work (feeds)
-            if($align == 'right') $ret .= ' align="right"';
-            if($align == 'left')  $ret .= ' align="left"';
-
-            if ($title) {
-                $ret .= ' title="' . $title . '"';
-                $ret .= ' alt="'   . $title .'"';
-            }else{
-                $ret .= ' alt=""';
-            }
-
-            if ( !is_null($width) )
-                $ret .= ' width="'.$this->_xmlEntities($width).'"';
-
-            if ( !is_null($height) )
-                $ret .= ' height="'.$this->_xmlEntities($height).'"';
-
-            $ret .= ' />';
-
-        }elseif($mime == 'application/x-shockwave-flash'){
-            if (!$render) {
-                // if the flash is not supposed to be rendered
-                // return the title of the flash
-                if (!$title) {
-                    // just show the sourcename
-                    $title = basename(noNS($src));
-                }
-                return $this->_xmlEntities($title);
-            }
-
-            $att = array();
-            $att['class'] = "media$align";
-            if($align == 'right') $att['align'] = 'right';
-            if($align == 'left')  $att['align'] = 'left';
-            $ret .= html_flashobject(ml($src,array('cache'=>$cache),true,'&'),$width,$height,
-                                     array('quality' => 'high'),
-                                     null,
-                                     $att,
-                                     $this->_xmlEntities($title));
-        }elseif($title){
-            // well at least we have a title to display
-            $ret .= $this->_xmlEntities($title);
-        }else{
-            // just show the sourcename
-            $ret .= $this->_xmlEntities(basename(noNS($src)));
-        }
-
-        return $ret;
-    }
     /**
      * Returns an HTML code for images used in link titles
      *
@@ -664,7 +614,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if(!$text) return; //skip empty headlines
 
         $hid = $this->_headerToLink($text,true);
-
+		/*
         //only add items within configured levels
         $this->toc_additem($hid, $text, $level);
 
@@ -681,14 +631,15 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             count($this->sectionedits) > 0 &&
             $this->sectionedits[count($this->sectionedits) - 1][2] === 'section') {
             $this->finishSectionEdit($pos - 1);
-        }
+        }*/
 
         // write the header
         $this->doc .= DOKU_LF.'<h'.$level;
-        if ($level <= $conf['maxseclevel']) {
+/*        if ($level <= $conf['maxseclevel']) {
             $this->doc .= ' class="' . $this->startSectionEdit($pos, 'section', $text) . '"';
-        }
-        $this->doc .= '><a name="'.$hid.'" id="'.$hid.'">';
+        }*/
+        //$this->doc .= '><a name="'.$hid.'" id="'.$hid.'">';
+        $this->doc .= '><a id="'.$hid.'" >';
         $this->doc .= $this->_xmlEntities($text);
         $this->doc .= "</a></h$level>".DOKU_LF;
     }
@@ -765,9 +716,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         // initialize the row counter used for classes
         $this->_counter['row_counter'] = 0;
         $class = 'table';
-        if ($pos !== null) {
+        /*if ($pos !== null) {
             $class .= ' ' . $this->startSectionEdit($pos, 'table');
-        }
+        }*/
         $this->doc .= '<div class="' . $class . '"><table class="inline">' .
                       DOKU_LF;
     }
@@ -1003,8 +954,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
           $link['class'] .= ' wikilink2';
 
         //output formatted
-        if ($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
-        else $this->doc .= $this->_formatLink($link);
+        //if ($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
+        //else $this->doc .= $this->_formatLink($link);
+        $this->doc .= $link['name'];
     }
 
     function externalmedia ($src, $title=NULL, $align=NULL, $width=NULL,
@@ -1336,12 +1288,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     function _latexElements($value){
         //LaTeX mode
         $replace = FALSE;
-        while(preg_match('/<latex>(.*?)<\/latex>/', $value, $matches)){
-            $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-			$text = preg_replace('/(\$)/', '\\\\$1', $text);
-			$value = preg_replace('/<latex>(.*?)<\/latex>/', filter_tex_sanitize_formula($text), $value, 1);
-			$replace = TRUE;
-        }
+        $value = preg_replace('/<latex>.*?<\/latex>/', '',$value);
         //Math block mode
         while(preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
             $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
@@ -1423,5 +1370,154 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $this->listitem_close();
         }
         $this->listu_close();
+    }
+
+
+/*************************************
+ * 				UTILS				 *
+**************************************/
+
+
+    /**
+     * Build a link
+     *
+     * Assembles all parts defined in $link returns HTML for the link
+     *
+     * @author Andreas Gohr <andi@splitbrain.org>
+     */
+    function _formatLink($link){
+        //make sure the url is XHTML compliant (skip mailto)
+        if(substr($link['url'],0,7) != 'mailto:'){
+            $link['url'] = str_replace('&','&amp;',$link['url']);
+            $link['url'] = str_replace('&amp;amp;','&amp;',$link['url']);
+        }
+        //remove double encodings in titles
+        $link['title'] = str_replace('&amp;amp;','&amp;',$link['title']);
+
+        // be sure there are no bad chars in url or title
+        // (we can't do this for name because it can contain an img tag)
+        $link['url']   = strtr($link['url'],array('>'=>'%3E','<'=>'%3C','"'=>'%22'));
+        $link['title'] = strtr($link['title'],array('>'=>'&gt;','<'=>'&lt;','"'=>'&quot;'));
+
+        $ret  = '';
+        $ret .= $link['pre'];
+        $ret .= '<a href="'.$link['url'].'"';
+        if(!empty($link['class']))  $ret .= ' class="'.$link['class'].'"';
+        if(!empty($link['target'])) $ret .= ' target="'.$link['target'].'"';
+        if(!empty($link['title']))  $ret .= ' title="'.$link['title'].'"';
+        if(!empty($link['style']))  $ret .= ' style="'.$link['style'].'"';
+        if(!empty($link['rel']))    $ret .= ' rel="'.$link['rel'].'"';
+        if(!empty($link['more']))   $ret .= ' '.$link['more'];
+        $ret .= '>';
+        $ret .= $link['name'];
+        $ret .= '</a>';
+        $ret .= $link['suf'];
+        return $ret;
+    }
+
+    /**
+     * Renders internal and external media
+     *
+     * @author Andreas Gohr <andi@splitbrain.org>
+     */
+    function _media ($src, $title=NULL, $align=NULL, $width=NULL,
+                      $height=NULL, $cache=NULL, $render = true) {
+
+        $ret = '';
+
+        list($ext,$mime,$dl) = mimetype($src);
+        if(substr($mime,0,5) == 'image'){
+            // first get the $title
+            if (!is_null($title)) {
+                $title  = $this->_xmlEntities($title);
+            }elseif($ext == 'jpg' || $ext == 'jpeg'){
+                //try to use the caption from IPTC/EXIF
+                require_once(DOKU_INC.'inc/JpegMeta.php');
+                $jpeg =new JpegMeta(mediaFN($src));
+                if($jpeg !== false) $cap = $jpeg->getTitle();
+                if($cap){
+                    $title = $this->_xmlEntities($cap);
+                }
+            }
+            if (!$render) {
+                // if the picture is not supposed to be rendered
+                // return the title of the picture
+                if (!$title) {
+                    // just show the sourcename
+                    $title = $this->_xmlEntities(basename(noNS($src)));
+                }
+                return $title;
+            }
+            if ($_SESSION['figure']){
+                $ret .= '<figure>'.DOKU_LF;
+                $title = $_SESSION['fig_title'];
+                if ($title) {
+                    $ret .= '<figcaption>'.$title.'</figcaption>'.DOKU_LF;
+                }
+            }
+            //add image tag
+            //$ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
+            $ret .= '<img src="../media/'.basename(str_replace(':', '/', $src)).'"';
+/*            if ($width && $height){
+                $ret .= ' width="'.$width.'" height="'.$height.'"';
+            }*/
+
+            if (!$_SESSION['figure']){
+                $ret .= ' class="imgB"';
+            }else{
+                $ret .= ' class="media'.$align.'"';
+            }
+
+            // make left/right alignment for no-CSS view work (feeds)
+            if($align == 'right') $ret .= ' align="right"';
+            if($align == 'left')  $ret .= ' align="left"';
+
+            if ($title) {
+                $ret .= ' title="' . $title . '"';
+                $ret .= ' alt="'   . $title .'"';
+            }else{
+                $ret .= ' alt=""';
+            }
+
+            if ( !is_null($width) )
+                $ret .= ' width="'.$this->_xmlEntities($width).'"';
+
+            if ( !is_null($height) )
+                $ret .= ' height="'.$this->_xmlEntities($height).'"';
+
+            $ret .= ' />';
+            if ($_SESSION['figure']){
+                $ret .= '</figure>'.DOKU_LF;
+            }
+
+        }elseif($mime == 'application/x-shockwave-flash'){
+            if (!$render) {
+                // if the flash is not supposed to be rendered
+                // return the title of the flash
+                if (!$title) {
+                    // just show the sourcename
+                    $title = basename(noNS($src));
+                }
+                return $this->_xmlEntities($title);
+            }
+
+            $att = array();
+            $att['class'] = "media$align";
+            if($align == 'right') $att['align'] = 'right';
+            if($align == 'left')  $att['align'] = 'left';
+            $ret .= html_flashobject(ml($src,array('cache'=>$cache),true,'&'),$width,$height,
+                                     array('quality' => 'high'),
+                                     null,
+                                     $att,
+                                     $this->_xmlEntities($title));
+        }elseif($title){
+            // well at least we have a title to display
+            $ret .= $this->_xmlEntities($title);
+        }else{
+            // just show the sourcename
+            $ret .= $this->_xmlEntities(basename(noNS($src)));
+        }
+
+        return $ret;
     }
 }

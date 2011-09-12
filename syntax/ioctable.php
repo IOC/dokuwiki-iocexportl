@@ -118,6 +118,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
+                    //Transform quotes
+                    $_SESSION['table_title'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['table_title']);
                     $_SESSION['table_footer'] = (isset($params['footer']) && !isset($params['large']))?trim($renderer->_xmlEntities($params['footer'])):'';
                     $_SESSION['table_id'] = $this->id;
                     if (isset($params['large'])){
@@ -174,6 +176,30 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }
                         $instructions = p_get_instructions($text);
                         $renderer->doc .= p_render($mode, $instructions, $info);
+                        $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_EXIT :
+                        break;
+                }
+            return TRUE;
+        }elseif ($mode === 'iocxhtml'){
+            list ($state, $text, $id, $params) = $data;
+            switch ($state) {
+                    case DOKU_LEXER_ENTER :
+                        $renderer->doc .= '<div class="ioctable">';
+                        $renderer->doc .= '<a name="'.$id.'">';
+                        $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
+                        $renderer->doc .= '</a>';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
+                        if (isset($params['title'])){
+                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
+                        }
+                        if (isset($params['footer'])){
+                        $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
+                        }
+                        $instructions = get_latex_instructions($text);
+                        $renderer->doc .= p_latex_render($mode, $instructions, $info);
                         $renderer->doc .= '</div>';
                         break;
                     case DOKU_LEXER_EXIT :

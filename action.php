@@ -39,11 +39,15 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$this->isExportPage()) return FALSE;
         if ($event->data != 'show') return FALSE;
-        if (!$INFO['writable']) return FALSE;
+        //if (!$INFO['writable']) return FALSE;
         if (!$this->checkPerms()) return FALSE;
         //Always admin can export
         if ($this->exportallowed || auth_isadmin()){
-	        echo $this->getform();
+	        if (preg_match('/^(?!talk).*?:pdfindex$/', $this->id)){
+                echo $this->getform_latex();
+	        }elseif (preg_match('/^(?!talk).*?:htmlindex$/', $this->id)){
+	            echo $this->getform_html();
+	        }
         }
         return TRUE;
     }
@@ -87,7 +91,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
       }
 
     function isExportPage(){
-        return preg_match('/^(?!talk).*?:pdfindex$/', $this->id, $matches);
+        return preg_match('/^(?!talk).*?:(htmlindex|pdfindex)$/', $this->id);
     }
 
     function getLanguage(){
@@ -100,7 +104,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         }
     }
 
-    function getform(){
+    function getform_latex(){
         global $conf;
         $url = '';
         $path_filename = str_replace(':','/',$this->id);
@@ -109,16 +113,42 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         if (file_exists($path_filename)){
             $media_path = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
             setlocale(LC_TIME, 'ca_ES.utf8');
-            $url = '<a class="media mediafile mf_pdf" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %r", filemtime($path_filename)).'</strong>';
+            $url = '<a class="media mediafile mf_pdf" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %T", filemtime($path_filename)).'</strong>';
         }
         $ret  = "<br /><br />";
         $ret .= "<div class=\"iocexport\">\n";
         $ret .= "<strong>Exportació IOC: </strong>";
-	    $ret .= " <form action=\"lib/plugins/iocexportl/generate.php\" id=\"export__form\" method=\"post\" >\n";
+	    $ret .= " <form action=\"lib/plugins/iocexportl/generate_latex.php\" id=\"export__form\" method=\"post\" >\n";
 	    if(auth_isadmin()){
 	        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" /> Zip";
 	    }
         $ret .= "  <input type=\"radio\" name=\"mode\" value=\"pdf\" checked=\"checked\" /> PDF";
+        $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
+        $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
+        $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";
+	    $ret .= " </form>\n";
+	    $ret .= "<span id=\"exportacio\">".$url."</span>";
+	    $ret .= "</div>";
+	    $ret .= "<script type=\"text/javascript\" src =\"lib/plugins/iocexportl/lib/form.js\"></script>";
+        return $ret;
+    }
+
+    function getform_html(){
+        global $conf;
+        $url = '';
+        $path_filename = str_replace(':','/',$this->id);
+        $filename = str_replace(':','_',basename($this->id)).'.zip';
+        $path_filename = $conf['mediadir'].'/'.dirname($path_filename).'/'.$filename;
+        if (file_exists($path_filename)){
+            $media_path = 'lib/exe/fetch.php?media='.str_replace('/', ':',dirname(str_replace(':','/',$this->id))).':'.$filename;
+            setlocale(LC_TIME, 'ca_ES.utf8');
+            $url = '<a class="media mediafile mf_zip" href="'.$media_path.'">'.$filename.'</a> <strong>'.strftime("%e %B %Y %T", filemtime($path_filename)).'</strong>';
+        }
+        $ret  = "<br /><br />";
+        $ret .= "<div class=\"iocexport\">\n";
+        $ret .= "<strong>Exportació IOC: </strong>";
+	    $ret .= " <form action=\"lib/plugins/iocexportl/generate_html.php\" id=\"export__form\" method=\"post\" >\n";
+        $ret .= "  <input type=\"radio\" name=\"mode\" value=\"zip\" checked=\"checked\" /> zip";
         $ret .= "  <input type=\"hidden\" name=\"pageid\" value=\"".$this->id."\" />";
         $ret .= "  <input type=\"hidden\" name=\"ioclanguage\" value=\"".$this->language."\" />";
         $ret .= "  <input type=\"submit\" name=\"submit\" id=\"id_submit\" value=\"Exporta\" class=\"button\" />\n";

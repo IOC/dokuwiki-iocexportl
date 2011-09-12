@@ -1,0 +1,944 @@
+/*
+	HTML5 Reset :: style.css
+	----------------------------------------------------------
+	We have learned much from/been inspired by/taken code where offered from:
+	
+	Eric Meyer					:: http://ericmeyer.com
+	HTML5 Doctor				:: http://html5doctor.com
+	and the HTML5 Boilerplate	:: http://html5boilerplate.com
+	
+-------------------------------------------------------------------------------*/
+
+/* Let's default this puppy out
+-------------------------------------------------------------------------------*/
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,figure,footer,header,hgroup,menu,nav,section,menu,time,mark,audio,video
+ {
+ margin: 0;
+ padding: 0;
+ border: 0;
+ outline: 0;
+ font-size: 100%;
+ vertical-align: baseline;
+ background: transparent;
+}
+
+article,aside,figure,footer,header,hgroup,nav,section {
+ display: block;
+}
+
+/* Responsive images and other embedded objects
+   Note: keeping IMG here will cause problems if you're using foreground images as sprites.
+   If this default setting for images is causing issues, you might want to replace it with a .responsive class instead. */
+img,object,embed {
+ max-width: 100%;
+}
+
+/* force a vertical scrollbar to prevent a jumpy page */
+html {
+ overflow-y: scroll;
+ height:100%;
+}
+
+/* we use a lot of ULs that aren't bulleted. 
+	don't forget to restore the bullets within content. */
+ul {
+ list-style: none;
+}
+
+blockquote,q {
+ quotes: none;
+}
+
+blockquote:before,blockquote:after,q:before,q:after {
+ content: '';
+ content: none;
+}
+
+a {
+ margin: 0;
+ padding: 0;
+ font-size: 100%;
+ vertical-align: baseline;
+ background: transparent;
+ text-decoration: none;
+}
+
+del {
+ text-decoration: line-through;
+}
+
+abbr[title],dfn[title] {
+ border-bottom: 1px dotted #000;
+ cursor: help;
+}
+
+/* tables still need cellspacing="0" in the markup */
+table {
+ border-collapse: collapse;
+ border-spacing: 0;
+}
+
+th {
+ font-weight: bold;
+ vertical-align: bottom;
+}
+
+td {
+ font-weight: normal;
+ vertical-align: top;
+}
+
+hr {
+ display: block;
+ height: 1px;
+ border: 0;
+ border-top: 1px solid #ccc;
+ margin: 1em 0;
+ padding: 0;
+}
+
+input,select {
+ vertical-align: middle;
+}
+
+pre {
+ white-space: pre; /* CSS2 */
+ white-space: pre-wrap; /* CSS 2.1 */
+ white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */
+ word-wrap: break-word; /* IE */
+}
+
+input[type="radio"] {
+ vertical-align: text-bottom;
+}
+
+input[type="checkbox"] {
+ vertical-align: bottom;
+ *vertical-align: baseline;
+}
+
+.ie6 input {
+ vertical-align: text-bottom;
+}
+
+select,input,textarea {
+ font: 99% sans-serif;
+}
+
+table {
+ font-size: inherit;
+ font: 100%;
+}
+
+/* Accessible focus treatment
+	people.opera.com/patrickl/experiments/keyboard/test */
+a:hover,a:active {
+ outline: none;
+}
+
+small {
+ font-size: 85%;
+}
+
+strong,th {
+ font-weight: bold;
+}
+
+td,td img {
+ vertical-align: top;
+}
+
+/* Make sure sup and sub don't screw with your line-heights
+	gist.github.com/413930 */
+sub,sup {
+ font-size: 75%;
+ line-height: 0;
+ position: relative;
+}
+
+sup {
+ top: -0.5em;
+}
+
+sub {
+ bottom: -0.25em;
+}
+
+/* standardize any monospaced elements */
+pre,code,kbd,samp {
+ font-family: monospace, sans-serif;
+}
+
+/* hand cursor on clickable elements */
+.clickable,label,input[type=button],input[type=submit],button {
+ cursor: pointer;
+}
+
+/* Webkit browsers add a 2px margin outside the chrome of form elements */
+button,input,select,textarea {
+ margin: 0;
+}
+
+/* make buttons play nice in IE */
+button {
+ width: auto;
+ overflow: visible;
+}
+
+/* scale images in IE7 more attractively */
+.ie7 img {
+ -ms-interpolation-mode: bicubic;
+}
+
+/* prevent BG image flicker upon hover */
+.ie6 html {
+ filter: expression(document.execCommand ( "BackgroundImageCache", false, true)
+  );
+}
+
+/* let's clear some floats */
+.clearfix:before,.clearfix:after {
+ content: "\0020";
+ display: block;
+ height: 0;
+ overflow: hidden;
+}
+
+.clearfix:after {
+ clear: both;
+}
+
+.clearfix {
+ zoom: 1;
+}
+
+/* Ok, this is where the fun starts.
+-------------------------------------------------------------------------------*/
+
+/* new Linux- and Windows-friendly sans-serif font stack: http://mky.be/fontstack */
+body {
+ font: 13px Helmet, Freesans, sans-serif;
+  height:91%;
+}
+
+/* using local fonts? make sure to read up on Paul Irish's 
+	Bulletproof @font-face syntax: http://mky.be/font-face/bulletproof/ */
+
+/* we like off-black for text */
+body,select,input,textarea {
+ color: #333;
+}
+
+a {
+ color: #03f;
+}
+
+a:hover {
+ color: #69f;
+}
+
+/* Custom text-selection colors (remove any text shadows: twitter.com/miketaylr/status/12228805301) */
+::-moz-selection {
+ background: #fcd700;
+ color: #fff;
+ text-shadow: none;
+}
+
+::selection {
+ background: #fcd700;
+ color: #fff;
+ text-shadow: none;
+}
+
+/*	j.mp/webkit-tap-highlight-color */
+a:link {
+ -webkit-tap-highlight-color: #fcd700;
+}
+
+ins {
+ background-color: #fcd700;
+ color: #000;
+ text-decoration: none;
+}
+
+mark {
+ background-color: #fcd700;
+ color: #000;
+ font-style: italic;
+ font-weight: bold;
+}
+
+/* Print styles!
+-------------------------------------------------------------------------------*/
+@media print {
+}
+
+/* Media queries!
+-------------------------------------------------------------------------------*/
+
+/* Consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
+@media screen and (max-device-width: 480px) {
+ .navigation{
+  width: 40px !important;
+ }
+ 
+ .navigation div{
+  font-size:11pt !important;
+  font-weight:bold !important;
+  top:60px !important;
+  right:1px !important;
+ }
+ 
+ aside ul li a {
+  font-size:18pt !important;
+ }
+}
+
+@media all and (orientation: portrait) {
+}
+
+@media all and (orientation: landscape) {
+}
+
+/* Customized fonts!
+-------------------------------------------------------------------------------*/
+@font-face {
+ font-family: 'Oswald';
+ src: url('../../fonts/Oswald.ttf') format('truetype');
+}
+
+/* Customized styles!
+-------------------------------------------------------------------------------*/
+header {
+ top: 0px;
+ position: fixed;
+ width: 100%;
+ height: 40px;
+ font-family: 'Helvetica', serif;
+ font-size: 11pt;
+ letter-spacing: -0.04em;
+ min-width: 550px;
+ min-height: 40px;
+ background-color: #53a6d5;
+ background-image: -moz-linear-gradient(top, #93c7e4 10%, #53a6d5 80%, #4fa4d4 10%);
+ background-image: -webkit-gradient(linear, left top, left bottom, from(#93c7e4),
+  color-stop(0.5, #53a6d5), color-stop(0.5, #4fa4d4), to(#4fa4d4) );
+ background: -o-linear-gradient(top, #93c7e4 10%, #53a6d5 80%, #4fa4d4 10%);
+ /* Opera11.10+ */
+ background: -ms-linear-gradient(top, #93c7e4 10%, #53a6d5 80%, #4fa4d4 10%);
+ /* IE10+ */
+ z-index: 100;
+}
+
+nav {
+ height: 50px;
+}
+
+aside {
+ position: fixed;
+ width: 190px;
+ max-height: 85%;
+ top: 70px;
+ left: 0px;
+ display: block;
+ overflow: auto;
+ padding: 10px 30px;
+ background-color: #ffffff;
+ font-family: sans-serif;
+ -moz-user-select: none;
+ -moz-border-radius-bottomright: 10px;
+ -moz-border-radius-topright: 10px;
+ border-bottom-right-radius: 10px;
+ border-top-right-radius: 10px;
+ border-bottom-right-radius: 10px;
+ -moz-box-shadow: 2px 2px 4px #888;
+ -webkit-box-shadow: 2px 2px 4px #888;
+ box-shadow: 2px 2px 4px #888;
+ z-index: 100;
+}
+
+#content {
+ top: 50px;
+ left: 10%;
+ right:10%;
+ overflow:auto;
+ margin: 50px auto 0 auto;
+ width: 70%;
+ min-width: 320px;
+ padding-bottom: 10px;
+ min-height:100%;
+ z-index: 1;
+}
+
+article {
+ padding: 10px 50px 19px 10px;
+ margin-left: 100px;
+ margin-right: auto;
+}
+
+article p{
+ text-align:left;
+}
+
+footer {
+ position: relative;
+ margin-top:-19px;
+ width: 100%;
+ background: #ffffff;
+ font-size: 10px;
+ height: 19px;
+ min-width: 578px;
+ padding: 3px 0px;
+ white-space: nowrap;
+ text-align: center;
+ bottom: 0;
+ z-index: 10;
+}
+
+h1 {
+ font-family: 'Oswald', serif;
+ font-size: 20pt;
+ margin-top: 2px;
+ letter-spacing: -0.05em;
+ line-height: 1.14
+}
+
+h2 {
+ font-family: 'Oswald', serif;
+ font-size: 18pt;
+ margin-top: 2px;
+ letter-spacing: -0.05em;
+ line-height: 1.14
+}
+
+h3 {
+ font-family: 'Oswald', serif;
+ font-size: 16pt;
+ margin-top: 2px;
+ letter-spacing: -0.05em;
+ line-height: 1.14
+}
+
+p {
+ font-family: 'Georgia', serif;
+ font-size: 11pt;
+}
+
+.footer {
+ vertical-align: text-top;
+}
+
+.hidemenu {
+ left: 259px;
+ position: absolute;
+ top: 50px;
+ z-index: 1;
+}
+
+.hidemenu:hover {
+ cursor: pointer;
+}
+
+.showmenu {
+ left: 0px;
+ position: absolute;
+ top: 50px;
+ cursor: pointer;
+}
+
+.showmenu:hover {
+ cursor: pointer;
+}
+
+.fullcontent {
+ width: 80% !important;
+}
+
+.heads {
+ float: left;
+ position: relative;
+ width: 20%;
+}
+
+.head1 {
+ position: relative;
+ float: left;
+ color:#000;
+ display: inline;
+ top: 10px;
+ left: 10px;
+ font-weight: bold;
+ text-shadow: 1px 1px 1px rgba(255, 255, 255, .5);
+ width:auto;
+ /* 50% white from bottom */
+}
+
+.head2 {
+ position: relative;
+ float: left;
+ color: white;
+ left: 13px;
+ top: 10px;
+ padding-left:6px;
+ font-weight: bold;
+ letter-spacing: 0.035em;
+ text-shadow: 1px 1px 1px #53a6d5;
+ width:auto;
+}
+
+.headdocument {
+ position: relative;
+ float: left;
+ width:60%;
+ color: white;
+ text-align: center;
+ font-weight: bold;
+ letter-spacing: 0.035em;
+ text-shadow: 1px 1px 1px #53a6d5;
+}
+
+.navmenu {
+ top: 40px;
+ position: relative;
+ width:100%;
+ color:#000;
+ background: #FFFFFF;
+ height: 20px;
+ text-align: left;
+ z-index: 1;
+}
+
+.webnav {
+ margin-left:10px;
+}
+
+.webnav li {
+ display:inline; 
+}
+
+.webnav li:before {
+    background: url("../../img/separator.png") no-repeat scroll 2px 6px #FFFFFF;
+    content: "";
+    padding-left: 14px;
+}
+
+.webnav li:after {
+    padding-right: 2px;
+    content: "";
+}
+
+.webnav li:first-child:before {
+ background: #fff;
+ content:"";
+}
+ 
+.navigation {
+ top: 190px;
+ left: 29px;
+ position: fixed;
+ color:#000;
+ background: #fff;
+ width: 20px;
+ height: 100px;
+ margin-left: 220px;
+ overflow: hidden;
+ z-index: 1000;
+ -moz-user-select: none;
+ -moz-border-radius-bottomright: 15px;
+ -moz-border-radius-topright: 15px;
+ border-bottom-right-radius: 15px;
+ border-top-right-radius: 15px;
+ border-bottom-right-radius: 15px;
+ -moz-box-shadow: 2px 1px 2px 0 #888;
+ -webkit-box-shadow: 2px 1px 2px 0 #888;
+ box-shadow: 2px 1px 2px 0 #888;
+}
+
+.navigation div {
+ position: relative;
+ top: 65px;
+ width: 100%;
+ height: 23px;
+ font-family: Verdana;
+ font-weight: bold;
+ -webkit-transform: rotate(-90deg);
+ -moz-transform: rotate(-90deg);
+ -ms-transform: rotate(-90deg);
+ -o-transform: rotate(-90deg);
+ z-index: 1000;
+}
+
+.navigation div:hover {
+ cursor: pointer;
+}
+
+.search {
+ vertical-align: middle;
+}
+
+.search:hover {
+ cursor: pointer;
+}
+
+.search form input {
+ width: 100px;
+ height: 20px;
+ margin-top: 2px;
+ padding-left: 10px;
+ padding-right: 30px;
+ background: #FFFFFF url(../../img/search.png) no-repeat 115px top;
+ border: 0;
+ border-radius: 5px 5px 5px 5px;
+ -moz-border-radius: 5px 5px 5px 5px;
+}
+
+aside h2 {
+ color:#000;
+ font-size: 14pt;
+ letter-spacing: -0.05em;
+ margin-bottom: 35px;
+}
+
+aside ul li {
+ margin-top: 6px;
+ padding-top: 4px;
+ border-top: 1px;
+ border-style: dotted;
+}
+
+aside ul li:first-child {
+ border-top: 0px;
+}
+
+aside ul li a {
+ font-size: 11px;
+ letter-spacing: -0.05em;
+ text-decoration: none;
+ color: #6f6f6f;
+ /*font-weight: bold;*/
+}
+
+aside ul li ul li {
+ border-top: 0px;
+}
+
+aside ul li ul li a {
+ padding-left: 10px;
+ color: #9f9f9f;
+}
+
+.hidden {
+ display: none;
+}
+
+.visible {
+ display: inline;
+}
+
+.wrapper {
+ height: 100%;
+}
+
+.topside {
+ position: fixed;
+ top: -270px;
+/* top:35px;*/
+ right: 3px;
+ display: block;
+ overflow: hidden;
+ padding: 20px 10px;
+ background-color: #ffffff;
+ font-family: Georgia;
+ -moz-user-select: none;
+ -moz-border-radius-bottomright: 10px;
+ -moz-border-radius-bottomright: 10px;
+ border-bottom-left-radius: 10px;
+ border-bottom-right-radius: 10px;
+ -moz-box-shadow: 2px 2px 4px 1px #888;
+ -webkit-box-shadow: 2px 2px 4px 1px #888;
+ box-shadow: 2px 2px 4px 1px #888;
+ z-index: 12;
+}
+
+.options {
+ top: 40px;
+ right: 130px;
+ position: fixed;
+ background: #fff;
+ width: 100px;
+ height: 20px;
+ z-index: 800;
+ -moz-user-select: none;
+ -moz-border-radius-bottomright: 15px;
+ -moz-border-radius-bottomleft: 15px;
+ border-bottom-right-radius: 15px;
+ border-bottom-left-radius: 15px;
+ -moz-box-shadow: 2px 2px 1px 0 #888;
+ -webkit-box-shadow: 2px 2px 1px 0 #888;
+ box-shadow: 2px 2px 1px 0 #888;
+}
+
+.options img {
+ top: 3px;
+ right: 41px;
+ position: absolute;
+ font-family: Verdana;
+ z-index: 1000;
+}
+
+.settings {
+ text-shadow: 1px 1px 1px rgba(255, 255, 255, .5);
+ /* 50% white from bottom */
+}
+
+.settings:hover {
+ cursor: pointer;
+}
+
+.settings span:first-child {
+ font-size: 12pt;
+ font-weight: bold;
+}
+
+.settings span:last-child {
+ font-size: 17pt;
+ font-weight: bold;
+}
+
+.toolbar {
+ position: relative;
+ float: right;
+ color:#000;
+ top: 7px;
+ right: 10px;
+ display: inline;
+ width:20%;
+}
+
+.toolbar li {
+ position: relative;
+ float: right;
+ display: inline;
+ vertical-align: middle;
+ margin-right: 10px;
+}
+
+/*** TOPSIDE ***/
+#topside .settings {
+ font-family: Georgia;
+ color: #4d4d4d;
+ font-weight: bold;
+ padding-top: 20px;
+ margin-left: 0;
+}
+
+#topside .settings li,ul {
+ display: inline;
+}
+
+#topside .settings li {
+ font-size: 11pt;
+ border-right: 2px solid #6F6F6F;
+ padding-left: 10px;
+ padding-right: 10px;
+}
+
+#topside .settings li:last-child {
+ border-right: 0;
+}
+
+#topside .font li:last-child {
+ font-family: Helvetica;
+}
+
+#topside p {
+ float: left;
+ font-family: Georgia;
+ text-align: right;
+ font-size: 12pt;
+ font-style: italic;
+ padding-right: 20px;
+ width: 12ex;
+}
+
+#topside .fontsize li:first-child {
+ font-size: 8pt;
+}
+
+#topside .fontsize li:nth-child(2) {
+ font-size: 11pt;
+}
+
+#topside .fontsize li:nth-child(3) {
+ font-size: 14pt;
+}
+
+#topside .fontsize li:last-child {
+ font-size: 17pt;
+}
+
+#topside .contrast li:first-child span {
+ background: #000;
+ color: #fff;
+ font-size: 13pt;
+ border-style: solid;
+ border-width: 1px;
+ border-color: #000;
+ padding: 1px 5px;
+ -moz-border-radius: 2px 2px 2px 2px;
+ border-radius: 5px 5px 5px 5px;
+}
+
+#topside .contrast li:nth-child(2) span {
+ background: #f0f0f0;
+ color: #000;
+ font-size: 13pt;
+ border-style: solid;
+ border-width: 1px;
+ border-color: #6f6f6f;
+ padding: 1px 5px;
+ -moz-border-radius: 2px 2px 2px 2px;
+ border-radius: 5px 5px 5px 5px;
+}
+
+#topside .contrast li:last-child span {
+ background: #ffffff;
+ color: #000;
+ font-size: 13pt;
+ border-style: solid;
+ border-width: 1px;
+ border-color: #6f6f6f;
+ padding: 1px 5px;
+ -moz-border-radius: 2px 2px 2px 2px;
+ border-radius: 5px 5px 5px 5px;
+}
+
+.settings li img {
+ vertical-align: middle;
+}
+
+.text-justify{
+  text-align: justify;
+}
+
+.text-left{
+  text-align: left;
+}
+
+.text-small{
+  font-size: 8pt;
+}
+
+.text-normal{
+  font-size: 11pt;
+}
+
+.text-big{
+  font-size: 14pt;
+}
+
+.text-huge{
+  font-size: 17pt;
+}
+
+.text-negre{
+  color: #fff;
+  background:#000;
+}
+
+.text-gris{
+  color: #000;
+  background:url("../../img/blue_dark.png") repeat scroll 0 0 #fafafa;
+}
+
+.text-blanc{
+  color: #000;
+  background:#FFFFFF;
+}
+
+.first-font{
+ font-family:Georgia;
+}
+
+.second-font{
+ font-family:Helvetica;
+}
+
+.header-shadow{
+ -moz-box-shadow: 0px 2px 19px 1px #888;
+ -webkit-box-shadow: 0px 2px 19px 1px #888;
+ box-shadow: 0px 2px 19px 1px #888;
+}
+
+.upbutton{
+ position:fixed;
+ top:65px;
+ right:15px;
+}
+
+.upbutton:hover{
+ cursor: pointer;
+}
+
+.selected{
+ /*border-color:4FA4D4;*/
+ border: 3px solid #4074D4 !important
+}
+
+.optselected{
+ font-weight: bold;
+}
+
+.font-selected{
+ color:#4074D4; 
+}
+
+.selector1{
+ background: #FFFFFF url(../../img/select_arrow.png) no-repeat 132px 14px; 
+}
+
+.selector2{
+ background: #FFFFFF url(../../img/select_arrow.png) no-repeat 182px 14px; 
+}
+
+.selector3{
+ background: #FFFFFF url(../../img/select_arrow.png) no-repeat 232px 14px; 
+}
+
+.default{
+ margin-left:60px;
+/* margin-right:auto;*/
+}
+
+.shadow{
+ background: url(../../img/shadow.png) no-repeat scroll center center transparent;
+}
+
+.menu-open{
+}
+
+li h4 a:link{
+   background: url(../../img/arrow.png) no-repeat scroll 3px 3px transparent;
+   padding-left: 12px;
+}
+
+ul li h4:hover{
+ cursor:pointer;
+}
+
+li ul li{
+ padding-left:10px;
+}
+
+li ul li h4 a:link{
+   background: url(../../img/arrow.png) no-repeat scroll 3px 3px transparent;
+}
+
+li ul li ul li{
+   /*background: url(../../img/arrow.png) no-repeat scroll 38px 1px transparent;*/
+   padding-left: 10px;
+}
+
+li ul li ul li h4 a:link{
+   background: url(../../img/arrow.png) no-repeat scroll 20px 1px transparent;
+}

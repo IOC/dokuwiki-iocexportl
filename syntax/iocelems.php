@@ -176,8 +176,33 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         break;
             }
             return TRUE;
-        }
-        return FALSE;
+        }elseif ($mode === 'iocxhtml'){
+            list($state, $data, $params) = $indata;
+            switch ($state) {
+                    case DOKU_LEXER_ENTER :
+                        $matches = array();
+                        preg_match('/::([^:]*):/', $data, $matches);
+                        $this->tipus = (isset($matches[1]))?$matches[1]:'';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
+                        $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
+                        //TEXT LARGE
+                        if($this->tipus === 'text' && isset($params['large'])){
+                            $this->tipus = 'textl';
+                        }
+                        $renderer->doc .= '<div class="ioc'.$this->tipus.'">';
+                        if (!empty($title)){
+                            $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
+                        }
+                        $instructions = get_latex_instructions($data);
+                        $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                        $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_EXIT :
+                        break;
+            }
+       }
+       return FALSE;
     }
 
     function _parse($text, $mode){

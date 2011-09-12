@@ -92,6 +92,8 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= $title;
         }elseif ($mode === 'xhtml'){
             $renderer->doc .= '<a href="'.$data.'" title="'.$title.'">'.$data.'</a>';
+        }elseif ($mode === 'iocxhtml'){
+            $renderer->doc .= '<a href="'.$data.'" title="'.$title.'">'.$data.'</a>';
         }
         return FALSE;
     }
