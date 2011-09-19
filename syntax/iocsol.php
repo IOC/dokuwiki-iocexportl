@@ -106,8 +106,17 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
               case DOKU_LEXER_ENTER :
                   break;
               case DOKU_LEXER_UNMATCHED :
+                  if (!isset($_SESSION['quizsol'])){
+                      $_SESSION['quizsol'] = array();
+                  }
                   $instructions = p_get_instructions($text);
-                  $renderer->doc .= p_render($mode, $instructions, $info);
+                  $sol = p_render($mode, $instructions, $info);
+                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
+                  if($_SESSION['quizmode'] !== 'relations'){
+                      $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
+                  }else{
+                      $renderer->doc .= ' (\hspace{5mm})';
+                  }
                   break;
               case DOKU_LEXER_EXIT :
                   break;

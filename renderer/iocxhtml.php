@@ -721,13 +721,15 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }*/
         $this->doc .= '<div class="' . $class . '"><table class="inline">' .
                       DOKU_LF;
+        $this->table = TRUE;
     }
 
     function table_close(){
         $this->doc .= '</table></div>'.DOKU_LF;
-        if ($pos !== null) {
+        $this->table = FALSE;
+        /*if ($pos !== null) {
             $this->finishSectionEdit($pos);
-        }
+        }*/
     }
 
     function tablerow_open(){
@@ -1454,6 +1456,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 if ($title) {
                     $ret .= '<figcaption>'.$title.'</figcaption>'.DOKU_LF;
                 }
+            }elseif(!$this->table){
+                $ret .= '<div class="iocfigurec">'.DOKU_LF;
             }
             //add image tag
             //$ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
@@ -1488,6 +1492,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $ret .= ' />';
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
+            }elseif(!$this->table){
+                $ret .= '</div>'.DOKU_LF;
             }
 
         }elseif($mime == 'application/x-shockwave-flash'){

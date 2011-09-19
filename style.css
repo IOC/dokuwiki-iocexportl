@@ -27,6 +27,31 @@ div.dokuwiki .iocexport form input{
 width:auto !important;
 }
 
+
+/* Quizes
+-------------------------------------------------------------------------------*/
+p.ok, p.ko{
+ height:0.5em;
+}
+
+td.ok{
+background: none repeat scroll 0 0 #BFFF80;
+}
+
+td.ko{
+background: none repeat scroll 0 0 #FF9F81;
+}
+
+.quiz_result {
+    background: none repeat scroll 0 0 #F2F6FA;
+    border: 2px solid #D9E4F0;
+    display: none;
+    margin: 1em 0;
+    padding: 0.4em 1em;
+    width:40%;
+}
+
+
 /* html styles
 -------------------------------------------------------------------------------*/
 .iocfigure{

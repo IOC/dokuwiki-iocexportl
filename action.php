@@ -27,6 +27,8 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'counter', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'chooseactivities', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'numbering', array());
+            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'quiz', array());
+            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'render', array());
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
     }
@@ -67,6 +69,18 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     function numbering(&$event) {
         if ($event->data != 'edit' && $event->data != 'preview' && !$this->isExportPage()){
             echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js"></script>';
+        }
+    }
+
+    function quiz(&$event) {
+        if ($event->data != 'edit' && $event->data != 'preview' && !$this->isExportPage()){
+            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js"></script>';
+        }
+    }
+
+    function render(&$event) {
+        if ($event->data != 'edit' && $event->data != 'preview' && !$this->isExportPage()){
+            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/render.js"></script>';
         }
     }
 

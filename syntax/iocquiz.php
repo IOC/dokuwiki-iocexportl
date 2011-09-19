@@ -41,9 +41,9 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
         return 514;
     }
 
-    function getAllowedTypes(){
+    /*function getAllowedTypes(){
        return array('container');
-    }
+    }*/
     /**
      * Connect pattern to lexer
      */
@@ -123,12 +123,29 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
+                  $this->class = $text;
                   break;
               case DOKU_LEXER_UNMATCHED :
-                  $instructions = p_get_instructions($text);
-                  $renderer->doc .= p_render($mode, $instructions, $info);
+                  //convert unnumered lists to tables
+                  $_SESSION['quizmode'] = $this->class;
+                  if ($this->class !== 'complete' && $this->class !== 'relations'){
+                     $text = $this->getsolutions($text);
+                  }
+                  if ($this->class === 'relations'){
+                      $text = preg_replace('/(\n)(\n  \*)/', '$1'.DOKU_LF.'@IOCRELATIONS@'.DOKU_LF.'$2', $text, 1);
+                  }
+                  //$instructions = get_latex_instructions($text);
+                  //$renderer->doc .=  p_latex_render('iocxhtml', $instructions, $info);
+                  $this->printquiz($text, $mode, $renderer);
+                  $_SESSION['quizmode'] = FALSE;
                   break;
               case DOKU_LEXER_EXIT :
+                  if ($this->class === 'relations'){
+                      $this->printoptions($renderer);
+                  }
+                  //$this->printsolutions($renderer);
+                  $this->class='';
+                  unset($_SESSION['quizsol']);
                   break;
             }
             return TRUE;
@@ -136,12 +153,28 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
+                  $this->class = $text;
                   break;
               case DOKU_LEXER_UNMATCHED :
+                  //convert unnumered lists to tables
+                  $_SESSION['quizmode'] = $this->class;
+                  if ($this->class !== 'complete' && $this->class !== 'relations'){
+                     $text = $this->getsolutions($text);
+                  }
+                  if ($this->class === 'relations'){
+                      $text = preg_replace('/(\n)(\n  \*)/', '$1'.DOKU_LF.'@IOCRELATIONS@'.DOKU_LF.'$2', $text, 1);
+                  }
                   $instructions = get_latex_instructions($text);
                   $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                  $_SESSION['quizmode'] = FALSE;
                   break;
               case DOKU_LEXER_EXIT :
+                  if ($this->class === 'relations'){
+                      $this->printoptions($renderer);
+                  }
+                  $this->printsolutions($renderer);
+                  $this->class='';
+                  unset($_SESSION['quizsol']);
                   break;
             }
             return TRUE;
@@ -228,5 +261,48 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
           $text .= '}'.DOKU_LF;
           $renderer->doc = preg_replace('/@IOCRELATIONS@/',$text, $renderer->doc, 1);
       }
+    }
+
+    function printquiz($text, $mode, $renderer){
+        preg_match('/(.*?\n)+(?=\n+  \*)/', $text, $matches);
+        $text = str_replace($matches[0], '', $text);
+        $instructions = get_latex_instructions($matches[0]);
+        $renderer->doc .=  p_latex_render('iocxhtml', $instructions, $info);
+        preg_match_all('/  \*(.*?)\n/', $text, $matches);
+        $renderer->doc .= '<div id="id_'.$this->class.'_'.md5($text).'" class="quiz">';
+        $renderer->doc .= '<form action="">';
+        $renderer->doc .= '<table>';
+        $renderer->doc .= '<tr>';
+        $renderer->doc .= '<th>Núm</th><th>Pregunta</th>';
+        if ($this->class == 'vf'){
+            $renderer->doc .= '<th>V</th><th>F</th>';
+            $cont = 1;
+        }elseif($this->class == 'choice'){
+            $renderer->doc .= '<th></th>';
+            $cont = 1;
+        }
+        $renderer->doc .= '</tr>';
+        foreach ($matches[1] as $k => $m){
+            $renderer->doc .= '<tr>';
+            $renderer->doc .= '<td>'.($k+1).'</td>';
+            $renderer->doc .= '<td>'.$m.'</td>';
+            if ($this->class == 'vf'){
+                $renderer->doc .= '<td><input type="radio" value="V" name="sol_'.$cont.'"></input></td>';
+                $renderer->doc .= '<td><input type="radio" value="F" name="sol_'.$cont.'"></input></td>';
+                $cont += 1;
+            }elseif($this->class == 'choice'){
+                $renderer->doc .= '<td><input type="checkbox" value="V" name="sol_'.$cont.'"></input></td>';
+                $cont += 1;
+            }
+            $renderer->doc .= '</tr>';
+        }
+        $renderer->doc .= '</table>';
+        $renderer->doc .= '<input type="hidden" name="qtype" value="'.$this->class.'"></input>';
+        $renderer->doc .= '<input type="hidden" name="qnum" value="'.($cont-1).'"></input>';
+        $renderer->doc .= '<input type="hidden" name="qsol" value="'.implode(',', $_SESSION['quizsol']).'"></input>';
+        $renderer->doc .= '<input class="btn_solution" type="button" onclick="checkquiz(this)" value="Solució">';
+        $renderer->doc .= '</form>';
+        $renderer->doc .= '<div class="quiz_result"></div>';
+        $renderer->doc .= '</div>';
     }
 }
