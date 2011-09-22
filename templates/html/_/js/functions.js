@@ -328,22 +328,15 @@
     	//Show and hide list elements
     	$(".expander ul").hide();
     	$(".expander h4").live("click", function() {
-    	    var $this = $(this);
-    	    var $nestList = $($this).siblings("ul");
-    	    if ($($this).parent().children("ul").css('display') == 'inline'){
-    	    	$($this).parent().children("ul").hide("fast", function (){
+    	    var $nestList = $(this).siblings("ul");
+    	    if ($(this).parent().children("ul").css('display') == 'inline'){
+				$(this).parent().children("ul").hide();
+			}else{
+				$(this).parent().children("ul").show();
+			}
+			$(this).parent().siblings().children().filter('ul').hide("fast", function(){
     				set_navi();
-				});
-    	    }else{
-	    	    // hide visible nested lists
-	    	    $($this).parent().siblings().children().filter('ul').hide("fast", function(){
-    				set_navi();
-				});
-	    	    // show this list
-	    	    $nestList.filter(":hidden").show("fast", function (){
-    				set_navi();
-				});
-    	    }
+			});
     	});
 
 		//Save selected option inside menu
