@@ -42,6 +42,25 @@ td.ko{
 background: none repeat scroll 0 0 #FF9F81;
 }
 
+select.ok{
+background: none repeat scroll 0 0 rgba(0, 255, 0, 0.5);
+vertical-align:baseline;
+}
+
+select.ko{
+background: none repeat scroll 0 0 rgba(255, 0, 0, 0.5);
+vertical-align:baseline;
+}
+
+div.solution{
+    background: none repeat scroll 0 0 #F2F6FA;
+    border: 2px solid #D9E4F0;
+    display: none;
+    margin: 1em 0;
+    padding: 0.4em 1em;
+    width:40%;
+}
+
 .quiz_result {
     background: none repeat scroll 0 0 #F2F6FA;
     border: 2px solid #D9E4F0;

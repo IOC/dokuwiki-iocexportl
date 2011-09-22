@@ -28,12 +28,10 @@ class syntax_plugin_iocexportl_iocreference extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    function getType(){ return 'baseonly'; }
+    function getType(){ return 'substition'; }
     function getPType(){ return 'normal'; }
     //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
-    function getAllowedTypes() {
-        return array('baseonly');
-    }
+
     function getSort(){
         return 513;
     }

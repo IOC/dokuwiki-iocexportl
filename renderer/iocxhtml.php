@@ -95,21 +95,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         //Check whether user can export
 		$exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$exportallowed && !auth_isadmin()) die;
-/*
-        if (!isset($_SESSION['tmp_dir'])){
-            $this->tmp_dir = rand();
-        }else{
-            $this->tmp_dir = $_SESSION['tmp_dir'];
-        }
-        if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir)){
-            mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
-            mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
-        }
-        if ($_SESSION['u0']){
-            //copy(DOKU_PLUGIN.'iocexportl/templates/backgroundu0.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/backgroundu0.pdf');
-        }else{
-            //copy(DOKU_PLUGIN.'iocexportl/templates/background.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/background.pdf');
-        }*/
 
         //Global variables
         $this->_initialize_globals();
@@ -119,12 +104,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      * Closes the document
      */
     function document_end(){
-/*        $this->doc = preg_replace('/@IOCKEYSTART@/','\{', $this->doc);
-        $this->doc = preg_replace('/@IOCKEYEND@/','\}', $this->doc);
-        $this->doc = preg_replace('/@IOCBACKSLASH@/',"\\\\", $this->doc);
-        $this->doc = preg_replace('/(textbf{)(\s*)(.*?)(\s*)(})/',"$1$3$5", $this->doc);
-        $this->doc = preg_replace('/(raggedright)(\s{2,*})/',"$1 ", $this->doc);
-		$this->_create_refs();*/
     }
 
 
@@ -210,14 +189,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             return sectionID($title,$check);
         }
     }
-
-	/**
-     * NOVA
-     *//*
-    function _create_refs(){
-		$this->doc = preg_replace('/:figure:(.*?):/',"\\\\MakeLowercase{\\\\figurename}  \\\\ref{\\1}", $this->doc);
-		$this->doc = preg_replace('/:table:(.*?):/',"\\\\MakeLowercase{\\\\tablename}  \\\\ref{\\1}", $this->doc);
-    }*/
 
 	/**
      * NOVA
@@ -357,9 +328,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      */
     function _format_text($text){
         $text = $this->_ttEntities(trim($text));//Remove extended symbols
-        if ($_SESSION['iocelem']){
-            $text = preg_replace('/\n/',"^^J$1", $text);
-        }
         $this->doc .= $text . DOKU_LF;
     }
 
@@ -406,7 +374,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      /**
      * NOVA
      */
-      function _image_convert($img, $dest, $width = NULL, $height = NULL){
+    function _image_convert($img, $dest, $width = NULL, $height = NULL){
         $imgdest = tempnam($dest, 'ltx');
         $resize = '';
         if ($width && $height){
@@ -414,162 +382,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
         @exec("convert $img $resize $imgdest".self::$imgext);
         return $imgdest.self::$imgext;
-      }
-
-     /**
-     * NOVA
-     */
-    function _latexAddImage($src, $width = NULL, $height = NULL, $align = NULL, $title = NULL, $linking = NULL, $external = FALSE){
-        if (!empty($_SESSION['figtitle'])){
-            $title = $_SESSION['figtitle'];
-        }
-        if (!empty($_SESSION['figfooter'])){
-            $title .= '/'.$_SESSION['figfooter'];
-        }
-        // make sure width and height are available
-        if (!$width && !$height) {
-            if (file_exists($src)) {
-                $info  = getimagesize($src);
-                $width  = $info[0];
-            }
-        }else{
-            if (file_exists($src)) {
-                $info  = getimagesize($src);
-                $ratio = $info[0]/$info[1];
-                if(!$width){
-                    $width = round($height * $ratio, 0);
-                }
-            }
-        }
-        if (!$_SESSION['u0']){
-            $align = 'centering';
-        }else{//Unit 0
-            $align = 'flushleft';
-        }
-        if (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && $_SESSION['iocelem'] !== 'textl'){
-            $max_width = '[width=35mm]';
-            $img_width = FALSE;
-        }elseif (!$this->table && $width > self::$p_width && $_SESSION['iocelem'] !== 'textl'){
-            $max_width = '[width=\textwidth]';
-            $img_width = FALSE;
-        }else{
-            $max_width = '[width='.$width.'px]';
-            $img_width = $width;
-        }
-        if (self::$convert || $_SESSION['draft'] || $external){
-            $img_aux = $this->_image_convert($src, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media');
-        }else{
-            $img_aux = DOKU_PLUGIN_LATEX_TMP . $this->tmp_dir . '/media/' . basename($src);
-            if (file_exists($src)){
-                copy($src, $img_aux);
-            }
-        }
-        if (file_exists($img_aux)){
-            if ($_SESSION['iocelem'] === 'textl'){
-                $this->doc .=  '\begin{center}'.DOKU_LF;
-                if ($width > (.8 * self::$p_width)){
-                    $this->doc .= '\resizebox{.8\linewidth}{!}{';
-                }
-            }elseif (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
-                $offset = '';
-                //Extract offset
-                if ($title){
-                    $data = preg_replace('/<verd>|<\/verd>/', '', $title);
-                    $data = split('/', $title, 2);
-                    $title = $data[0].'/';
-                    if(!empty($data[1])){
-                        $offset = '['.$data[1].'mm]';
-                    }
-                }
-                $this->doc .= '\imgB'.$offset.'{';
-            }elseif (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
-                $this->doc .= '\begin{figure}[H]'.DOKU_LF;
-            }
-            if ($linking !== 'details'){
-                $this->doc .= '\href{'.$linking.'}{';
-            }
-            if ($_SESSION['figure']){
-                $this->doc .= '\\' . $align . DOKU_LF;
-            }
-            $hspace = 0;//Align text and image
-            if ($title) {
-                $title = preg_replace('/<verd>|<\/verd>/', '', $title);
-                $title = split('/', $title, 2);
-                $title_width = ($img_width)?$img_width.'px':'\textwidth';
-                  if ($_SESSION['figure']){
-                    $this->doc .= '\parbox[t]{'.$title_width.'}{\caption{'.trim($this->_xmlEntities($title[0]));
-    				if (!empty($_SESSION['figlabel'])){
-    	                $this->doc .= '\label{'.$_SESSION['figlabel'].'}';
-    				}
-    				$this->doc .= '}}\\\\\vspace{2mm}'.DOKU_LF;
-                }else{
-					if (empty($title[1])){
-						$title[1] = $title[0];
-					}
-                }
-            }
-            //Inside table, images will be centered vertically
-            if ($this->table && $width > self::$img_max_table){
-                $this->doc .= '\resizebox{\linewidth}{!}{';
-            }
-                $this->doc .= '\includegraphics'.$max_width.'{media/'.basename($img_aux).'}';
-            if($_SESSION['iocelem'] === 'textl'){
-                if ($width > (.8 * self::$p_width)){
-                    $this->doc .= '}' . DOKU_LF;
-                }
-                $this->doc .= '\end{center}' . DOKU_LF;
-            }elseif ($this->table && $width > self::$img_max_table){
-                $this->doc .= '}';
-
-            }
-			//Close href
-            if ($linking !== 'details'){
-                $this->doc .= '}';
-                if (!$_SESSION['video_url']){
-                    $this->doc .= 'DOKU_LF';
-                }
-            }
-            if (!$_SESSION['video_url'] && !empty($title[1])){
-                $this->doc .= DOKU_LF;
-            }
-            if ($title[1]) {
-                if ($_SESSION['figure']){
-                    if ($img_width){
-                        $hspace = ($img_width + $hspace).'pt';
-                    }else{
-                       $hspace = '\textwidth';
-                    }
-					$vspace = '\vspace{-2mm}';
-					$align = '\raggedleft';
-                }elseif($_SESSION['iocelem'] === 'textl'){
-                        //textboxsize .05
-                        $hspace = '.9\linewidth';
-                        $vspace = '\vspace{-6mm}';
-                        $align = '\raggedleft';
-                }else{
-                    $hspace = '\marginparwidth';
-					$vspace = '\vspace{-4mm}';
-					$align = '\iocalignment';
-                }
-                $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\footerspacingline\textsf{\tiny'.$vspace.trim($this->_xmlEntities($title[1])).'}}}';
-                $thid->doc .= '}';
-
-            }
-            if (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['iocelem'] && !$_SESSION['u0']){
-                $this->doc .= '\end{figure}';
-            }elseif (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['iocelem'] && !$_SESSION['u0']){
-                if (!empty($title[1])){
-                    $this->doc .= DOKU_LF;
-                }
-                $this->doc .= '}' . DOKU_LF;
-            }
-            if ($_SESSION['iocelem'] === 'textl'){
-                $this->doc .= '\vspace{1ex}' . DOKU_LF;
-            }
-            $this->endimg = TRUE;
-        }else{
-            $this->doc .= '\textcolor{red}{\textbf{File '. $this->_xmlEntities(basename($src)).' does not exist.}}';
-        }
     }
 
     function render_TOC() {
@@ -976,7 +788,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 fwrite($tmp_img, $img);
                 fclose($tmp_img);
 				//Add and convert image to pdf
-                $this->_latexAddImage($tmp_name, $width, $height, $align, $title, $linking, TRUE);
+				$this->_media($tmp_name, $title, NULL, $width, $height);
             }
         }else{
             $this->externallink($src, $title);
@@ -1259,56 +1071,53 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     }
 
     function _xmlEntities($value) {
-        global $symbols;
-        $matches = array();
-        if (!$this->monospace){
-            //Search mathematical formulas
-            //echo $value.'INICIAL'.DOKU_LF;
-            list($value, $replace) = $this->_latexElements($value);
-            //echo $value.'FINAL';
-            if ($replace){
-                return $value;
-            }
-        }
-        static $find = array('{','}','\\','_','^','<','>','#','%', '$', '&', '~', '"','−');
-        static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
-								'@IOCBACKSLASH@textless{}','@IOCBACKSLASH@textgreater{}','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl{}', '-');
-
-        if ($this->monospace){
-            $value = str_ireplace($find, $replace, $value);
-            return preg_replace('/\n/', '\\newline ', $value);
-        }else{
-            return str_ireplace($find, $replace, $value);
-        }
+        //$value = $this->_latexElements($value);
+        return htmlspecialchars($value,ENT_QUOTES,'UTF-8');
     }
 
     function _ttEntities($value) {
         global $symbols;
         return str_ireplace($symbols, ' (Invalid character) ', $value);
     }
-
+/*
     function _latexElements($value){
         //LaTeX mode
-        $replace = FALSE;
-        $value = preg_replace('/<latex>.*?<\/latex>/', '',$value);
-        //Math block mode
-        while(preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $value, $matches)){
-            $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
-			$text = preg_replace('/(\$)/', '\\\\$1', $text);
-            $value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '\begin{center}\begin{math}'.filter_tex_sanitize_formula($text).'\end{math}\end{center}', $value, 1);
-            $replace = TRUE;
+        //$value = preg_replace('/<latex>.*?<\/latex>/', '',$value);
+        $block = preg_match('/^\${2}/', $value);
+
+        $renderer = new Doku_Renderer_xhtml();
+        $xhtml = $renderer->render($value);
+
+        if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
+            $url = $match[1];
+            $path = mediaFN($match[2]);
+        } else {
+            $url = DOKU_BASE . "lib/plugins/latex/images/renderfail.png";
+            $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
         }
+        //Math block mode
+        if ($block){
+            //$text = str_ireplace($symbols, ' (Invalid character) ', $value);
+			//$text = preg_replace('/(\$)/', '\\\\$1', $text);
+            //$value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '\begin{center}\begin{math}'.filter_tex_sanitize_formula($text).'\end{math}\end{center}', $value, 1);
+            $value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '@STARTLATEX@'.basename($path).'@ENDLATEX@.', $value, 1);
+	        //$value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '<div class="latexblock"><img src="../media/'.basename($path).'" alt="LaTeX"/></div>', $value, 1);
+        }else{//Math inline mode
+            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '@STARTLATEX@'.basename($path).'@ENDLATEX@.', $value, 1);
+            //$value = preg_replace('/\$\n?([^\$]+)\n?\$/', '<div class="latex"><img src="../media/'.basename($path).'" alt="LaTeX"/></div>', $value, 1);
+        }
+        /*
         //Math inline mode
         if(preg_match_all('/\$\n?([^\$]+)\n?\$/', $value, $matches, PREG_SET_ORDER)){
             foreach($matches as $m){
                 $text = str_ireplace($symbols, ' (Invalid character) ', $m[1]);
     			$text = preg_replace('/(\$)/', '\\\\$1', $text);
                 $value = str_replace($m[0], '$ '.filter_tex_sanitize_formula($text).' $', $value);
-                $replace = TRUE;
             }
         }
-        return array($value, $replace);
+        return array($value,$path);
     }
+*/
 
     function rss ($url,$params){
         global $lang;

@@ -12,7 +12,7 @@ require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 
-class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_iocexportl_iocsolucio extends DokuWiki_Syntax_Plugin {
 
    /**
     * Get an associative array with plugin info.
@@ -21,9 +21,9 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Marc Català',
             'email'  => 'mcatala@ioc.cat',
-            'date'   => '2011-03-21',
+            'date'   => '2011-09-20',
             'name'   => 'IOC sol Plugin',
-            'desc'   => 'Plugin to parse sol tags',
+            'desc'   => 'Plugin to parse iocstl solucio tags',
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
@@ -39,18 +39,15 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
     function getSort(){
         return 513;
     }
-/*
-    function getAllowedTypes() {
-        return array('formatting');
-    }*/
+
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('<sol>(?=.*?</sol>)',$mode,'plugin_iocexportl_iocsol');
+        $this->Lexer->addEntryPattern('<iocstl solucio>(?=.*?</iocstl>)',$mode,'plugin_iocexportl_iocsolucio');
     }
     function postConnect() {
-        $this->Lexer->addExitPattern('</sol>','plugin_iocexportl_iocsol');
+        $this->Lexer->addExitPattern('</iocstl>','plugin_iocexportl_iocsolucio');
     }
 
     /**
@@ -84,61 +81,26 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
               case DOKU_LEXER_ENTER :
                   break;
               case DOKU_LEXER_UNMATCHED :
-                  if (!isset($_SESSION['quizsol'])){
-                      $_SESSION['quizsol'] = array();
-                  }
                   $instructions = get_latex_instructions($text);
-                  $sol = p_latex_render($mode, $instructions, $info);
-                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
-                  if($_SESSION['quizmode'] !== 'relations'){
-                      $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
-                  }else{
-                      $renderer->doc .= ' (\hspace{5mm})';
-                  }
+                  $renderer->doc .= p_latex_render($mode, $instructions, $info);
                   break;
               case DOKU_LEXER_EXIT :
                   break;
             }
             return TRUE;
-        }elseif($mode === 'xhtml'){
+        }elseif($mode === 'xhtml' || $mode === 'iocxhtml'){
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
               case DOKU_LEXER_UNMATCHED :
-                  if (!isset($_SESSION['quizsol'])){
-                      $_SESSION['quizsol'] = array();
-                  }
-                  $instructions = p_get_instructions($text);
-                  $sol = p_render($mode, $instructions, $info);
-                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
-                  if($_SESSION['quizmode'] !== 'relations'){
-                      $renderer->doc .= '\quizrule{'.min(20,strlen($text)).'em}';
-                  }else{
-                      $renderer->doc .= ' (\hspace{5mm})';
-                  }
-                  break;
-              case DOKU_LEXER_EXIT :
-                  break;
-            }
-            return TRUE;
-        }elseif($mode === 'iocxhtml'){
-            list($state, $text) = $data;
-            switch ($state) {
-              case DOKU_LEXER_ENTER :
-                  break;
-              case DOKU_LEXER_UNMATCHED :
-                  if (!isset($_SESSION['quizsol'])){
-                      $_SESSION['quizsol'] = array();
-                  }
+                  $renderer->doc .= '<form action="">';
+                  $renderer->doc .= '<div class="solution">';
                   $instructions = get_latex_instructions($text);
-                  $sol = p_latex_render($mode, $instructions, $info);
-                  array_push($_SESSION['quizsol'], preg_replace('/\n/', '', $sol));
-                  if($_SESSION['quizmode'] !== 'relations'){
-                      $renderer->doc .= '@IOCDROPDOWN@';
-                  }else{
-                      $renderer->doc .= '';
-                  }
+                  $renderer->doc .= p_latex_render('iocxhtml', $instructions, $info);
+                  $renderer->doc .= '</div>';
+                  $renderer->doc .= '<input type="button" value="Mostra" onclick="showsol(this)"></input>';
+                  $renderer->doc .= '</form>';
                   break;
               case DOKU_LEXER_EXIT :
                   break;
