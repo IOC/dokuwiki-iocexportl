@@ -917,12 +917,12 @@ aside ul li ul li a {
 .menu-open{
 }
 
-h4.arrow a:link{
+h4.arrow a:link, h4.arrow a:visited{
    background: url(../../img/arrow.png) no-repeat scroll 3px 3px transparent;
    padding-left: 10px;
 }
 
-li h4 a:link{
+li h4 a:link, li h4 a:visited{
    background: url(../../img/darrow.png) no-repeat scroll 3px 3px transparent;
    padding-left: 15px;
 }
@@ -935,16 +935,15 @@ li ul li{
  padding-left:10px;
 }
 
-li ul li h4 a:link{
+li ul li h4 a:link, li ul li h4 a:visited{
    background: url(../../img/darrow.png) no-repeat scroll 3px 3px transparent;
 }
 
 li ul li ul li{
-   /*background: url(../../img/arrow.png) no-repeat scroll 38px 1px transparent;*/
    padding-left: 13px;
 }
 
-li ul li ul li h4 a:link{
+li ul li ul li h4 a:link, li ul li ul li h4 a:visited{
    background: url(../../img/darrow.png) no-repeat scroll 20px 1px transparent;
 }
 
