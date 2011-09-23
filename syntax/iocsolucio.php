@@ -99,7 +99,7 @@ class syntax_plugin_iocexportl_iocsolucio extends DokuWiki_Syntax_Plugin {
                   $instructions = get_latex_instructions($text);
                   $renderer->doc .= p_latex_render('iocxhtml', $instructions, $info);
                   $renderer->doc .= '</div>';
-                  $renderer->doc .= '<input type="button" value="Mostra" onclick="showsol(this)"></input>';
+                  $renderer->doc .= '<input class="btnsolution3" type="button" value="Mostra"></input>';
                   $renderer->doc .= '</form>';
                   break;
               case DOKU_LEXER_EXIT :

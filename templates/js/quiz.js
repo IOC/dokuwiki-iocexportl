@@ -1,5 +1,5 @@
 define (function(){
-	function checkquiz(e){
+	var checkquiz = function(e){
 	  var target = jQuery(e);
 	  var form = target.parents('form');
 	  var quiz = form.parent();
@@ -68,7 +68,7 @@ define (function(){
 	  showsolution(target, res);
 	}
 
-	function checkquiz2(e){
+	var checkquiz2 = function(e){
 	  var target = jQuery(e);
 	  var form = target.parents('form');
 	  var solutions = [];
@@ -101,7 +101,7 @@ define (function(){
 	  showsolution(target, resp);
 	} 
 
-	function showsolution(target, text){
+	var showsolution = function(target, text){
 	  var form = target.parents('form');
 	  var quiz = target.parents('div');
 	  
@@ -112,7 +112,7 @@ define (function(){
 	  }
 	} 
 
-	function showsol(target){
+	var showsol = function(target){
 		var form = jQuery(target).parents('form');
 		if (jQuery(form).children(".solution").css('display') == 'block' ){
 			jQuery(form).children(".solution").hide("slow");
@@ -123,8 +123,7 @@ define (function(){
 		}
 	}
 
-	function inArray(needle, haystack)
-	{
+	var inArray = function(needle, haystack){
 		for(var key in haystack)
 		{
 			needle = needle + '';//to String
@@ -135,4 +134,18 @@ define (function(){
 		}
 		return false;
 	}
+	
+	$('.btn_solution').click(function (){
+		checkquiz(this);
+	});
+	
+	$('.btn_solution2').click(function (){
+		checkquiz2(this);
+	});
+	
+	$('.btn_solution3').click(function (){
+		showsol(this);
+	});
+
+//	return {checkquiz:checkquiz,checkquiz2:checkquiz2,showsol:showsol};
 });

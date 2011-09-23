@@ -10,5 +10,3 @@ require.ready(function(){
 	});
 });
 
-
-
