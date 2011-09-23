@@ -54,17 +54,9 @@ $tmp_dir = rand();
 $_SESSION['tmp_dir'] = $tmp_dir;
 if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
     mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
-//    mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media', 0775, TRUE);
 }
-/*if (!file_exists(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx')){
-    session_destroy();
-    return FALSE;
-}*/
 //get all pages and activitites
 $data = getData();
-
-//FrontPage
-//renderFrontpage($latex, $data);
 
 $zip = new ZipArchive;
 $res = $zip->open(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
@@ -101,7 +93,6 @@ if ($res === TRUE) {
          unset($data[0]['intro']);
     }
      //Content468
-     //print_r($tree_names);die;
      foreach ($data[0] as $ku => $unit){
         //Section
         //var to attach all url media files
@@ -114,13 +105,9 @@ if ($res === TRUE) {
                 //Activities
                 $_SESSION['activities'] = TRUE;
                 foreach ($section as $ka => $act){
-/*                    if ($ka === 'continguts'){
-                        continue;
-                    }*/
                     $text = io_readFile(wikiFN($act));
                     list($header, $text) = extractHeader($text);
                     $toc = getTOC($text);
-                    //$_href = '../../../'.$web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html';
                     $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href,$def_section_href,''));
                     preg_match_all('/\{\{([^}|?]*)[^}]*\}\}/', $text, $matches);
                     array_push($files, $matches[1]);
@@ -150,7 +137,6 @@ if ($res === TRUE) {
             }else{
                 $text = io_readFile(wikiFN($section));
                 list($header, $text) = extractHeader($text);
-                //$toc = getTOC($text);
                 $navmenu = createNavigation('../../',array($unitname,$tree_names[$ku][$ks]), array($def_unit_href,''));
                 preg_match_all('/\{\{([^}|]+)[^}]*\}\}/', $text, $matches);
                 array_push($files, $matches[1]);
@@ -444,7 +430,6 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html';
                     preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
                     $act_name = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
-                    //array_push($tree_names[$ku],$act_name);
                     $tree_names[$ku][$ks]=$act_name;
                     $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks);
                     unset($unit[$ks]);

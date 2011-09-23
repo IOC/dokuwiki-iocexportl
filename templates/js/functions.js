@@ -1,5 +1,4 @@
-// remap jQuery to $
-(function($){
+define (function(){
 	var lnavi = parseInt($("#navi").css('left'),10);
 	var topside = parseInt($("#topside").css('top'),10);
 	var topsideheight = parseInt($("#topside").css('height'),10);
@@ -118,7 +117,7 @@
     });
     
     $('#reset').click(function() {
-		var object = jQuery.parseJSON(defaultsettings);
+		var object = $.parseJSON(defaultsettings);
    	 	settings(object);
 		for (obj in object.settings[0]){
 			setCookieProperty(obj,object.settings[0][obj]);
@@ -268,7 +267,7 @@
 	//Set params into our cookie
 	var setcookie = (function(value){
 		document.cookie ='ioc_html=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
-		document.cookie="ioc_html=" + escape(value) + ";";
+		document.cookie="ioc_html=" + escape(value) + "; path=/;";
 	});
 
 	//get params from our cookie    	
@@ -285,16 +284,22 @@
 		}
 	});
 
+	var set_navi = (function(h){
+		var height = parseInt($("#aside").css("height"),10);
+		height = (height/2)+(parseInt($("#aside").css("top"),10)-(parseInt($("#navi").css("height"),10)/2))+8;
+		$("#navi").css("top",height);
+	});
+
 	var get_params = (function(reset){
 		var info = getcookie();
 		if (info!=null && info!="" && !reset){
 			//Get and apply stored options
-			var object = jQuery.parseJSON(info);
+			var object = $.parseJSON(info);
 			settings(object);
 			sidemenu(object);
 		}else{
 			//Save default options
-			var object = jQuery.parseJSON(defaultsettings);
+			var object = $.parseJSON(defaultsettings);
 			settings(object);
 			sidemenu(object);
 			setcookie(defaultsettings);
@@ -302,56 +307,54 @@
 		set_navi();
 	});
 	
-	var set_navi = (function(){
-		var height = parseInt($("#aside").css("height"),10);
-		height = (height/2)+(parseInt($("#aside").css("top"),10)-(parseInt($("#navi").css("height"),10)/2))+8;
-		$("#navi").css("top",height);
-	});
 	
 	function basename(path) {
 		return path.replace(/\\/g,'/').replace( /.*\//, '' );
 	}
 
-    
-    $("document").ready(function () {
-    	//Header shadow
-    	$(window).scroll(function () {
-    		if ($(window).scrollTop() > 30){
-    			$("header").addClass("header-shadow");
-    			$("#upbutton").show("slow");
-    		}else{
-    			$("header").removeClass("header-shadow");
-    			$("#upbutton").hide("slow");
-    		}
-    	});
-    	
-    	//Show and hide list elements
-    	$(".expander ul").hide();
-    	$(".expander h4").live("click", function() {
-    	    var $nestList = $(this).siblings("ul");
-    	    if ($(this).parent().children("ul").css('display') == 'inline'){
-				$(this).parent().children("ul").hide();
-			}else{
-				$(this).parent().children("ul").show();
-			}
-			$(this).parent().siblings().children().filter('ul').hide("fast", function(){
-    				set_navi();
-			});
-    	});
-
-		//Save selected option inside menu
-		$("#menu li > a").click(function(e) {
-			e.preventDefault();
-			setUrl($(this).attr("href"));
-    	});
-		
-		jQuery.expr[':'].parents = function(a,i,m){
-		    return jQuery(a).parents(m[3]).children('ul').length < 1;
-		};
-		jQuery('li > h4').filter(':parents(li)').addClass('arrow');
-		
-		//Initialize menu and settings params
-		get_params();
+	//Header shadow
+	$(window).scroll(function () {
+		if ($(window).scrollTop() > 30){
+			$("header").addClass("header-shadow");
+			$("#upbutton").show("slow");
+		}else{
+			$("header").removeClass("header-shadow");
+			$("#upbutton").hide("slow");
+		}
 	});
+	
+	//Show and hide list elements
+	$(".expander ul").hide();
+	$(".expander h4").live("click", function() {
+
+	    var $nestList = $(this).siblings("ul");
+	    if ($(this).parent().children("ul").css('display') == 'inline'){
+			$(this).parent().children("ul").hide('fast', function(){
+				set_navi();
+			});
+		}else{
+			$(this).parent().children("ul").show('fast',function(){
+				set_navi();
+			});
+		}
+		$(this).parent().siblings().children().filter('ul').hide('fast', function(){
+			set_navi();
+		});
+			
+	});
+
+	//Save selected option inside menu
+	$("#menu li > a").click(function(e) {
+		e.preventDefault();
+		setUrl($(this).attr("href"));
+	});
+	
+	$.expr[':'].parents = function(a,i,m){
+	    return $(a).parents(m[3]).children('ul').length < 1;
+	};
+	$('li > h4').filter(':parents(li)').addClass('arrow');
+	
+	//Initialize menu and settings params
+	get_params();
     
-})(window.jQuery);
+});
