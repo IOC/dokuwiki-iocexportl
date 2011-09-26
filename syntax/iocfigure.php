@@ -96,7 +96,7 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
      */
     function render($mode, &$renderer, $data) {
         if ($mode === 'ioccounter'){
-            list ($state, $text) = $data;
+            list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER : break;
                 case DOKU_LEXER_UNMATCHED :
