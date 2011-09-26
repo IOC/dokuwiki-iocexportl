@@ -146,6 +146,4 @@ define (function(){
 	$('.btn_solution3').click(function (){
 		showsol(this);
 	});
-
-//	return {checkquiz:checkquiz,checkquiz2:checkquiz2,showsol:showsol};
 });

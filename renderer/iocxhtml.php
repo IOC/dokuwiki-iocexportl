@@ -35,23 +35,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     var $_codeblock = 0; // counts the code and file blocks, used to provide download links
 
 
-    var $code = FALSE;
-    var $col_colspan;
-    var $col_num = 1;
-    static $convert = FALSE;//convert images to $imgext
-    var $endimg = FALSE;
-    var $formatting = '';
-    static $hr_width = 354;
 	var $id = '';
-    static $imgext = '.pdf';//Format to convert images
-    static $img_max_table = 99;//Image max width inside tables
-    var $max_cols = 0;
     var $monospace = FALSE;
-    static $p_width = 360;//415.12572;
     var $table = FALSE;
-    var $tableheader = FALSE;
-    var $tableheader_count = 0;//Only one header per table
-    var $tableheader_end = FALSE;
     var $tmp_dir = 0;//Value of temp dir
 
 
@@ -371,18 +357,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
       }
 
-     /**
-     * NOVA
-     */
-    function _image_convert($img, $dest, $width = NULL, $height = NULL){
-        $imgdest = tempnam($dest, 'ltx');
-        $resize = '';
-        if ($width && $height){
-            $resize = "-resize $width"."x"."$height";
-        }
-        @exec("convert $img $resize $imgdest".self::$imgext);
-        return $imgdest.self::$imgext;
-    }
 
     function render_TOC() {
          return '';
@@ -1079,45 +1053,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         global $symbols;
         return str_ireplace($symbols, ' (Invalid character) ', $value);
     }
-/*
-    function _latexElements($value){
-        //LaTeX mode
-        //$value = preg_replace('/<latex>.*?<\/latex>/', '',$value);
-        $block = preg_match('/^\${2}/', $value);
-
-        $renderer = new Doku_Renderer_xhtml();
-        $xhtml = $renderer->render($value);
-
-        if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
-            $url = $match[1];
-            $path = mediaFN($match[2]);
-        } else {
-            $url = DOKU_BASE . "lib/plugins/latex/images/renderfail.png";
-            $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
-        }
-        //Math block mode
-        if ($block){
-            //$text = str_ireplace($symbols, ' (Invalid character) ', $value);
-			//$text = preg_replace('/(\$)/', '\\\\$1', $text);
-            //$value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '\begin{center}\begin{math}'.filter_tex_sanitize_formula($text).'\end{math}\end{center}', $value, 1);
-            $value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '@STARTLATEX@'.basename($path).'@ENDLATEX@.', $value, 1);
-	        //$value = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '<div class="latexblock"><img src="../media/'.basename($path).'" alt="LaTeX"/></div>', $value, 1);
-        }else{//Math inline mode
-            $value = preg_replace('/\$\n?([^\$]+)\n?\$/', '@STARTLATEX@'.basename($path).'@ENDLATEX@.', $value, 1);
-            //$value = preg_replace('/\$\n?([^\$]+)\n?\$/', '<div class="latex"><img src="../media/'.basename($path).'" alt="LaTeX"/></div>', $value, 1);
-        }
-        /*
-        //Math inline mode
-        if(preg_match_all('/\$\n?([^\$]+)\n?\$/', $value, $matches, PREG_SET_ORDER)){
-            foreach($matches as $m){
-                $text = str_ireplace($symbols, ' (Invalid character) ', $m[1]);
-    			$text = preg_replace('/(\$)/', '\\\\$1', $text);
-                $value = str_replace($m[0], '$ '.filter_tex_sanitize_formula($text).' $', $value);
-            }
-        }
-        return array($value,$path);
-    }
-*/
 
     function rss ($url,$params){
         global $lang;
