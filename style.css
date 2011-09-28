@@ -73,15 +73,109 @@ div.solution{
 
 /* html styles
 -------------------------------------------------------------------------------*/
-.iocfigure{
-	margin:5mm 0px;
+#bodyContent{
+/*	overflow:hidden;*/
 }
 
+
+.dokuwiki h1, .dokuwiki h2, .dokuwiki h3, .dokuwiki h4{
+	clear:left;
+	width:75%;
+}
+/*#bodyContent .level1, #bodyContent .level2,#bodyContent .level3, #bodyContent .level4{*/
+.ioctextl, .iocexample, .iocimportant, .iocfigure, .ioctable{
+	width:75% !important;
+}
+
+div.level1, div.level2, div.level3, div.level4{
+	float:none !important;
+}
+
+.level1 p, .level2 p, .level3 p, .level4 p, .level1 ol, .level2 ol, .level3 ol, .level4 ol, .level1 ul, .level2 ul, .level3 ul, .level4 ul{
+/*	float:left;*/
+	width:75% !important;
+}
+
+div.dokuwiki #toc__inside{
+	float:right;
+}
+
+div.dokuwiki #toc__inside ul{
+	float:none;
+}
+
+.dokuwiki .secedit {
+	clear:both;
+	float:left !important;
+}
+
+.ioccontent ul, .ioccontent ol{
+	float:none;
+}
+
+.iocfigure{
+	margin:2em auto;
+	width:100%;
+}
+
+.iocfigure .iocinfo{
+	margin:2em auto;
+	width:100%;
+}
+
+.imgb{
+	position: relative;
+    clear: right;
+	float:right;
+	width:150px !important;
+}
+.imgb img{
+/*	float:right !important;*/
+}
+
+.imgb a{
+	float:right !important;
+
+}
+
+.imgb .title{
+    clear: right;
+    float: right !important;
+    padding: 0.3em 0 1em;
+    text-align: right;
+    width: 150px;
+}
 .ioctable{
 	margin:5mm 0px;
+	width:100%;
 }
 
-.ioctext{
+.ioctextl .ioccontent{
+	clear:both!important;
+	width:80%;
+	background: url("img/ioctextl.png") no-repeat scroll left 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+	margin:1em auto;
+}
+
+/* COLUMN B */
+.ioctext, .iocquote, .iocreference, .iocnote{
+/*    clear: right;*/
+/*    overflow: hidden;*/
+/*    width: 150px;*/
+}
+
+.ioctextl, .iocexample, .iocimportant{
+    overflow: hidden;
+}
+
+.ioctext .ioccontent{
+	position: relative;
+    clear: right;
+	float:right;
+	width:150px !important;
 	margin:5mm 0px;
 	background: url("img/ioctext.png") no-repeat scroll left 1mm #fcd900;
 	border-style:dashed;
@@ -89,47 +183,36 @@ div.solution{
 	padding:3mm 3mm 3mm 10mm;
 }
 
-.ioctextl{
-	margin:5mm 0px;
-	background: url("img/ioctextl.png") no-repeat scroll 1mm 1mm #fcd900;
-	border-style:dashed;
-	border-width:1px;
-	padding:3mm 3mm 3mm 10mm;
-}
 
 .iocquote{
+	position: relative;
+    clear: right;
+	float:right;
+	width:150px !important;
 	margin:5mm 0px;
-	background: url("img/iocquote.png") no-repeat scroll 1mm 1mm #fcd900;
-	border-style:dashed;
-	border-width:1px;
-	padding:3mm 3mm 3mm 10mm;
-}
-
-.iocexemple{
-	margin:5mm 0px;
-	background: url("img/ioctextl.png") no-repeat scroll 1mm 1mm #fcd900;
-	border-style:dashed;
-	border-width:1px;
-	padding:3mm 3mm 3mm 10mm;
-}
-
-.iocimportant{
-	margin:5mm 0px;
-	background: url("img/iocimportant.png") no-repeat scroll 1mm 1mm #fcd900;
+	background: url("img/iocquote.png") no-repeat scroll left 1mm #fcd900;
 	border-style:dashed;
 	border-width:1px;
 	padding:3mm 3mm 3mm 10mm;
 }
 
 .iocreference{
+	position: relative;
+    clear: right;
+	float:right;
+	width:150px !important;
 	margin:5mm 0px;
-	background: url("img/iocreference.png") no-repeat scroll 1mm 1mm #fcd900;
+	background: url("img/iocreference.png") no-repeat scroll left 1mm #fcd900;
 	border-style:dashed;
 	border-width:1px;
 	padding:3mm 3mm 3mm 10mm;
 }
 
 .iocnote{
+	position: relative;
+    clear: right;
+	float:right;
+	width:150px !important;
 	margin:5mm 0px;
 	background: url("img/iocnote.png") no-repeat scroll left 1mm #fcd900;
 	border-style:dashed;
@@ -137,8 +220,32 @@ div.solution{
 	padding:3mm 3mm 3mm 10mm;
 }
 
-.ioctext p, .ioctextl p, .iocquote p, .iocexemple p, .iocimportant p, .iocreference p, .iocnote p{
+/* COLUMN A */
+.iocexample .ioccontent{
+	clear:both!important;
+	width:80%;
+	background: url("img/iocexemple.png") no-repeat scroll left 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+	margin:1em auto;
+}
+
+.iocimportant .ioccontent{
+	clear:both!important;
+	width:80%;
+	background: url("img/iocimportant.png") no-repeat scroll left 1mm #fcd900;
+	border-style:dashed;
+	border-width:1px;
+	padding:3mm 3mm 3mm 10mm;
+	margin:1em auto;
+}
+
+
+.ioctext p, .ioctextl p, .iocquote p, .iocexample p, .iocimportant p, .iocreference p, .iocnote p{
 	margin-bottom:0px !important;
+	width:100% !important;
+	float:none;
 }
 
 .ioctext pre, .ioctextl pre, .iocquote pre, .iocexemple pre{

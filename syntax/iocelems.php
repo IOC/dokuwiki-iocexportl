@@ -165,11 +165,13 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                             $this->tipus = 'textl';
                         }
                         $renderer->doc .= '<div class="ioc'.$this->tipus.'">';
+                        $renderer->doc .= '<div class="ioccontent">';
                         if (!empty($title)){
                             $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
                         }
                         $instructions = p_get_instructions($data);
                         $renderer->doc .= p_render($mode, $instructions, $info);
+                        $renderer->doc .= '</div>';
                         $renderer->doc .= '</div>';
                         break;
                     case DOKU_LEXER_EXIT :
