@@ -146,17 +146,21 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                     case DOKU_LEXER_ENTER :
                         $renderer->doc .= '<div class="iocfigure">';
+                        $renderer->doc .= '<div class="iocinfo">';
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
                         $renderer->doc .= '</a>';
                         break;
                     case DOKU_LEXER_UNMATCHED :
                         if (isset($params['title'])){
-                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
+                            $instructions = p_get_instructions($params['title']);
+                            $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>', p_render($mode, $instructions, $info));
+                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$title.'<br />';
                         }
                         if (isset($params['footer'])){
                             $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
                         }
+                        $renderer->doc .= '</div>';
                         $instructions = p_get_instructions($text);
                         $renderer->doc .= p_render($mode, $instructions, $info);
                         $renderer->doc .= '</div>';
