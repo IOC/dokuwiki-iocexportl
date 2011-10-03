@@ -58,7 +58,7 @@ div.solution{
     display: none;
     margin: 1em 0;
     padding: 0.4em 1em;
-    width:40%;
+    max-width:73%;
 }
 
 .quiz_result {
@@ -135,6 +135,15 @@ div.dokuwiki #toc__inside ul{
 .iocfigure img{
 	display:block;
 	margin:0 auto 2em auto;
+}
+
+
+.solution p{
+	width:100% !important;
+}
+
+.solution img{
+	max-width:100%;
 }
 
 .imgb{
@@ -275,4 +284,9 @@ div.dokuwiki #toc__inside ul{
 
 .ioctitle{
 	font-weight:bold;
+}
+
+img.latex_displayed{
+	margin:1em auto!important;
+	display:block;
 }

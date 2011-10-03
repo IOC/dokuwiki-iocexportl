@@ -88,19 +88,41 @@ class syntax_plugin_iocexportl_iocsolucio extends DokuWiki_Syntax_Plugin {
                   break;
             }
             return TRUE;
-        }elseif($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }elseif($mode === 'iocxhtml'){
             list($state, $text) = $data;
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   break;
               case DOKU_LEXER_UNMATCHED :
+                  $_SESSION['iocelem'] = TRUE;
                   $renderer->doc .= '<form action="">';
-                  $renderer->doc .= '<div class="solution">';
+                  $renderer->doc .= '<div class="solution ioccontent">';
                   $instructions = get_latex_instructions($text);
                   $renderer->doc .= p_latex_render('iocxhtml', $instructions, $info);
                   $renderer->doc .= '</div>';
                   $renderer->doc .= '<input class="btn_solution3" type="button" value="Mostra"></input>';
                   $renderer->doc .= '</form>';
+                  $_SESSION['iocelem'] = FALSE;
+                  break;
+              case DOKU_LEXER_EXIT :
+                  break;
+            }
+            return TRUE;
+        }elseif($mode === 'xhtml'){
+            list($state, $text) = $data;
+            switch ($state) {
+              case DOKU_LEXER_ENTER :
+                  break;
+              case DOKU_LEXER_UNMATCHED :
+                  $_SESSION['iocelem'] = TRUE;
+                  $renderer->doc .= '<form action="">';
+                  $renderer->doc .= '<div class="solution ioccontent">';
+                  $instructions = p_get_instructions($text);
+                  $renderer->doc .= p_render($mode, $instructions, $info);
+                  $renderer->doc .= '</div>';
+                  $renderer->doc .= '<input class="btn_solution3" type="button" value="Mostra"></input>';
+                  $renderer->doc .= '</form>';
+                  $_SESSION['iocelem'] = FALSE;
                   break;
               case DOKU_LEXER_EXIT :
                   break;
