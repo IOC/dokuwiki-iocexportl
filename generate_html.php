@@ -281,6 +281,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $id;
         global $conf;
         global $toexport;
+        $sort = FALSE;
 
         $file = wikiFN($id);
         if (@file_exists($file)) {
@@ -302,12 +303,25 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     array_push($data['intro'], array($match[2],$ns));
                 }else{
                     $ns = preg_replace('/:/' ,'/', $ns);
+                    $content = io_readFile($conf['datadir'].'/'.$ns.'/index.txt');
                     $result = array();
-                    search($result,$conf['datadir'],'search_allpages', null, $ns);
+                    if (preg_match('/^[I|i]ndex/', $content)){
+                        $result = explode(DOKU_LF,$content);
+                        @array_shift($result);
+                        $ns = str_replace('/', ':', $ns);
+                        $sort = TRUE;
+                    }else{
+                        search($result,$conf['datadir'], 'search_allpages', null, $ns);
+                    }
                     foreach ($result as $pagename){
-                        if (!preg_match('/:(pdfindex|imatges|index)$/', $pagename['id'])){
-                            preg_match('/:(u\d+):/', $pagename['id'], $unit);
-                            preg_match('/:(a\d+):/', $pagename['id'], $section);
+                        if ($sort){
+                            $pagename = $ns.':'.$pagename;
+                        }else{
+                            $pagename = $pagename['id'];
+                        }
+                        if (!preg_match('/:(pdfindex|imatges|index)$/', $pagename)){
+                            preg_match('/:(u\d+):/', $pagename, $unit);
+                            preg_match('/:(a\d+):/', $pagename, $section);
                             if (!empty($unit[1]) && !isset($data[$unit[1]])){
                                 $data[$unit[1]] = array();
                             }
@@ -316,11 +330,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                             }
                             //Save unit name
                             $data[$unit[1]]['iocname'] = $match[2];
-                            preg_match('/([^:]*:)+([^\.]*)$/', $pagename['id'], $name);
+                            preg_match('/([^:]*:)+([^\.]*)$/', $pagename, $name);
                             if (!empty($section[1])){
-                                $data[$unit[1]][$section[1]][$name[2]] = $pagename['id'];
+                                $data[$unit[1]][$section[1]][$name[2]] = $pagename;
                              }else{
-                                $data[$unit[1]][$name[2]] = $pagename['id'];
+                                $data[$unit[1]][$name[2]] = $pagename;
                             }
                         }
                     }
