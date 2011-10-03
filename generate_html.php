@@ -1,6 +1,6 @@
 <?php
 /**
- * LaTeX Plugin: Generate Latex document
+ * LaTeX Plugin: Generate HTML document
  *
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author Marc Català <mcatala@ioc.cat>
@@ -18,21 +18,19 @@ require_once DOKU_INC.'inc/parser/xhtml.php';
 
 global $conf;
 
-$id = getID();
-$tmp_dir = '';
-$media_path = 'lib/exe/fetch.php?media=';
+static $def_unit_href = 'introduccio.html';
+static $def_section_href = 'continguts.html';
 $exportallowed = FALSE;
-$meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'creditcodi', 'creditnom', 'familia');
-$img_src = array('familyicon_administracio.png','familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
-$ioclanguage = array('CA' => 'catalan', 'DE' => 'german', 'EN' => 'english','ES' => 'catalan','FR' => 'frenchb','IT' => 'italian');
-$ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
+$id = getID();
+static $max_menu = 75;
+static $max_navmenu = 35;
+static $media_path = 'lib/exe/fetch.php?media=';
 $menu_html = '';
-$web_folder = 'WebContent';
-$max_navmenu = 35;
-$max_menu = 75;
-$def_unit_href = 'introduccio.html';
-$def_section_href = 'continguts.html';
+static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'creditcodi', 'creditnom', 'familia');
+$tmp_dir = '';
 $tree_names = array();
+static $web_folder = 'WebContent';
+
 
 if (!checkPerms()) return FALSE;
 $exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
