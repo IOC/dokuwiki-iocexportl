@@ -10,3 +10,4 @@
 $lang['jquery_url'] = 'jQuery Url';
 $lang['allowexport']   = 'Permetre als rols que no son administrador exportar a pdf.';
 $lang['counter'] = 'Activar el comptador de caràcters.';
+$lang['toccontents'] = 'Mostrar la taula de continguts dintre la wiki.';

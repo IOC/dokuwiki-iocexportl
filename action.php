@@ -22,6 +22,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     function register(&$controller) {
         global $ACT;
         if ($ACT === 'show'){
+            $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'handle_dokuwiki_started');
             $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'getLanguage', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'showform', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'counter', array());
@@ -31,6 +32,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'render', array());
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
+    }
+
+    public function handle_dokuwiki_started(Doku_Event &$event, $param) {
+        global $JSINFO;
+
+        $JSINFO['plugin_iocexportl'] = array(
+            'toccontents' => $this->getConf('toccontents'),
+        );
     }
 
     function showform(&$event){
