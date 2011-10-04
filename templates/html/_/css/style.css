@@ -620,7 +620,8 @@ aside ul li ul li {
  border-top: 0px;
 }
 
-aside ul li ul li a {
+aside ul li ul li > a:before {
+ content: "\203a\0020";
  padding-left: 10px;
  color: #9f9f9f;
 }
