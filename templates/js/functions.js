@@ -217,10 +217,10 @@ define (function(){
 	var sidemenu = (function (info){
 		if (info.menu[0]['mvisible']==1){
 			$("#aside").css('left','0px');
-			$("#navi").css('left',$("#navi").outerWidth()+9);
+			$("#navi").css('left',lnavi);
 		}else{
 			$("#aside").css('left',-$("#aside").outerWidth());
-			$("#navi").css('left',-$("#aside").outerWidth()+$("#navi").outerWidth()+9);
+			$("#navi").css('left',-$("#aside").outerWidth()+lnavi);
 		}
 		enablesideoption();
 	});
@@ -321,6 +321,10 @@ define (function(){
 			$("header").removeClass("header-shadow");
 			$("#upbutton").hide("slow");
 		}
+	});
+	
+	jQuery(window).resize(function() {
+		get_params();
 	});
 	
 	//Show and hide list elements
