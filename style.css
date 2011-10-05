@@ -116,6 +116,10 @@ div.dokuwiki #toc__inside ul{
 	width:73%;
 }
 
+.dokuwiki .ioccontent pre{
+	width:98%;
+}
+
 .iocfigure{
 	width:100% !important;
 }
