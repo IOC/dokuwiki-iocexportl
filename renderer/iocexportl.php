@@ -272,7 +272,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $align = 'flushleft';
         }
         if (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && $_SESSION['iocelem'] !== 'textl'){
-            $max_width = '[width=35mm]';
+            if ($width < 133){
+                $max_width = '[width='.$width.'px]';
+            }else{
+                $max_width = '[width=35mm]';
+            }
             $img_width = FALSE;
         }elseif (!$this->table && $width > self::$p_width && $_SESSION['iocelem'] !== 'textl' && !$_SESSION['figlarge']){
             $max_width = '[width=\textwidth]';
