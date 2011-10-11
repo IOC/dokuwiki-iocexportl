@@ -310,11 +310,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $offset = '';
                 //Extract offset
                 if ($title){
+                    $title_aux = $title;
                     $data = preg_replace('/<verd>|<\/verd>/', '', $title);
                     $data = preg_split('/\//', $title, 2);
                     $title = $data[0].'/';
-                    if(!empty($data[1])){
+                    if(!empty($data[1]) &&  is_numeric($data[1])){
                         $offset = '['.$data[1].'mm]';
+                    }else{
+                        $title = '/'.$title_aux;
                     }
                 }
                 $this->doc .= '\imgB'.$offset.'{';
