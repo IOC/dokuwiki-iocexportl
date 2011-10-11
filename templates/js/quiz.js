@@ -146,4 +146,6 @@ define (function(){
 	$('.btn_solution3').click(function (){
 		showsol(this);
 	});
+	
+	return this;
 });

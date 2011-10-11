@@ -59,8 +59,11 @@ $data = getData();
 $zip = new ZipArchive;
 $res = $zip->open(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
 if ($res === TRUE) {
+    list($menu_html, $files_name) = createMenu($data[0]);
+    $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
+    $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
+    $zip->addFromString('_/js/build.js', $build);
     getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
-    $menu_html = createMenu($data[0]);
     $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
     $text_template = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html, $text_template, 1);
     $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
@@ -73,6 +76,13 @@ if ($res === TRUE) {
     $html = preg_replace('/@IOCPATH@/', '', $html);
     $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
     $zip->addFromString('index.html', $html);
+    //Create search page
+    $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_template, 1);
+    $html = preg_replace('/@IOCTITLE@/', 'Cerca', $html, 1);
+    $html = preg_replace('/@IOCTOC@/', '', $html, 1);
+    $html = preg_replace('/@IOCPATH@/', '', $html);
+    $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+    $zip->addFromString('search.html', $html);
     if (isset($data[0]['intro'])){
         //Intro
         foreach ($data[0]['intro'] as $page){
@@ -413,20 +423,22 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         return $menu_html;
     }
 
-        /**
+    /**
      *
-     * Create side menu elements
+     * Create side menu elements and return path to filenames
      */
     function createMenu($elements){
         global $web_folder;
         global $tree_names;
 
+        $files = array();
         $menu_html = '';
         if (isset($elements['intro'])){
             //Intro
             foreach ($elements['intro'] as $kp => $page){
                 $href = '@IOCPATH@'.basename(wikiFN($page[1]),'.txt').'.html';
                 $menu_html .= setMenu('root', $page[0], $href, 'c'.$kp);
+                array_push($files, '"'.str_replace('@IOCPATH@', '', $href).'"');
             }
             unset($elements['intro']);
         }
@@ -444,6 +456,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $act_name = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
                     $tree_names[$ku][$ks]=$act_name;
                     $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks);
+                    array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                     unset($unit[$ks]);
                 }
             }
@@ -472,13 +485,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         $tree_names[$ku][$ks]['continguts']=$act_name;
                     }
                     $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
+                    array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                 }
                 //Close menu activities
                 $menu_html .= setMenu();
             }
         }
         $menu_html .= setMenu();
-        return $menu_html;
+        return array($menu_html, $files);
     }
 
 
@@ -503,7 +517,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         $zip->addEmptyDir($dirname);
                         getFiles($path, $zip);
                     }else{
-                        if ($contents !== 'index.html'){
+                        if ($contents !== 'index.html' && $contents !== 'build.js' ){
                             $dirname = str_replace(DOKU_PLUGIN_TEMPLATES_HTML,'',$directory);
                             $zip->addFile($path, $dirname ."/".$contents);
                         }

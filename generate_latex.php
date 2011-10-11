@@ -225,8 +225,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
         @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         if ($result === 0){
-            @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
             //One more to calculate correctly size tables
+            @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            if ($_SESSION['onemoreparsing']){
+                @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            }
             @exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
         }
         if ($result !== 0){

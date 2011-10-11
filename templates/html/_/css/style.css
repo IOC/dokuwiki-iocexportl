@@ -538,7 +538,7 @@ p {
  width: 20px;
  height: 100px;
  left: 0;
- margin-left:16.8%;
+ margin-left:17%;
  overflow: hidden;
  z-index: 1000;
  -moz-user-select: none;
@@ -579,12 +579,12 @@ p {
 }
 
 .search form input {
- width: 100px;
+ width: 130px;
  height: 20px;
  margin-top: 2px;
  padding-left: 10px;
  padding-right: 30px;
- background: #FFFFFF url(../../img/search.png) no-repeat 115px top;
+ background: #FFFFFF url(../../img/search.png) no-repeat 145px 50%;
  border: 0;
  border-radius: 5px 5px 5px 5px;
  -moz-border-radius: 5px 5px 5px 5px;
@@ -656,7 +656,7 @@ aside ul li ul li > a:before {
  -moz-box-shadow: 2px 2px 4px 1px #888;
  -webkit-box-shadow: 2px 2px 4px 1px #888;
  box-shadow: 2px 2px 4px 1px #888;
- z-index: 12;
+ z-index: 50;
 }
 
 .options {
@@ -873,7 +873,7 @@ aside ul li ul li > a:before {
  position:fixed;
  top:65px;
  right:15px;
- z-index:101;
+ z-index:49;
 }
 
 .upbutton:hover{
@@ -1007,4 +1007,14 @@ div.solution{
  margin: 1em 0;
  padding: 0.4em 1em;
  width:40%;
+}
+
+.highlight{
+ font-size:110%;
+ font-weight:bold;
+}
+
+.urlpath{
+ font-size:90%;
+ font-style:italic;
 }

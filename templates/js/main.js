@@ -1,11 +1,11 @@
 require.ready(function(){
-	require(["jquery.min"], function(){
-		require(["quiz", "functions"], function(){
-		    //Initialize menu and settings params
-		    Hyphenator.config({
-				minwordlength : 4,
-		    });
-		    Hyphenator.run();
+	require(["jquery.min","doctools"], function(jQuery,Highlight){
+		Highlight();
+		require(["quiz", "functions","searchtools"], function(quiz,func,Search){
+			Search.init();
+			if (/search\.html/.exec(document.location.href)){
+				func();
+			}
 		});
 	});
 });

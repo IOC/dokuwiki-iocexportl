@@ -153,6 +153,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!isset($_SESSION['imgB'])){
             $_SESSION['imgB'] = FALSE;
         }
+        if (!isset($_SESSION['onemoreparsing'])){
+            $_SESSION['onemoreparsing'] = FALSE;
+        }
         if (!isset($_SESSION['qrcode'])){
             $_SESSION['qrcode'] = FALSE;
         }

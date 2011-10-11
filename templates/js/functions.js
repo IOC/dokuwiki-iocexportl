@@ -41,10 +41,7 @@ define (function(){
 	});
 	
     $('#search').click(function() {
-    	$("#imgsearch").addClass("hidden");
-    	$("#frmsearch").removeClass("hidden");
-    	$("#frmsearch").addClass("visible");
-    	$("input[name='search']").focus();
+    	showSearch();
     });
     
     //Font
@@ -133,6 +130,13 @@ define (function(){
     $('#navmenu').click(function() {
 		setCookieProperty('selected','null');
     });
+
+	var showSearch = (function (){
+		$("#imgsearch").addClass("hidden");
+    	$("#frmsearch").removeClass("hidden");
+    	$("#frmsearch").addClass("visible");
+    	$("input[name='q']").focus();
+	});
 
 	var setFont = (function (info){
 		var options=new Array("first-font","second-font");
@@ -226,7 +230,7 @@ define (function(){
 	});
 
 	var enablesideoption = (function(){
-		var url = document.location.href;
+		var url = document.location.pathname;
 		var dir = "WebContent/";
 		url = url.slice(url.indexOf(dir)+dir.length,url.length);
 		var elements = url.split("/");
@@ -239,8 +243,8 @@ define (function(){
 			}
 			node+=elements[i];
 		}
-		//Remove html extension and others characters at the end
-		var patt = new RegExp('\.html.*?','g')
+		//Remove html extension
+		var patt = new RegExp('\.html','g')
 		node = node.replace(patt,'');
 		
 		if (parent_node!=''){
@@ -360,5 +364,5 @@ define (function(){
 	
 	//Initialize menu and settings params
 	get_params();
-    
+	return showSearch;
 });

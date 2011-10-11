@@ -121,6 +121,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     //Transform quotes
                     $_SESSION['table_title'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['table_title']);
                     $_SESSION['table_footer'] = (isset($params['footer']) && !isset($params['large']))?trim($renderer->_xmlEntities($params['footer'])):'';
+                    if (!empty($_SESSION['table_footer'])){
+                        $_SESSION['onemoreparsing'] = TRUE;
+                    }
                     $_SESSION['table_id'] = $this->id;
                     if (isset($params['large'])){
                         $renderer->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{}{\hspace*{-\marginparwidth}\hspace*{-11mm}}'.DOKU_LF;
