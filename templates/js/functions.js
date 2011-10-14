@@ -259,7 +259,7 @@ define (function(){
 	});
 
 	var setUrl = (function(url){
-		local = document.location.href;
+		local = document.location.pathname;
 		local = local.slice(local.indexOf("WebContent"),local.length);
 		url2 = url.slice(url.indexOf("WebContent"),local.length);
 		if (local!=basename(url2)){
@@ -334,9 +334,8 @@ define (function(){
 	//Show and hide list elements
 	$(".expander ul").hide();
 	$(".expander h4").live("click", function() {
-
 	    var $nestList = $(this).siblings("ul");
-	    if ($(this).parent().children("ul").css('display') == 'inline'){
+	    if ($(this).parent().children("ul").css('display') != 'none'){
 			$(this).parent().children("ul").hide('fast', function(){
 				set_navi();
 			});

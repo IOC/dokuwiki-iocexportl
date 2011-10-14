@@ -1,12 +1,12 @@
 <?php
 /**
- * Figure Syntax Plugin
+ * Table Syntax Plugin
  * @author     Marc Català <mcatala@ioc.cat>
- * 	::figure:id
-  	  :title:
-  	  :footer:
-  	  :copyright:
-  	  :license:
+ * syntax
+ * 	::table:id
+   	  :title:
+   	  :footer:
+      :large: (bool)
 	:::
  */
 
@@ -15,9 +15,9 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
+class syntax_plugin_iocexportl_iocaccounting extends DokuWiki_Syntax_Plugin {
 
-class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
-
+    var $id;
     /**
      * return some info
      */
@@ -25,9 +25,9 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Marc Català',
             'email'  => 'mcatala@ioc.cat',
-            'date'   => '2011-03-17',
-            'name'   => 'IOC figure Plugin',
-            'desc'   => 'Plugin to parse figure tags',
+            'date'   => '2011-10-13',
+            'name'   => 'IOC accounting Plugin',
+            'desc'   => 'Plugin to parse accounting tags',
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
@@ -53,37 +53,37 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
         return 513;
     }
 
+
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('^::figure:.*?\n(?=.*?\n:::)', $mode, 'plugin_iocexportl_iocfigure');
+        $this->Lexer->addEntryPattern('^::accounting:.*?\n(?=\S[^:].*?\n:::)', $mode, 'plugin_iocexportl_iocaccounting');
     }
 
     function postConnect() {
-        $this->Lexer->addExitPattern('^:::', 'plugin_iocexportl_iocfigure');
+        $this->Lexer->addExitPattern('^:::', 'plugin_iocexportl_iocaccounting');
     }
+
 
     /**
      * Handle the match
      */
     function handle($match, $state, $pos, &$handler){
         $matches = array();
-        $data = array();
 		$id = '';
 		$params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                if (preg_match('/::figure:(.*?$)/', $match, $matches)){
-                    $id = $matches[1];
+                if (preg_match('/::accounting:(.*?)\n/', $match, $matches)){
+					$id = $matches[1];
                 }
-                break;
-            case DOKU_LEXER_UNMATCHED :
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
                     $params[$m[1]] = $m[2];
                 }
-                $match = preg_replace('/\s{2}:\w+:.*?\n/', '',  $match);
+                break;
+            case DOKU_LEXER_UNMATCHED :
                 break;
             case DOKU_LEXER_EXIT :
                 break;
@@ -98,14 +98,13 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
         if ($mode === 'ioccounter'){
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
-                case DOKU_LEXER_ENTER : break;
-                case DOKU_LEXER_UNMATCHED :
-                    $_SESSION['figure'] = TRUE;
+                case DOKU_LEXER_ENTER :
                     $renderer->doc .= (isset($params['title']))?$params['title']:'';
                     $renderer->doc .= (isset($params['footer']))?$params['footer']:'';
+                    break;
+                case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    $_SESSION['figure'] = FALSE;
                     break;
                 case DOKU_LEXER_EXIT :
                     break;
@@ -115,29 +114,30 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-    				$_SESSION['figlabel'] = trim($renderer->_xmlEntities($id));
-    				break;
+                    $this->id = trim($id);
+                    $_SESSION['accounting'] = TRUE;
+                    $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
+                    //Transform quotes
+                    $_SESSION['table_title'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['table_title']);
+                    $_SESSION['table_footer'] = (isset($params['footer']) && !isset($params['large']))?trim($renderer->_xmlEntities($params['footer'])):'';
+                    if (!empty($_SESSION['table_footer'])){
+                        $_SESSION['onemoreparsing'] = TRUE;
+                    }
+                    $_SESSION['table_id'] = $this->id;
+                    break;
                 case DOKU_LEXER_UNMATCHED :
-                    $_SESSION['figure'] = TRUE;
-                    $_SESSION['figtitle'] = (isset($params['title']))?$params['title']:'';
-                    $_SESSION['figlarge'] = (isset($params['large']));
-                    //Transform quotes
-                    $_SESSION['figtitle'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['figtitle']);
-                    $_SESSION['figfooter'] = (isset($params['footer']))?$params['footer']:'';
-                    //Transform quotes
-                    $_SESSION['figfooter'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['figfooter']);
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    /*if ($_SESSION['figfooter']){
-                        $renderer->doc .='\small '. $_SESSION['figfooter'] .'\\\\';
-                    }*/
-                    $_SESSION['figure'] = FALSE;
-    				$_SESSION['figlabel'] = '';
-    				$_SESSION['figtitle'] = '';
-    				$_SESSION['figlarge'] = FALSE;
-    				$_SESSION['figfooter'] = '';
                     break;
                 case DOKU_LEXER_EXIT :
+                    $renderer->doc .= '\vspace{-2ex}\par'.DOKU_LF;
+                    $_SESSION['table_id'] = '';
+                    $_SESSION['table_title'] = '';
+                    $_SESSION['table_footer'] = '';
+                    $_SESSION['table_large'] = FALSE;
+                    $_SESSION['table_small'] = FALSE;
+                    $_SESSION['accounting'] = FALSE;
+                    $this->id = '';
                     break;
             }
             return TRUE;
@@ -145,22 +145,22 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
-                        $renderer->doc .= '<div class="iocfigure">';
+                        $renderer->doc .= '<div class="iocaccounting">';
                         $renderer->doc .= '<div class="iocinfo">';
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
                         $renderer->doc .= '</a>';
-                        break;
-                    case DOKU_LEXER_UNMATCHED :
                         if (isset($params['title'])){
                             $instructions = p_get_instructions($params['title']);
-                            $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>', p_render($mode, $instructions, $info));
+                            $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>',p_render($mode, $instructions, $info));
                             $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$title.'<br />';
                         }
                         if (isset($params['footer'])){
                             $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
                         }
                         $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
                         $instructions = p_get_instructions($text);
                         $renderer->doc .= p_render($mode, $instructions, $info);
                         break;
@@ -173,25 +173,20 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
-                        $renderer->doc .= '<div class="iocfigure">';
+                        $renderer->doc .= '<div class="iocaccounting">';
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
                         $renderer->doc .= '</a>';
+                        if (isset($params['title'])){
+                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
+                        }
+                        if (isset($params['footer'])){
+                            $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
+                        }
                         break;
                     case DOKU_LEXER_UNMATCHED :
-                        if (isset($params['title'])){
-                            //$renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
-                            $_SESSION['fig_title'] = $params['title'];
-                        }
-                        $_SESSION['figure'] = TRUE;
-
                         $instructions = get_latex_instructions($text);
                         $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                        $_SESSION['figure'] = FALSE;
-                        $_SESSION['fig_title'] = '';
-                        if (isset($params['footer'])){
-                            $renderer->doc .= $params['footer'].'<br />';
-                        }
                         break;
                     case DOKU_LEXER_EXIT :
                         $renderer->doc .= '</div>';

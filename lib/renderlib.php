@@ -72,6 +72,7 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
 
       //Call our customized function get_parsermodes
       $modes = get_latex_parsermodes();
+      //$modes = p_get_parsermodes();
 
       // Create the parser
       $Parser = new Doku_Parser();
@@ -96,6 +97,7 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
      */
     function get_latex_parsermodes(){
       global $conf;
+      global $DOKU_PLUGINS;
 
       //reuse old data
       static $modes = null;
@@ -120,7 +122,16 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
         foreach($pluginlist as $p){
           require_once DOKU_PLUGIN . 'iocexportl/syntax/'.$p.'.php';
           $class_name = 'syntax_plugin_iocexportl_'. $p;
-          $obj = new $class_name();//attempt to load plugin into $obj
+          $p = 'iocexportl_'.$p;
+          if (!empty($DOKU_PLUGINS['syntax'][$p])){
+              if (!$DOKU_PLUGINS[$type][$name]->isSingleton()) {
+                  $DOKU_PLUGINS['syntax'][$p] = &class_exists($class_name) ? new $class_name(): null;
+              }
+              $DOKU_PLUGINS['syntax'][$p] = new $class_name();//attempt to load plugin into $obj
+          }else{
+              $DOKU_PLUGINS['syntax'][$p] = new $class_name();
+          }
+          $obj = &$DOKU_PLUGINS['syntax'][$p];
           $PARSER_MODES[$obj->getType()][] = "plugin_$p"; //register mode type
           //add to modes
           $modes[] = array(
@@ -178,10 +189,8 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
         $obj     = new Doku_Parser_Mode_camelcaselink();
         $modes[] = array('sort' => $obj->getSort(), 'mode' => 'camelcaselink','obj'  => $obj );
       }
-
       //sort modes
       usort($modes,'p_sort_modes');
-
       return $modes;
     }
 
@@ -211,11 +220,19 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
      * @param array $info
      */
     function p_latex_render($mode,$instructions,&$info){
+        global $DOKU_PLUGINS;
+
         if(is_null($instructions)) return '';
 
         require_once DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php';
+
         $class = "renderer_plugin_".$mode;
+
+        //$DOKU_PLUGINS['renderer'][$mode] = new $class;
+
+        //$Renderer = &$DOKU_PLUGINS['renderer'][$mode];
         $Renderer = new $class;
+
 
         if (is_null($Renderer)) return null;
 

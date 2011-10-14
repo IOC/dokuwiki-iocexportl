@@ -18,6 +18,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
 
     var $id;
+    var $vertical;
     /**
      * return some info
      */
@@ -53,15 +54,16 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         return 513;
     }
 
+
     /**
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('::table:.*?\n(?=.*?\n:::)', $mode, 'plugin_iocexportl_ioctable');
+        $this->Lexer->addEntryPattern('^::table:.*?\n(?=\S[^:].*?\n:::)', $mode, 'plugin_iocexportl_ioctable');
     }
 
     function postConnect() {
-        $this->Lexer->addExitPattern('\n:::', 'plugin_iocexportl_ioctable');
+        $this->Lexer->addExitPattern('^:::', 'plugin_iocexportl_ioctable');
     }
 
 
@@ -77,13 +79,12 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                 if (preg_match('/::table:(.*?)\n/', $match, $matches)){
 					$id = $matches[1];
                 }
-                break;
-            case DOKU_LEXER_UNMATCHED :
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
                     $params[$m[1]] = $m[2];
                 }
-                $match = preg_replace('/\s{2}:\w+:.*?\n/', '',  $match);
+                break;
+            case DOKU_LEXER_UNMATCHED :
                 break;
             case DOKU_LEXER_EXIT :
                 break;
@@ -99,12 +100,12 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
+                    $renderer->doc .= (isset($params['title']))?$params['title']:'';
+                    $renderer->doc .= (isset($params['footer']))?$params['footer']:'';
                     break;
                 case DOKU_LEXER_UNMATCHED :
-                    $renderer->doc .= (isset($params['title']))?$params['title']:'';
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    $renderer->doc .= (isset($params['footer']))?$params['footer']:'';
                     break;
                 case DOKU_LEXER_EXIT :
                     break;
@@ -115,8 +116,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     $this->id = trim($id);
-                    break;
-                case DOKU_LEXER_UNMATCHED :
+                    $this->vertical = (isset($params['vertical']))?$params['vertical']:FALSE;
                     $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
                     //Transform quotes
                     $_SESSION['table_title'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['table_title']);
@@ -132,21 +132,25 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     }elseif (isset($params['small'])){
                         $_SESSION['table_small'] = TRUE;
                         $renderer->doc .= '\begin{SCtable}[1][h]'.DOKU_LF;
-                    }elseif (isset($params['vertical'])){
+                    }elseif($this->vertical){
                         $renderer->doc .= '\begin{landscape}'.DOKU_LF;
                     }
+                    break;
+                case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                    if (isset($params['footer']) && isset($params['large'])) {
+                    break;
+                case DOKU_LEXER_EXIT :
+                    if ($_SESSION['table_footer'] && $_SESSION['table_large']) {
                         $hspace = '[\textwidth+\marginparwidth+10mm]';
                         $vspace = '\vspace{4mm}';
-                        $renderer->doc .=  $vspace.'\tablefooterlarge'.$hspace.'{'.trim($renderer->_xmlEntities($params['footer'])).'}';
+                        $renderer->doc .=  $vspace.'\tablefooterlarge'.$hspace.'{'.$_SESSION['table_footer'].'}';
                     }
-                    if (isset($params['large'])){
+                    if ($_SESSION['table_large']){
                         $renderer->doc .= '}'.DOKU_LF;
-                    }elseif (isset($params['vertical'])){
+                    }elseif ($this->vertical){
                         $renderer->doc .= '\end{landscape}'.DOKU_LF;
-                    }elseif (isset($params['small'])){
+                    }elseif ($_SESSION['table_small']){
                         $renderer->doc .= '\end{SCtable}'.DOKU_LF;
                     }
                     $renderer->doc .= '\vspace{-2ex}\par'.DOKU_LF;
@@ -155,8 +159,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_footer'] = '';
                     $_SESSION['table_large'] = FALSE;
                     $_SESSION['table_small'] = FALSE;
-                    break;
-                case DOKU_LEXER_EXIT :
                     $this->id = '';
                     break;
             }
@@ -170,8 +172,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
                         $renderer->doc .= '</a>';
-                        break;
-                    case DOKU_LEXER_UNMATCHED :
                         if (isset($params['title'])){
                             $instructions = p_get_instructions($params['title']);
                             $title = preg_replace('/(<p>)(.*?)(<\/p>)/s','<span>$2</span>',p_render($mode, $instructions, $info));
@@ -181,11 +181,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                             $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
                         }
                         $renderer->doc .= '</div>';
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
                         $instructions = p_get_instructions($text);
                         $renderer->doc .= p_render($mode, $instructions, $info);
-                        $renderer->doc .= '</div>';
                         break;
                     case DOKU_LEXER_EXIT :
+                        $renderer->doc .= '</div>';
                         break;
                 }
             return TRUE;
@@ -197,19 +199,19 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
                         $renderer->doc .= '</a>';
-                        break;
-                    case DOKU_LEXER_UNMATCHED :
                         if (isset($params['title'])){
                             $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
                         }
                         if (isset($params['footer'])){
                             $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
                         }
+                        break;
+                    case DOKU_LEXER_UNMATCHED :
                         $instructions = get_latex_instructions($text);
                         $renderer->doc .= p_latex_render($mode, $instructions, $info);
-                        $renderer->doc .= '</div>';
                         break;
                     case DOKU_LEXER_EXIT :
+                        $renderer->doc .= '</div>';
                         break;
                 }
             return TRUE;

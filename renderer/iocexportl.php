@@ -37,13 +37,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
 
     /**
-     * Return version info
-     */
-    function getInfo(){
-        return confToHash(dirname(__FILE__).'/info.txt');
-    }
-
-    /**
      * Returns the format produced by this renderer.
      */
     function getFormat(){
@@ -53,9 +46,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     /**
      * Make multiple instances of this class
      */
-    function isSingleton(){
+   /* function isSingleton(){
         return FALSE;
-    }
+    }*/
 
     function reset(){
         $this->doc = '';
@@ -117,6 +110,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * NOVA
      */
     function _initialize_globals(){
+        if (!isset($_SESSION['accounting'])){
+            $_SESSION['accounting'] = FALSE;
+        }
         if (!isset($_SESSION['activities_header'])){
             $_SESSION['activities_header'] = FALSE;
         }
@@ -248,11 +244,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * NOVA
      */
     function _latexAddImage($src, $width = NULL, $height = NULL, $align = NULL, $title = NULL, $linking = NULL, $external = FALSE){
+        $max_width_elem = '.9\linewidth';
         if ($_SESSION['figure']){
             $title = $_SESSION['figtitle'];
+            $title = preg_replace('/<verd>|<\/verd>/', '', $title);
         }
+        $footer = '';
         if (!empty($_SESSION['figfooter'])){
-            $title .= '/'.$_SESSION['figfooter'];
+            $footer = $_SESSION['figfooter'];
         }
         // make sure width and height are available
         if (!$width && !$height) {
@@ -281,12 +280,23 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $max_width = '[width=35mm]';
             }
             $img_width = FALSE;
-        }elseif (!$this->table && $width > self::$p_width && $_SESSION['iocelem'] !== 'textl' && !$_SESSION['figlarge']){
+        }elseif (!$this->table && $width > self::$p_width && !$_SESSION['iocelem'] && !$_SESSION['figlarge']){
             $max_width = '[width=\textwidth]';
             $img_width = FALSE;
         }elseif($_SESSION['figlarge']){
             $max_width = '[width=\textwidth+\marginparwidth+\marginparsep]';
             $img_width = FALSE;
+        //}elseif ($_SESSION['figure'] && $_SESSION['iocelem']){
+        }elseif ($_SESSION['iocelem']){
+             //Check wheter image fits on iocelem
+             if ($width >= (.9 * self::$p_width)){
+                $max_width = '[width='.$max_width_elem.']';
+                $img_width = $max_width_elem;
+             }else{
+                 $max_width = '[width='.$width.'px]';
+                 $img_width = $width;
+                 $max_width_elem = FALSE;
+             }
         }else{
             $max_width = '[width='.$width.'px]';
             $img_width = $width;
@@ -300,24 +310,26 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
         }
         if (file_exists($img_aux)){
-            if ($_SESSION['iocelem'] === 'textl'){
+            /*if (!$_SESSION['figure'] && $_SESSION['iocelem'] === 'textl'){
                 $this->doc .=  '\begin{center}'.DOKU_LF;
                 if ($width > (.8 * self::$p_width)){
                     $this->doc .= '\resizebox{.8\linewidth}{!}{';
                 }
             //Image colB
-            }elseif (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
+            }else*/if (!$this->table && !$_SESSION['figure'] && !$_SESSION['iocelem'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
                 $offset = '';
                 //Extract offset
                 if ($title){
-                    $title_aux = $title;
-                    $data = preg_replace('/<verd>|<\/verd>/', '', $title);
-                    $data = preg_split('/\//', $title, 2);
-                    $title = $data[0].'/';
-                    if(!empty($data[1]) &&  is_numeric($data[1])){
-                        $offset = '['.$data[1].'mm]';
+                    preg_match('/(.*?)(\/([^\/]*$))/', $title, $data);
+                    if (!empty($data)){
+                        if(!empty($data[3]) &&  is_numeric($data[3])){
+                            $offset = '['.trim($data[3]).'mm]';
+                            $footer = $data[1];
+                        }else{
+                            $footer = $title;
+                        }
                     }else{
-                        $title = '/'.$title_aux;
+                        $footer = $title;
                     }
                 }
                 $this->doc .= '\imgB'.$offset.'{';
@@ -332,31 +344,36 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             $hspace = 0;//Align text and image
             //Create title with label
-            $title = preg_replace('/<verd>|<\/verd>/', '', $title);
-            $title = preg_split('/\//', $title, 2);
+
             $title_width = ($img_width)?$img_width.'px':'\textwidth';
             if ($_SESSION['figure']){
-                $this->doc .= '\parbox[t]{'.$title_width.'}{\caption{'.trim($this->_xmlEntities($title[0]));
+                if ($_SESSION['iocelem'] && $max_width_elem){
+                    $title_width = $max_width_elem;
+                }
+                $this->doc .= '\parbox[t]{'.$title_width.'}{\caption{'.trim($this->_xmlEntities($title));
 				if (!empty($_SESSION['figlabel'])){
 	                $this->doc .= '\label{'.$_SESSION['figlabel'].'}';
 				}
 				$this->doc .= '}}\\\\\vspace{2mm}'.DOKU_LF;
-            }else{
-				if (empty($title[1])){
-					$title[1] = $title[0];
-				}
             }
             //Inside table, images will be centered vertically
             if ($this->table && $width > self::$img_max_table){
                 $this->doc .= '\resizebox{\linewidth}{!}{';
             }
-                $this->doc .= '\includegraphics'.$max_width.'{media/'.basename($img_aux).'}';
-            if($_SESSION['iocelem'] === 'textl'){
+            //Image is smaller than page size
+            if ($_SESSION['figure'] && $img_width){
+                $this->doc .= '\begin{center}'.DOKU_LF;
+            }
+            $this->doc .= '\includegraphics'.$max_width.'{media/'.basename($img_aux).'}';
+            if ($_SESSION['figure'] && $img_width){
+                $this->doc .= '\end{center}'.DOKU_LF;
+            }
+            /*if($_SESSION['iocelem'] && !$_SESSION['figure']){
                 if ($width > (.8 * self::$p_width)){
                     $this->doc .= '}' . DOKU_LF;
                 }
                 $this->doc .= '\end{center}' . DOKU_LF;
-            }elseif ($this->table && $width > self::$img_max_table){
+            }else*/if ($this->table && $width > self::$img_max_table){
                 $this->doc .= '}';
 
             }
@@ -367,20 +384,22 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     $this->doc .= 'DOKU_LF';
                 }
             }
-            if (!$_SESSION['video_url'] && !empty($title[1])){
+            if (!$_SESSION['video_url'] && !empty($footer)){
                 $this->doc .= DOKU_LF;
             }
             //Check whether footer exists
-            if ($title[1]) {
+            if ($footer) {
                 if ($_SESSION['figure']){
-                    if ($img_width){
+                    if ($img_width && !$_SESSION['iocelem']){
                         $hspace = ($img_width + $hspace).'pt';
+                    }elseif($_SESSION['iocelem']){
+                        $hspace = ($max_width_elem)?$max_width_elem:$img_width.'px';
                     }else{
                        $hspace = '\textwidth';
                     }
 					$vspace = '\vspace{-2mm}';
 					$align = '\raggedleft';
-                }elseif($_SESSION['iocelem'] === 'textl'){
+                }elseif($_SESSION['iocelem']){
                         //textboxsize .05
                         $hspace = '.9\linewidth';
                         $vspace = '\vspace{-6mm}';
@@ -390,19 +409,19 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 					$vspace = '\vspace{-4mm}';
 					$align = '\iocalignment';
                 }
-                $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\footerspacingline\textsf{\tiny'.$vspace.trim($this->_xmlEntities($title[1])).'}}}';
+                $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\footerspacingline\textsf{\tiny'.$vspace.trim($this->_xmlEntities($footer)).'}}}';
                 $thid->doc .= '}';
 
             }
-            if (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['iocelem'] && !$_SESSION['u0']){
+            if (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] /*&& !$_SESSION['iocelem'] */&& !$_SESSION['u0']){
                 $this->doc .= '\end{figure}';
             }elseif (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['iocelem'] && !$_SESSION['u0']){
-                if (!empty($title[1])){
+                if (!empty($footer)){
                     $this->doc .= DOKU_LF;
                 }
                 $this->doc .= '}' . DOKU_LF;
             }
-            if ($_SESSION['iocelem'] === 'textl'){
+            if ($_SESSION['iocelem'] && !$_SESSION['figure']){
                 $this->doc .= '\vspace{1ex}' . DOKU_LF;
             }
             $this->endimg = TRUE;
@@ -590,6 +609,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->col_num = 1;
         $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
+        $border = ($_SESSION['accounting'])?'|':'';
         $large = '';
         $csetup = '';
         $col_width = '-1,';
@@ -599,7 +619,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $large = ' to 170mm';
             $csetup = '\tablelargecaption';
 
-        }elseif ($_SESSION['table_small']){
+        }elseif($_SESSION['table_small']){
             $this->doc .= '\addtocounter{table}{-1}\caption{'.$_SESSION['table_title'].
             			  '\label{'.$_SESSION['table_id'].'}}'.DOKU_LF;
             $large = ' spread 0pt';
@@ -612,7 +632,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
         for($i=0; $i < $maxcols; $i++){
-            $this->doc .= 'X['.$col_width.'l] ';
+            if($_SESSION['accounting'] && $i===0){
+                $col_width = '3,';
+                $this->doc .= $border;
+            }
+            $this->doc .= 'X['.$col_width.'l] '.$border;
+            if($_SESSION['accounting'] && $i===0){
+                $col_width = '-1,';
+            }
+
         }
         $this->doc .= '}';
         if (!$_SESSION['table_small']){
@@ -629,8 +657,13 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
     function table_close(){
         $this->table = FALSE;
-        $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
+        if (!$_SESSION['accounting']){
+            $this->doc .= '\noalign{\vspace{1mm}}'.DOKU_LF;
+        }
         $this->doc .= '\hline'.DOKU_LF;
+        if (($_SESSION['iocelem'] || $_SESSION['accounting']) && $_SESSION['table_footer']){
+            $this->doc .='\multicolumn{'.$this->max_cols.'}{l@{\hspace{0mm}}}{\hspace{-2mm}'.$_SESSION['table_footer'].'}'.DOKU_LF;
+        }
         $this->tableheader_count = 0;
         preg_match('/(?<=@IOCHEADERSTART@)([^@]*)(?=@IOCHEADEREND@)/',$this->doc, $matches);
         $this->doc = preg_replace('/@IOCHEADERSTART@|@IOCHEADEREND@/','', $this->doc);
@@ -649,6 +682,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablerow_open(){
+        if($_SESSION['accounting'] && $this->tableheader && $this->tableheader_count === 0){
+            $this->doc .='\rowcolor{coloraccounting}';
+        }
+
         $this->col_num = 1;
     }
 
@@ -657,7 +694,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->tableheader_count += 1;
             $this->tableheader = TRUE;
         }
-        if ($this->tableheader_end && $this->tableheader_count === 1 && !$_SESSION['table_small']){
+        if ($this->tableheader_end && $this->tableheader_count === 1
+            && !$_SESSION['table_small'] && !$_SESSION['iocelem'] && !$_SESSION['accounting']){
             $this->doc .= '@IOCHEADEREND@';
             $this->doc .= '\\\\ \hline \noalign{\vspace{1mm}} \endfirsthead'.DOKU_LF;
             $this->doc .= '\tablecaptioncontinue\caption[]{(\ioclangcontinue)\vspace{-3mm}} \\\\' . DOKU_LF;
@@ -676,6 +714,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }else{
             $this->doc .= '\\\\'.DOKU_LF;
             if ($this->tableheader_end){
+                $this->doc .= '\hline'.DOKU_LF;
+            }elseif($_SESSION['accounting']){
                 $this->doc .= '\hline'.DOKU_LF;
             }
         }
@@ -736,45 +776,54 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablecell_open($colspan = 1, $align = NULL, $rowspan = 1){
-        $position = 'p{\the\tabucolX * '.$colspan.'}';
-        $this->tableheader = FALSE;
-        if ($colspan > 1){
-            $this->doc .= '\multicolumn{'.$colspan.'}{'.$position.'}{';
-        }
-        $this->col_colspan = $colspan;
-        if (!$_SESSION['table_small']){
-            $this->doc .= '\raisebox{-\height}{';
-        }
-        if ($align){
-            if ($align === 'left'){
-                $align = '\raggedright';
-            }elseif($align === 'right'){
-                $align = '\raggedleft';
-            }else{
-                $align = '\centering';
-            }
+        if ($_SESSION['accounting'] && $colspan === 3){
+            $this->doc .= '\rowcolor{coloraccounting}  & & ';
+            $this->col_colspan = $colspan;
         }else{
-            $align = '\raggedright';
-        }
-        if (!$_SESSION['table_small']){
-            $this->doc .= '\parbox[t]{\linewidth}{'.$align.' ';
+            $position = 'p{\the\tabucolX * '.$colspan.'}';
+            $this->tableheader = FALSE;
+            if ($colspan > 1){
+                $this->doc .= '\multicolumn{'.$colspan.'}{'.$position.'}{';
+            }
+            $this->col_colspan = $colspan;
+            if (!$_SESSION['table_small']){
+                $this->doc .= '\raisebox{-\height}{';
+            }
+            if ($align){
+                if ($align === 'left'){
+                    $align = '\raggedright';
+                }elseif($align === 'right'){
+                    $align = '\raggedleft';
+                }else{
+                    $align = '\centering';
+                }
+            }else{
+                $align = '\raggedright';
+            }
+            if (!$_SESSION['table_small']){
+                $this->doc .= '\parbox[t]{\linewidth}{'.$align.' ';
+            }
         }
     }
 
     function tablecell_close(){
-        $col_num_aux = ($this->col_colspan > 1)?$this->col_num + $this->col_colspan:$this->col_num;
-        if (!$_SESSION['table_small']){
-            $this->doc .= '}';//close parbox
-            $this->doc .= '}';//close raisebox
+        if ($_SESSION['accounting'] && $this->col_colspan === 3){
+            $this->col_num += $this->col_colspan;
+        }else{
+            $col_num_aux = ($this->col_colspan > 1)?$this->col_num + $this->col_colspan:$this->col_num;
+            if (!$_SESSION['table_small']){
+                $this->doc .= '}';//close parbox
+                $this->doc .= '}';//close raisebox
+            }
+            if ($this->col_colspan > 1) {
+                $col_num_aux--;
+                $this->doc .= '} ';//close multicolumn
+            }
+            if ($col_num_aux < $this->max_cols){
+                $this->doc .= ' & ';
+            }
+            $this->col_num += $this->col_colspan;
         }
-        if ($this->col_colspan > 1) {
-            $col_num_aux--;
-            $this->doc .= '} ';//close multicolumn
-        }
-        if ($col_num_aux < $this->max_cols){
-            $this->doc .= ' & ';
-        }
-        $this->col_num += $this->col_colspan;
     }
 
     function footnote_open() {
