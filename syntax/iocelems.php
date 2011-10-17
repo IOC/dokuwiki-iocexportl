@@ -21,8 +21,6 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
 
-   var $tipus = '';
-
    /**
     * Get an associative array with plugin info.
     */
@@ -111,37 +109,37 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     //avoid hyphenation
                     $renderer->doc .= '\hyphenpenalty=100000'.DOKU_LF;
                     preg_match('/::([^:]*):/', $data, $matches);
-                    $this->tipus = (isset($matches[1]))?$matches[1]:'';
+                    $type = (isset($matches[1]))?$matches[1]:'';
                     //IMPORTANT
-                    if($this->tipus === 'important'){
+                    if($type === 'important'){
                         $renderer->doc .= '\iocimportant{';
                     //TEXT
-                    }elseif($this->tipus === 'text'){
+                    }elseif($type === 'text'){
                         if (isset($params['large'])){
-                            $this->tipus = 'ioctextl';
+                            $type = 'ioctextl';
                         }else{
-                            $this->tipus = 'ioctext';
+                            $type = 'ioctext';
                         }
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
-                        $renderer->doc .= '\\'.$this->tipus.$offset.'{'.$title.'}{';
+                        $renderer->doc .= '\\'.$type.$offset.'{'.$title.'}{';
                     //NOTE
-                    }elseif($this->tipus === 'note'){
+                    }elseif($type === 'note'){
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
                         $renderer->doc .= '\iocnote'.$offset.'{';
                     //QUOTE
-                    }elseif($this->tipus === 'quote'){
+                    }elseif($type === 'quote'){
                         $renderer->doc .= '\iocquote{';
                     //EXAMPLE
-                    }elseif($this->tipus === 'example'){
+                    }elseif($type === 'example'){
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         $renderer->doc .= '\iocexample{'.$title.'}{';
                     //REFERENCE
-                    }elseif($this->tipus === 'reference'){
+                    }elseif($type === 'reference'){
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
                         $renderer->doc .= '\iocreference'.$offset.'{';
                     }
-                    $_SESSION['iocelem'] = ($this->tipus === 'example' || $this->tipus === 'ioctextl' || $this->tipus === 'quote')?'textl':TRUE;
+                    $_SESSION['iocelem'] = ($type === 'example' || $type === 'ioctextl' || $type === 'quote')?'textl':TRUE;
                     break;
                 case DOKU_LEXER_UNMATCHED :
                         $renderer->doc .= $this->_parse($data, $mode);
@@ -150,7 +148,6 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                      $renderer->doc .= '}';
                     //allow hyphenation
                     $renderer->doc .= '\hyphenpenalty=1000'.DOKU_LF;
-                    $this->tipus = '';
                     $_SESSION['iocelem'] = FALSE;
                     break;
             }
@@ -161,16 +158,16 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     case DOKU_LEXER_ENTER :
                         $matches = array();
                         preg_match('/::([^:]*):/', $data, $matches);
-                        $this->tipus = (isset($matches[1]))?$matches[1]:'';
+                        $type = (isset($matches[1]))?$matches[1]:'';
                         //TEXT LARGE
-                        if($this->tipus === 'text' && isset($params['large'])){
-                            $this->tipus = 'textl';
+                        if($type === 'text' && isset($params['large'])){
+                            $type = 'textl';
                         }
-                        $renderer->doc .= '<div class="ioc'.$this->tipus.'">';
+                        $renderer->doc .= '<div class="ioc'.$type.'">';
                         $renderer->doc .= '<div class="ioccontent">';
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         if (!empty($title)){
-                            $renderer->doc .= '<span class="ioctitle">'.$title.'</span>';
+                            $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
                         }
                         break;
                     case DOKU_LEXER_UNMATCHED :
@@ -189,13 +186,13 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                     case DOKU_LEXER_ENTER :
                         $matches = array();
                         preg_match('/::([^:]*):/', $data, $matches);
-                        $this->tipus = (isset($matches[1]))?$matches[1]:'';
+                        $type = (isset($matches[1]))?$matches[1]:'';
                         $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         //TEXT LARGE
-                        if($this->tipus === 'text' && isset($params['large'])){
-                            $this->tipus = 'textl';
+                        if($type === 'text' && isset($params['large'])){
+                            $type = 'textl';
                         }
-                        $renderer->doc .= '<div class="ioc'.$this->tipus.'">';
+                        $renderer->doc .= '<div class="ioc'.$type.'">';
                         if (!empty($title)){
                             $renderer->doc .= '<span class="ioctitle">'.$title.'</span>';
                         }
@@ -214,10 +211,8 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
 
     function _parse($text, $mode){
         $info = array();
-//        $_SESSION['iocelem'] = ($this->tipus === 'example' || $this->tipus === 'ioctextl' || $this->tipus === 'quote')?'textl':TRUE;
         $instructions = get_latex_instructions($text);
         $text = p_latex_render($mode, $instructions, $info);
-//        $_SESSION['iocelem'] = FALSE;
         return preg_replace('/(.*?)(\n*)$/', '$1', $text);
     }
 }

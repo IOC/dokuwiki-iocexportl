@@ -609,6 +609,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->col_num = 1;
         $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
+        //Make sure accounting only have 3 cols
+        if ($_SESSION['accounting'] && $maxcols !== 3){
+            $_SESSION['accounting'] = FALSE;
+        }
         $border = ($_SESSION['accounting'])?'|':'';
         $large = '';
         $csetup = '';
@@ -711,6 +715,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $this->doc .= '\endfoot' . DOKU_LF;
             $this->doc .= (!empty($_SESSION['table_footer']))?'\multicolumn{'.$this->max_cols.'}{r@{\hspace{0mm}}}{\tablefooter{'.$_SESSION['table_footer'].'}}'.DOKU_LF:''.DOKU_LF;
             $this->doc .= '\endlastfoot' . DOKU_LF;
+        }elseif ($this->tableheader_end && $this->tableheader_count === 1
+            && !$_SESSION['table_small'] && $_SESSION['iocelem'] && $_SESSION['accounting']){
+            $this->doc .= '\\\\ \hline \endfirsthead\endhead'.DOKU_LF;
         }else{
             $this->doc .= '\\\\'.DOKU_LF;
             if ($this->tableheader_end){

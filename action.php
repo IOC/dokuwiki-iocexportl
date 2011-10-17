@@ -197,7 +197,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 'title'  => $this->getLang('figure_btn'),
                                 'icon'   => '../../plugins/iocexportl/img/ico_figure.png',
                                 'key'    => '1',
-                                'open'   => '::figure:\n  :title:\n  :copyright:\n  :license:\n',
+                                'open'   => '::figure:\n  :title:\n  :footer:\n',
                                 'close'  => '\n:::\n',
                                 ),
                             array(
@@ -278,6 +278,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
                                 'icon'   => '../../plugins/iocexportl/img/ico_quote.png',
                                 'key'    => '11',
                                 'open'   => '::quote:\n',
+                                'close'  => '\n:::\n',
+                                ),
+                            array(
+                                'type'   => 'format',
+                                'title'  => $this->getLang('accounting_btn'),
+                                'icon'   => '../../plugins/iocexportl/img/ico_table.png',
+                                'key'    => '12',
+                                'open'   => '::accounting:\n  :title:\n  :footer:\n',
                                 'close'  => '\n:::\n',
                                 ),
                         ),

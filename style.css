@@ -78,7 +78,7 @@ div.solution{
 	clear:left;
 	width:73%;
 }
-.ioctextl, .iocexample, .iocimportant, .iocquote, .iocfigure, .ioctable{
+.ioctextl, .iocexample, .iocimportant, .iocquote, .iocfigure, .ioctable, .iocaccounting{
 	width:73% !important;
 }
 
@@ -121,11 +121,12 @@ div.dokuwiki #toc__inside ul{
 }
 
 .iocfigure{
-	width:100% !important;
+  /*margin:0 auto;
+	width:100% !important;*/
 }
 
 .iocfigure .iocinfo{
-	margin:2em auto 0 auto;
+	margin:2em auto 0;
 }
 
 .iocfigure .iocinfo img{
@@ -178,11 +179,29 @@ div.dokuwiki #toc__inside ul{
 }
 
 /* TABLE */
-.ioctable{
-	margin:5mm 0px;
-	width:100%;
+.ioctable,.iocaccounting{
+/*	width:100%;*/
 }
 
+.iocaccounting table{
+ border:1px solid !important;
+}
+
+.iocaccounting table td,.iocaccounting table th{
+ border:1px solid !important;
+}
+
+.iocaccounting table th{
+ background-color:#ccc!important;
+}
+
+.iocaccounting table td[colspan="3"]{
+ background-color:#ccc!important;
+}
+
+.ioctable .iocinfo, .iocaccounting .iocinfo{
+	margin:2em auto 0 auto;
+}
 
 /* COLUMN B */
 
@@ -248,14 +267,16 @@ div.dokuwiki #toc__inside ul{
 .iocexample .ioccontent{
 	clear:both!important;
 	width:80%;
-    border-top: 1px solid;
+    border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 	padding:1.5em 1.5em 2.5em;
 	margin:1em auto;
+	font-size:85%;
 }
 
 .iocexample .ioccontent p.ioctitle{
 	margin-bottom: 2em !important;
+	font-size:120%;
 }
 
 .iocquote .ioccontent{
@@ -278,11 +299,23 @@ div.dokuwiki #toc__inside ul{
 	margin:1em auto;
 }
 
+.iocexample .iocaccounting, .iocexample .ioctable, .ioctextl .iocaccounting, .ioctextl .ioctable{
+ width:100%!important;
+}
+
+.iocexample .iocfigure, .ioctextl .iocfigure{
+ margin:0 auto;
+}
+ 
 
 .ioctext p, .ioctextl p, .iocquote p, .iocexample p, .iocimportant p, .iocreference p, .iocnote p{
 	margin-bottom:0px !important;
 	width:100% !important;
 	float:none;
+}
+
+.ioctextl img, .iocexample img{
+	max-width:100%;
 }
 
 .ioctext pre, .ioctextl pre, .iocquote pre, .iocexemple pre{

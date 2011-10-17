@@ -18,3 +18,4 @@ $lang['note_btn']  = 'Incloure la sintaxis de note';
 $lang['reference_btn']  = 'Incloure la sintaxis de reference';
 $lang['important_btn']  = 'Incloure la sintaxis de\'important';
 $lang['quote_btn']  = 'Incloure la sintaxis de quote';
+$lang['accounting_btn']  = 'Incloure la sintaxis d\'un assentament contable';

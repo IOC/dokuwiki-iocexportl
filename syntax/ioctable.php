@@ -18,6 +18,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
 
     var $id;
+    var $type;
     var $vertical;
     /**
      * return some info
@@ -59,7 +60,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('^::table:.*?\n(?=\S[^:].*?\n:::)', $mode, 'plugin_iocexportl_ioctable');
+        $this->Lexer->addEntryPattern('^::(?:table|accounting):.*?\n(?=\S[^:].*?\n:::)', $mode, 'plugin_iocexportl_ioctable');
     }
 
     function postConnect() {
@@ -116,6 +117,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             switch ($state) {
                 case DOKU_LEXER_ENTER :
                     $this->id = trim($id);
+                    preg_match('/::([^:]*):/', $text, $matches);
+                    $this->type = (isset($matches[1]))?$matches[1]:'';
+                    $_SESSION['accounting'] = ($this->type === 'accounting');
                     $this->vertical = (isset($params['vertical']))?$params['vertical']:FALSE;
                     $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
                     //Transform quotes
@@ -135,12 +139,20 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     }elseif($this->vertical){
                         $renderer->doc .= '\begin{landscape}'.DOKU_LF;
                     }
+                    if ($_SESSION['accounting']){
+                        $renderer->doc .= '\begin{center}'.DOKU_LF;
+                        $renderer->doc .= '\parbox[t]{\linewidth}{'.DOKU_LF;
+                    }
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
+                    if ($_SESSION['accounting']){
+                        $renderer->doc .= '}'.DOKU_LF;
+                        $renderer->doc .= '\end{center}'.DOKU_LF;
+                    }
                     if ($_SESSION['table_footer'] && $_SESSION['table_large']) {
                         $hspace = '[\textwidth+\marginparwidth+10mm]';
                         $vspace = '\vspace{4mm}';
@@ -159,7 +171,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_footer'] = '';
                     $_SESSION['table_large'] = FALSE;
                     $_SESSION['table_small'] = FALSE;
+                    $_SESSION['accounting'] = FALSE;
                     $this->id = '';
+                    $this->type = '';
                     break;
             }
             return TRUE;
@@ -167,7 +181,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
-                        $renderer->doc .= '<div class="ioctable">';
+                        preg_match('/::([^:]*):/', $text, $matches);
+                        $this->type = (isset($matches[1]))?$matches[1]:'';
+                        if($this->type === 'table'){
+                            $renderer->doc .= '<div class="ioctable">';
+                        }else{
+                            $renderer->doc .= '<div class="iocaccounting">';
+                        }
                         $renderer->doc .= '<div class="iocinfo">';
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
@@ -188,6 +208,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         break;
                     case DOKU_LEXER_EXIT :
                         $renderer->doc .= '</div>';
+                        $this->type = '';
                         break;
                 }
             return TRUE;
@@ -195,7 +216,13 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
-                        $renderer->doc .= '<div class="ioctable">';
+                        preg_match('/::([^:]*):/', $text, $matches);
+                        $this->type = (isset($matches[1]))?$matches[1]:'';
+                        if($this->type === 'table'){
+                            $renderer->doc .= '<div class="ioctable">';
+                        }else{
+                            $renderer->doc .= '<div class="iocaccounting">';
+                        }
                         $renderer->doc .= '<a name="'.$id.'">';
                         $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
                         $renderer->doc .= '</a>';
@@ -212,6 +239,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         break;
                     case DOKU_LEXER_EXIT :
                         $renderer->doc .= '</div>';
+                        $this->type = '';
                         break;
                 }
             return TRUE;
