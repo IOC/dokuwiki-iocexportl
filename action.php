@@ -21,15 +21,11 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function register(&$controller) {
         global $ACT;
-        if ($ACT === 'show'){
+        if ($ACT === 'show' || (is_array($ACT) && $ACT['preview'])){
             $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'handle_dokuwiki_started');
+            $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'handle_tpl_metaheader_output');
             $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'getLanguage', array());
             $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'showform', array());
-            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'counter', array());
-            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'chooseactivities', array());
-            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'numbering', array());
-            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'quiz', array());
-            $controller->register_hook('TPL_ACT_RENDER', 'AFTER', $this, 'render', array());
         }
         $controller->register_hook('TOOLBAR_DEFINE', 'AFTER', $this, 'ioctoolbar_buttons', array ());
     }
@@ -42,15 +38,34 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         );
     }
 
+    public function handle_tpl_metaheader_output(Doku_Event &$event, $param) {
+
+        if (!$this->has_jquery()) {
+            $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
+            $this->include_script($event, 'jQuery.noConflict();');
+        }
+
+        if ($this->checkPerms() && $this->showcounts()){
+            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
+        }
+        if ($this->isExportPage() && ($this->exportallowed || auth_isadmin())){
+            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/chooser.js');
+        }
+        if ($ACT != 'edit' && !$this->isExportPage()){
+            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js');
+            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js');
+            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/render.js');
+        }
+
+    }
+
     function showform(&$event){
 	    global $conf;
-        global $INFO;
 
 		$this->id = getID();
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$this->isExportPage()) return FALSE;
         if ($event->data != 'show') return FALSE;
-        //if (!$INFO['writable']) return FALSE;
         if (!$this->checkPerms()) return FALSE;
         //Always admin can export
         if ($this->exportallowed || auth_isadmin()){
@@ -63,39 +78,34 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         return TRUE;
     }
 
-    function counter(&$event) {
-        if ($this->checkPerms() && $this->showcounts()){
-            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js"></script>';
-        }
+    public function has_jquery() {
+        $version = getVersionData();
+        $date = str_replace('-', '', $version['date']);
+        return (int) $date > 20110525;
     }
 
-    function chooseactivities(&$event) {
-        if ($this->isExportPage() && ($this->exportallowed || auth_isadmin())){
-            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/chooser.js"></script>';
-        }
+    private function link_script($event, $url) {
+        array_push($event->data['script'], array(
+            'type' => 'text/javascript',
+            'charset' => 'utf-8',
+            'src' => $url,
+        ));
     }
 
-    function numbering(&$event) {
-        if ($event->data != 'edit' && $event->data != 'preview' && !$this->isExportPage()){
-            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js"></script>';
-        }
-    }
-
-    function quiz(&$event) {
-        if ($event->data != 'edit' && $event->data != 'preview' && !$this->isExportPage()){
-            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js"></script>';
-        }
-    }
-
-    function render(&$event) {
-        if ($event->data != 'edit' && $event->data != 'preview' && !$this->isExportPage()){
-            echo '<script type="text/javascript" src="'.DOKU_BASE.'lib/plugins/iocexportl/lib/render.js"></script>';
-        }
+    private function include_script($event, $code) {
+        $event->data['script'][] = array(
+            'type' => 'text/javascript',
+            'charset' => 'utf-8',
+            '_data' => $code,
+        );
     }
 
     function showcounts(){
         global $conf;
         $this->id = getID();
+        if (!$this->isExportPage()){
+            return FALSE;
+        }
         $file = wikiFN($this->id);
         $bool = io_grep($file, '/~~NOCOUNT~~/', 1);
         $counter = (isset($conf['plugin']['iocexportl']['counter']) && $conf['plugin']['iocexportl']['counter']);
@@ -119,6 +129,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
 
     function getLanguage(){
         $this->id = getID();
+        if (!$this->isExportPage()){
+            return FALSE;
+        }
         $file = wikiFN($this->id);
         $lang = io_grep($file, '/^~~(?:ca|de|en|es|fr|it)~~$/i', 1);
         if (isset($lang[0])){
