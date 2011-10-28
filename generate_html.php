@@ -27,7 +27,6 @@ static $max_navmenu = 35;
 static $media_path = 'lib/exe/fetch.php?media=';
 $menu_html = '';
 static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'creditcodi', 'creditnom', 'familia');
-$tmp_dir = '';
 $tree_names = array();
 static $web_folder = 'WebContent';
 
@@ -50,6 +49,7 @@ if ($_POST['mode'] !== 'zip') return FALSE;
 session_start();
 $tmp_dir = rand();
 $_SESSION['tmp_dir'] = $tmp_dir;
+$_SESSION['latex_images'] = array();
 if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
     mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
 }
@@ -64,17 +64,20 @@ if ($res === TRUE) {
     $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
     $zip->addFromString('_/js/build.js', $build);
     getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
-    $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
+    //Get index source
+    $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
+    $text_index = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html, $text_index, 1);
+    $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 2);
+    //Get template source
+    $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
     $text_template = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html, $text_template, 1);
     $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
     //Create index page
     $navmenu = createNavigation('');
     $menu_index = preg_replace('/(expander|id="\w+")/', '', $menu_html);
-    $html = preg_replace('/@IOCCONTENT@/', '<ul>'.$menu_index.'</ul>', $text_template, 1);
-    $html = preg_replace('/@IOCTITLE@/', 'TOC', $html, 1);
-    $html = preg_replace('/@IOCTOC@/', '', $html, 1);
+    $html = preg_replace('/@IOCTOC@/', $menu_index, $text_index, 1);
+    $html = preg_replace('/@IOCMETA@/',createMeta($data[1]), $html, 1);
     $html = preg_replace('/@IOCPATH@/', '', $html);
-    $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
     $zip->addFromString('index.html', $html);
     //Create search page
     $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_template, 1);
@@ -119,22 +122,29 @@ if ($res === TRUE) {
                     $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href,$def_section_href,''));
                     preg_match_all('/\{\{([^}|?]*)[^}]*\}\}/', $text, $matches);
                     array_push($files, $matches[1]);
-                    preg_match_all('/(\${1,2}[^\$]+\${1,2})/', $text, $matches);
+                    /*preg_match_all('/(\${1,2}[^\$]+\${1,2})|(<latex>.*?<\/latex>)/', $text, $matches);
                     if (!empty($matches[1])){
                         foreach ($matches[1] as $match){
                             list($text,$path) = _latexpreElements($text, $match);
                             array_push($latex, $path);
                         }
-                    }
+                    }*/
                     $instructions = get_latex_instructions($text);
                     $html = p_latex_render('iocxhtml', $instructions, $info);
                     $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-                    preg_match_all('/@STARTLATEX@[BI]#[^@]+@ENDLATEX@/', $html, $matches, PREG_SET_ORDER);
+                    preg_match_all('/(<span class="(blocklatex|inlinelatex)">.*?<\/span>)/', $html, $matches);
+                    /*if (!empty($matches[0])){
+                        foreach ($matches[0] as $match){
+                            $path = _latexPath($match);
+                            array_push($latex, $path);
+                        }
+                    }*/
+                    /*preg_match_all('/@STARTLATEX@[BI]#[^@]+@ENDLATEX@/', $html, $matches, PREG_SET_ORDER);
                     if (!empty($matches)){
                         foreach ($matches as $match){
                             $html = _latexpostElements($html, $match[0]);
                         }
-                    }
+                    }*/
                     $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
                     $html = preg_replace('/@IOCTOC@/', $toc, $html, 1);
                     $html = preg_replace('/@IOCPATH@/', '../../../', $html);
@@ -148,22 +158,30 @@ if ($res === TRUE) {
                 $navmenu = createNavigation('../../',array($unitname,$tree_names[$ku][$ks]), array($def_unit_href,''));
                 preg_match_all('/\{\{([^}|]+)[^}]*\}\}/', $text, $matches);
                 array_push($files, $matches[1]);
-                preg_match_all('/(\${1,2}[^\$]+\${1,2})/', $text, $matches);
+                /*preg_match_all('/(\${1,2}[^\$]+\${1,2})|(<latex>.*?<\/latex>)/', $text, $matches);
                 if (!empty($matches[1])){
                     foreach ($matches[1] as $match){
                         list($text,$path) = _latexpreElements($text, $match);
                         array_push($latex, $path);
                     }
-                }
+                }*/
                 $instructions = get_latex_instructions($text);
                 $html = p_latex_render('iocxhtml', $instructions, $info);
                 $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-                preg_match_all('/@STARTLATEX@[BI]#[^@]+@ENDLATEX@/', $html, $matches, PREG_SET_ORDER);
+                /*preg_match_all('/<span class="(blocklatex|inlinelatex)">.*?<\/span>/', $html, $matches);
+                if (!empty($matches[0])){
+                    foreach ($matches[0] as $match){
+                        $path = _latexPath($match);
+                        array_push($latex, $path);
+                    }
+                }*/
+
+                /*preg_match_all('/@STARTLATEX@[BI]#[^@]+@ENDLATEX@/', $html, $matches, PREG_SET_ORDER);
                 if (!empty($matches)){
                     foreach ($matches as $match){
                         $html = _latexpostElements($html, $match[0]);
                     }
-                }
+                }*/
                 $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
                 $html = preg_replace('/@IOCTOC@/', '', $html, 1);
                 $html = preg_replace('/@IOCPATH@/', '../../', $html);
@@ -181,7 +199,8 @@ if ($res === TRUE) {
             }
         }
         //Attach latex files
-        foreach($latex as $l){
+        //foreach($latex as $l){
+        foreach($_SESSION['latex_images'] as $l){
             if (file_exists($l)){
                 $zip->addFile($l, $web_folder.'/'.$ku.'/media/'.basename($l));
             }
@@ -376,6 +395,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 foreach ($info as $i){
                     $key = trim($i[2]);
                     if (in_array($key, $meta_params)){
+                        //$instructions = get_latex_instructions(trim($i[3]));
+                        //$data[1][$key] = p_latex_render('iocxhtml', $instructions, $inf);
                         $data[1][$key] = trim($i[3]);
                     }else{
                         $instructions = get_latex_instructions(trim($i[1].$i[3]));
@@ -402,12 +423,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $name = substr($name, 0, $max_menu) . '...';
         }
         if ($type === 'root'){
-            $menu_html = '<li id="'.$id.'">';
-            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
+            $menu_html = '<li id="'.$id.'" class="rootnode">';
+            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a><hr></h4>';
             $menu_html .= '</li>';
         }elseif ($type === 'unit'){
-            $menu_html = '<li id="'.$id.'">';
-            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
+            $menu_html = '<li id="'.$id.'" class="parentnode">';
+            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a><hr></h4>';
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'">';
@@ -508,6 +529,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         } elseif(!is_readable($directory)) {
             return FALSE;
         } else {
+            $ignore = array('index.html','template.html','build.js');
             $directoryHandle = opendir($directory);
             while ($contents = readdir($directoryHandle)) {
                 if($contents != '.' && $contents != '..') {
@@ -517,7 +539,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         $zip->addEmptyDir($dirname);
                         getFiles($path, $zip);
                     }else{
-                        if ($contents !== 'index.html' && $contents !== 'build.js' ){
+                        if (!in_array($contents, $ignore)){
                             $dirname = str_replace(DOKU_PLUGIN_TEMPLATES_HTML,'',$directory);
                             $zip->addFile($path, $dirname ."/".$contents);
                         }
@@ -546,6 +568,21 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
         $toc .= '</ul></div>';
         return $toc;
+    }
+
+    /**
+     *
+     * Create Meta data
+     */
+    function createMeta($data){
+        $meta = '<div class="meta">';
+        $meta .= '<strong>'.(isset($data['familia'])?$data['familia']:'').'</strong>';
+        $meta .= '<h1>'.(isset($data['creditnom'])?$data['creditnom']:'').'</h1>';
+        $meta .= '<p>'.(isset($data['creditcodi'])?$data['creditcodi']:'').'</p>';
+        $meta .= '<p>'.(isset($data['autoria'])?$data['autoria']:'').'</p>';
+        $meta .= '<strong>'.(isset($data['ciclenom'])?$data['ciclenom']:'').'</strong>';
+        $meta .= '</div>';
+        return $meta;
     }
 
      /**
@@ -592,8 +629,22 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     }
 
 
+    function _latexPath($xhtml){
+        echo $xhtml.DOKU_LF;
+         if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
+            $path = mediaFN($match[2]);
+        } else {
+            $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+        }
+        echo $path;die;
+        return $path;
+    }
     function _latexpreElements($html, $value){
+        $inline = FALSE;
         $block = preg_match('/^\${2}/', $value);
+        if (!$block){
+            $inline = preg_match('/^<latex>/', $value);
+        }
 
         $renderer = new Doku_Renderer_xhtml();
         $xhtml = $renderer->render($value);
@@ -603,11 +654,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         } else {
             $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
         }
-        //Math block mode
-        if ($block){
-            $html = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '@STARTLATEX@B#'.$path.'@ENDLATEX@', $html, 1);
-        }else{//Math inline mode
-            $html = preg_replace('/\$\n?([^\$]+)\n?\$/', '@STARTLATEX@I#'.$path.'@ENDLATEX@', $html, 1);
+        if (!$inline){
+            //Math block mode
+            if ($block){
+                $html = preg_replace('/\${2}\n?([^\$]+)\n?\${2}/', '@STARTLATEX@B#'.$path.'@ENDLATEX@', $html, 1);
+            }else{//Math inline mode
+                $html = preg_replace('/\$\n?([^\$]+)\n?\$/', '@STARTLATEX@I#'.$path.'@ENDLATEX@', $html, 1);
+            }
+        }else{
+            $html = preg_replace('/<latex>\n?([^<]*)\n?<\/latex>/', '@STARTLATEX@I#'.$path.'@ENDLATEX@', $html, 1);
         }
         return array($html,$path);
     }

@@ -49,25 +49,26 @@ class syntax_plugin_iocexportl_iocreference extends DokuWiki_Syntax_Plugin {
      */
 
     function handle($match, $state, $pos, &$handler){
-        return array($state, $match);
+        return $match;
     }
 
    /**
     * output
     */
     function render($mode, &$renderer, $data) {
-        if($mode === 'iocexportl'){
-            list($state, $match) = $data;
-            $renderer->doc .= $match;
+        if ($mode === 'ioccounter'){
+            preg_match('/:(figure|table):([^:]+):/',$data, $matches);
+            $renderer->doc .= $matches[2];
             return TRUE;
-        }elseif($mode === 'xhtml'){
-            list($state, $match) = $data;
-            $match = preg_replace('/(:(?:figure|table):)([^:]+)(:)/','<a href="#$2">$2</a>',$match);
-            $renderer->doc .= $match;
+        }elseif($mode === 'iocexportl'){
+            if(preg_match('/:figure:(.*?):/',$data,$matches)){
+                $renderer->doc .= '\MakeLowercase{\figurename}  \ref{'.trim($matches[1]).'}';
+            }elseif(preg_match('/:table:(.*?):/',$data,$matches)){
+                $renderer->doc .= '\MakeLowercase{\tablename}  \ref{'.trim($matches[1]).'}';
+            }
             return TRUE;
-        }elseif($mode === 'iocxhtml'){
-            list($state, $match) = $data;
-            $match = preg_replace('/(:(?:figure|table):)([^:]+)(:)/','<a href="#$2">$2</a>',$match);
+        }elseif($mode === 'xhtml' || $mode === 'iocxhtml'){
+            $match = preg_replace('/(:(?:figure|table):)([^:]+)(:)/','<a href="#$2">$2</a>',$data, 1);
             $renderer->doc .= $match;
             return TRUE;
         }

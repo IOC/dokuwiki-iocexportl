@@ -45,13 +45,13 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $this->include_script($event, 'jQuery.noConflict();');
         }
 
-        if ($this->checkPerms() && $this->showcounts()){
+        if ($this->isExportPage() && $this->checkPerms() && $this->showcounts()){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
         }
         if ($this->isExportPage() && ($this->exportallowed || auth_isadmin())){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/chooser.js');
         }
-        if ($ACT != 'edit' && !$this->isExportPage()){
+        if (!$this->isExportPage()){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js');
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js');
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/render.js');
@@ -124,6 +124,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
       }
 
     function isExportPage(){
+        $this->id = getID();
         return preg_match('/^(?!talk).*?:(htmlindex|pdfindex)$/', $this->id);
     }
 

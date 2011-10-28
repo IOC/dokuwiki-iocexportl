@@ -46,11 +46,11 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
     function getSort(){
         return 512;
     }
-/*
+
     function getAllowedTypes(){
-        return array('baseonly');
+        return array('container');
     }
-*/
+
 
     /**
      * Connect pattern to lexer
@@ -79,12 +79,14 @@ class syntax_plugin_iocexportl_iocblockverd extends DokuWiki_Syntax_Plugin {
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
+                    $renderer->doc .= '::IOCVERDINICI::';
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
-                    $renderer->verd .= ' ' . p_latex_render($mode, $instructions, $info);
+                    $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
+                    $renderer->doc .= '::IOCVERDFINAL::';
                     break;
             }
             return TRUE;

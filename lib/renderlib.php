@@ -124,7 +124,7 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
           $class_name = 'syntax_plugin_iocexportl_'. $p;
           $p = 'iocexportl_'.$p;
           if (!empty($DOKU_PLUGINS['syntax'][$p])){
-              if (!$DOKU_PLUGINS[$type][$name]->isSingleton()) {
+              if (!$DOKU_PLUGINS['syntax'][$p]->isSingleton()) {
                   $DOKU_PLUGINS['syntax'][$p] = &class_exists($class_name) ? new $class_name(): null;
               }
               $DOKU_PLUGINS['syntax'][$p] = new $class_name();//attempt to load plugin into $obj

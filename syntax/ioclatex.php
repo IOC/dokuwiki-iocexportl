@@ -10,6 +10,8 @@ require_once(DOKU_PLUGIN.'syntax.php');
 
 
 class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
+
+    var $type;
     /**
      * return some info
      */
@@ -28,21 +30,21 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
      * What kind of syntax are we?
      */
     function getType(){
-        return 'container';
+        return 'protected';
     }
 
     /**
      * What about paragraphs?
      */
     function getPType(){
-        return 'block';
+        return 'normal';
     }
 
     /**
      * Where to sort in?
      */
     function getSort(){
-        return 513;
+        return 510;
     }
 
 
@@ -50,18 +52,14 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addEntryPattern('\$\$\n?(?=.*?\n?\$\$)', $mode, 'plugin_iocexportl_ioclatex');
-    }
-
-    function postConnect() {
-        $this->Lexer->addExitPattern('\$\$', 'plugin_iocexportl_ioclatex');
+       $this->Lexer->addSpecialPattern('(?:\$[^\$].*?\$|\${2}.+?\${2}|<latex>.*?\</latex>)', $mode, 'plugin_iocexportl_ioclatex');
     }
 
     /**
      * Handle the match
      */
     function handle($match, $state, $pos, &$handler){
-        return array($state, $match);
+        return $match;
     }
 
     /**
@@ -82,52 +80,41 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
             }
             return TRUE;
         }elseif ($mode === 'iocexportl'){
-            list ($state, $text) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    $renderer->doc .= DOKU_LF.'\begin{center}'. DOKU_LF;
-                    $renderer->doc .= ' \begin{math}';
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    $text = str_ireplace($symbols, ' (INVALID CHARACTER) ', $text);
-    				//replace \\ (not supported in math mode) by \break
-    				if (!preg_match('/{matrix}/', $text)){
-    				    $text = preg_replace('/\\\\\\\\/', '\\\\break', $text);
-    				}
-    				$text = preg_replace('/(\$)/', '\\\\$1', $text);
-                    $renderer->doc .= filter_tex_sanitize_formula($text);
-                    break;
-                case DOKU_LEXER_EXIT :
-                    $renderer->doc .= '\end{math} '. DOKU_LF;
-                    $renderer->doc .= '\end{center}' . DOKU_LF.DOKU_LF;
-                    break;
-            }
-            return TRUE;
-        }elseif ($mode === 'xhtml'){
-            list ($state, $text) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    $renderer->doc .= $text;
-                    break;
-                case DOKU_LEXER_EXIT :
-                    break;
+            if(preg_match('/<latex>(.*?)<\/latex>/', $data, $matches)){
+                $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
+                $text = preg_replace('/(\$)/', '\\\\$1', $text);
+                $renderer->doc .= filter_tex_sanitize_formula($text);
+            }elseif(preg_match('/\${2}\n?([^\$]+)\n?\${2}/', $data, $matches)){//Math block mode
+                $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
+                $text = preg_replace('/(\$)/', '\\\\$1', $text);
+                $renderer->doc .= '\begin{center}\begin{math}'.filter_tex_sanitize_formula($text).'\end{math}\end{center}';
+            }elseif(preg_match('/\$\n?([^\$]+)\n?\$/', $data, $matches)){//Math inline mode
+                $text = str_ireplace($symbols, ' (Invalid character) ', $matches[1]);
+                $text = preg_replace('/(\$)/', '\\\\$1', $text);
+                $renderer->doc .= '$'.filter_tex_sanitize_formula($text).'$';
             }
             return TRUE;
         }elseif ($mode === 'iocxhtml'){
-            list ($state, $text) = $data;
-            switch ($state) {
-                case DOKU_LEXER_ENTER :
-                    break;
-                case DOKU_LEXER_UNMATCHED :
-                    $renderer->doc .= $text;
-                    break;
-                case DOKU_LEXER_EXIT :
-                    break;
+            if(!$this->reservedWords($data)){
+                $block = preg_match('/^\${2}/', $data);
+                $class = ($block)?'blocklatex':'inlinelatex';
+                $render = new Doku_Renderer_xhtml();
+                $xhtml = $render->render($data);
+                if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
+                    $path = mediaFN($match[2]);
+                } else {
+                    $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                }
+                array_push($_SESSION['latex_images'],$path);
+                $renderer->doc .= '<span class="'.$class.'"><img src="../media/'.basename($match[1]).'" /></span>';
             }
             return TRUE;
         }
         return FALSE;
+    }
+
+    function reservedWords($text){
+        $words = array('\\\\newpage','\\\\enlargethispage');
+        return preg_match('/'.implode('|', $words).'/', $text);
     }
 }

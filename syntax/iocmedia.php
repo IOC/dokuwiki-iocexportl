@@ -36,7 +36,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     }
 
     function getType(){
-        return 'container';
+        return 'substition';
     }
 
     function getPType(){

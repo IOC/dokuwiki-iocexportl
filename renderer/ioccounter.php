@@ -15,9 +15,6 @@ require_once DOKU_INC.'inc/parser/renderer.php';
  */
 class renderer_plugin_ioccounter extends Doku_Renderer {
 
-	// Tag verd content
-    var $verd = '';
-
     /**
      * Return version info
      */
@@ -41,7 +38,6 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
 
     function reset(){
         $this->doc = '';
-        $this->verd = '';
     }
 
     /**
@@ -56,12 +52,7 @@ class renderer_plugin_ioccounter extends Doku_Renderer {
      * Closes the document
      */
     function document_end(){
-        if (!empty($this->verd)){
-            $this->doc .= '::IOCVERDINICI::';
-            $this->doc .= preg_replace('/^ /', '', $this->verd);//Remove first white space
-            $this->doc .= '::IOCVERDFINAL::';
-        }
-        $this->doc = preg_replace('/\n/',' ',$this->doc);//Remove line breaks
+        $this->doc = preg_replace('/\n/',' ',$this->doc);//Replace line breaks
         $this->doc = preg_replace('/ {2,}/',' ',$this->doc);//Replace two or more spaces for one
         $this->doc = preg_replace('/ $/','',$this->doc);//Remove last space
     }

@@ -94,17 +94,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->doc = preg_replace('/@IOCBACKSLASH@/',"\\\\", $this->doc);
         $this->doc = preg_replace('/(textbf{)(\s*)(.*?)(\s*)(})/',"$1$3$5", $this->doc);
         $this->doc = preg_replace('/(raggedright)(\s{2,*})/',"$1 ", $this->doc);
-		$this->_create_refs();
     }
 
-
-	/**
-     * NOVA
-     */
-    function _create_refs(){
-		$this->doc = preg_replace('/:figure:(.*?):/',"\\\\MakeLowercase{\\\\figurename}  \\\\ref{\\1}", $this->doc);
-		$this->doc = preg_replace('/:table:(.*?):/',"\\\\MakeLowercase{\\\\tablename}  \\\\ref{\\1}", $this->doc);
-    }
 
 	/**
      * NOVA
@@ -280,13 +271,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $max_width = '[width=35mm]';
             }
             $img_width = FALSE;
-        }elseif (!$this->table && $width > self::$p_width && !$_SESSION['iocelem'] && !$_SESSION['figlarge']){
+        }elseif (!$this->table && $width > self::$p_width && !$_SESSION['iocelem']){
             $max_width = '[width=\textwidth]';
             $img_width = FALSE;
-        }elseif($_SESSION['figlarge']){
-            $max_width = '[width=\textwidth+\marginparwidth+\marginparsep]';
-            $img_width = FALSE;
-        //}elseif ($_SESSION['figure'] && $_SESSION['iocelem']){
         }elseif ($_SESSION['iocelem']){
              //Check wheter image fits on iocelem
              if ($width >= (.9 * self::$p_width)){
@@ -334,6 +321,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 }
                 $this->doc .= '\imgB'.$offset.'{';
             }elseif (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
+                if ($_SESSION['figlarge']){
+                    $this->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{\hspace*{0mm}}{\hspace*{-\marginparwidth}\hspace*{-10mm}}'.DOKU_LF;
+                    $this->doc .= '\begin{minipage}[c]{\textwidth+\marginparwidth+\marginparsep}'. DOKU_LF;
+                }
                 $this->doc .= '\begin{figure}[H]'.DOKU_LF;
             }
             if ($linking !== 'details'){
@@ -415,6 +406,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             if (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] /*&& !$_SESSION['iocelem'] */&& !$_SESSION['u0']){
                 $this->doc .= '\end{figure}';
+                if ($_SESSION['figlarge']){
+                    $this->doc .= '\end{minipage}'. DOKU_LF;
+                }
             }elseif (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['iocelem'] && !$_SESSION['u0']){
                 if (!empty($footer)){
                     $this->doc .= DOKU_LF;
@@ -609,10 +603,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         $this->col_num = 1;
         $this->table_align = array();
         $this->doc .= '\fonttable'.DOKU_LF;
-        //Make sure accounting only have 3 cols
-        if ($_SESSION['accounting'] && $maxcols !== 3){
-            $_SESSION['accounting'] = FALSE;
-        }
         $border = ($_SESSION['accounting'])?'|':'';
         $large = '';
         $csetup = '';
@@ -783,8 +773,11 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablecell_open($colspan = 1, $align = NULL, $rowspan = 1){
-        if ($_SESSION['accounting'] && $colspan === 3){
-            $this->doc .= '\rowcolor{coloraccounting}  & & ';
+        if ($_SESSION['accounting'] && $colspan === $this->max_cols){
+            $this->doc .= '\rowcolor{coloraccounting}';
+            for($i=1;$i<$colspan;$i++){
+                $this->doc .= ' &';
+            }
             $this->col_colspan = $colspan;
         }else{
             $position = 'p{\the\tabucolX * '.$colspan.'}';
@@ -1183,9 +1176,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function _xmlEntities($value) {
-        global $symbols;
-        $matches = array();
-        if (!$this->monospace){
+        /*if (!$this->monospace){
             //Search mathematical formulas
             //echo $value.'INICIAL'.DOKU_LF;
             list($value, $replace) = $this->_latexElements($value);
@@ -1193,7 +1184,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if ($replace){
                 return $value;
             }
-        }
+        }*/
         static $find = array('{','}','\\','_','^','<','>','#','%', '$', '&', '~', '"','−');
         static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
 								'@IOCBACKSLASH@textless{}','@IOCBACKSLASH@textgreater{}','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl{}', '-');

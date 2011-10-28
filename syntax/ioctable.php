@@ -55,7 +55,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         return 513;
     }
 
-
     /**
      * Connect pattern to lexer
      */
@@ -77,8 +76,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
 		$params = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                if (preg_match('/::table:(.*?)\n/', $match, $matches)){
-					$id = $matches[1];
+                if (preg_match('/::(table|accounting):(.*?)\n/', $match, $matches)){
+					$id = $matches[2];
                 }
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
@@ -116,7 +115,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
             list ($state, $text, $id, $params) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
-                    $this->id = trim($id);
+                    $_SESSION['table_id'] = trim($id);
                     preg_match('/::([^:]*):/', $text, $matches);
                     $this->type = (isset($matches[1]))?$matches[1]:'';
                     $_SESSION['accounting'] = ($this->type === 'accounting');
@@ -128,7 +127,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     if (!empty($_SESSION['table_footer'])){
                         $_SESSION['onemoreparsing'] = TRUE;
                     }
-                    $_SESSION['table_id'] = $this->id;
                     if (isset($params['large'])){
                         $renderer->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{}{\hspace*{-\marginparwidth}\hspace*{-11mm}}'.DOKU_LF;
                         $renderer->doc .= '\parbox[c]{\marginparwidth+\marginparsep}{'.DOKU_LF;
@@ -172,7 +170,6 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_large'] = FALSE;
                     $_SESSION['table_small'] = FALSE;
                     $_SESSION['accounting'] = FALSE;
-                    $this->id = '';
                     $this->type = '';
                     break;
             }
