@@ -39,7 +39,9 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
     }
 
     public function handle_tpl_metaheader_output(Doku_Event &$event, $param) {
+        global $conf;
 
+        $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
         if (!$this->has_jquery()) {
             $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
             $this->include_script($event, 'jQuery.noConflict();');

@@ -1,4 +1,5 @@
-/*
+/*-------------------------------------------------------------------------------
+
 	HTML5 Reset :: style.css
 	----------------------------------------------------------
 	We have learned much from/been inspired by/taken code where offered from:
@@ -230,11 +231,11 @@ body,select,input,textarea {
 }
 
 a {
- color: #03f;
+ color:#333;
 }
 
 a:hover {
- color: #69f;
+ color: #6f6f6f;
 }
 
 /* Custom text-selection colors (remove any text shadows: twitter.com/miketaylr/status/12228805301) */
@@ -637,14 +638,14 @@ position: absolute;
 #toc {
  position: fixed;
  max-height:80%;
- width: 20em;
+ max-width: 24em;
  top: 99px;
  left: 55px;
  display: block;
  overflow: auto;
  padding: 1%;
  background-color: #fff;
- font-family: sans-serif;
+ font-family: arial, helvetica, sans-serif;
  -moz-user-select: none;
  -moz-border-radius-bottomright: 10px;
  -moz-border-radius-topright: 10px;
@@ -658,6 +659,30 @@ position: absolute;
  z-index: 2;
 }
 
+#toc .parentnode > ul{
+ display:block;
+ margin-top:3em;
+}
+
+#toc .parentnode > h4 a{
+ font-size:11pt;
+}
+
+#toc .expander h4 {
+background: url("../../img/tocright.png") no-repeat scroll right 90% transparent;
+color:#000;
+font-weight:normal;
+border-bottom:1px solid #989898;
+}
+
+#toc .expander .tocdown{
+ background: url("../../img/tocdown.png") no-repeat scroll right 90% transparent;
+}
+
+#toc .parentnode hr{
+ border-color:#989898;
+}
+
 #toc h2 {
  color:#000;
  font-size: 14pt;
@@ -665,23 +690,31 @@ position: absolute;
  margin-bottom: 35px;
 }
 
-#toc li {
- margin-top: 6px;
- padding-top: 4px;
- border-top: 1px;
- border-style: dotted;
+#toc .expander li a{
+ display:block;
+ width:99%;
 }
 
 #toc li:first-child {
- border-top: 0px;
+ margin-top: 0;
+}
+
+#toc li {
+ margin-top: 6px;
+ padding-top: 4px;
+/* border-top: 1px;
+ border-style: dotted;*/
+}
+
+#toc li:first-child {
+/* border-top: 0px;*/
 }
 
 #toc li a {
- font-size: 11px;
- letter-spacing: -0.05em;
+ font-size: 10pt;
  text-decoration: none;
- color: #6f6f6f;
- /*font-weight: bold;*/
+ /*color: #6f6f6f;
+ font-weight: bold;*/
 }
 
 #toc li ul li {
@@ -689,9 +722,9 @@ position: absolute;
 }
 
 #toc li ul li > a:before {
- content: "\203a\0020";
+/* content: "\203a\0020";
  padding-left: 10px;
- color: #9f9f9f;
+ color: #9f9f9f;*/
 }
 
 #bridge{
@@ -961,8 +994,9 @@ position: absolute;
  border: 3px solid #4074D4 !important
 }
 
-.optselected{
+.optselected a{
  font-weight: bold;
+ color:#ff0000;
 }
 
 .font-selected{
@@ -1077,6 +1111,10 @@ div.solution{
  background-color:#F5F1E8;
 }
 
+.mainindex{
+ padding: 20px 0 35px 0; 
+}
+
 .headtoc{
  position: absolute;
  bottom:0;
@@ -1129,7 +1167,7 @@ div.solution{
 
 .indexcontent{
  margin: 0 auto;
- width: 80%;
+ width: 90%;
  padding:2em;
  background:#fff;
  -moz-user-select: none;
@@ -1137,28 +1175,38 @@ div.solution{
  border-radius:20px;
 }
 
-.indexcontent .parentnode > h4 {
- background: url("../../img/tocdown.png") no-repeat scroll right 0.8em transparent;
- font-size: 12pt;
- font-weight: normal;
- height: 2em;
+.indexcontent h4, .indexcontent ul {
+ margin:0;
+ padding:0;
+}
+
+.indexcontent .rootnode{
+margin-bottom:1em;
 }
 
 .indexcontent .rootnode > h4 {
- background: url("../../img/tocright.png") no-repeat scroll right 0.7em transparent;
- font-size: 12pt;
+ background: url("../../img/tocright.png") no-repeat scroll right 80% transparent;
+ border-bottom: 1px solid #000000;
+ font-size: 14pt;
  font-weight: normal;
- height: 2em;
+ line-height: 1em;
+ margin-bottom:1em;
 }
 
-.indexcontent .parentnode ul li > h4 {
- font-weight: normal;
+.indexcontent .parentnode{
+ margin-bottom:1em;
 }
 
-.indexcontent .parentnode hr {
- list-style: none outside none;
- margin-bottom: 1.4em;
+.indexcontent .parentnode > h4 {
+ background: url("../../img/tocdown.png") no-repeat scroll right 80% transparent;
+ border-bottom: 1px solid #000000;
+ font-size: 14pt;
+ font-weight: normal;
+ line-height: 1em;
+ margin-bottom:.6em;
 }
+
+
 
 .indexcontent a{
  color:#333;

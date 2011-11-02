@@ -318,6 +318,7 @@ define (function(){
                           $(this).show();
                   });
                   $('#'+parent_node+"> ul").show();
+                  $('#'+parent_node+"> ul").closest("li").children("h4").addClass("tocdown");
           }
           if (node != ''){
                   $('#'+node).addClass("optselected");
@@ -422,18 +423,19 @@ define (function(){
 	//Show and hide list elements
 	$(".expander ul").hide();
 	$(".expander h4").live("click", function() {
+		$(this).toggleClass("tocdown");
 	    var $nestList = $(this).siblings("ul");
 	    if ($(this).parent().children("ul").css('display') != 'none'){
-			$(this).parent().children("ul").hide('fast', function(){
-
+			$(this).parent().children("ul").hide('fast', function(obj){
+				$(this).closest("li").children("h4").removeClass("tocdown");
 			});
 		}else{
 			$(this).parent().children("ul").show('fast',function(){
 
 			});
 		}
-		$(this).parent().siblings().children().filter('ul').hide('fast', function(){
-
+		$(this).parent().siblings().children().filter('ul').hide('fast', function(obj){
+			$(this).closest("li").children("h4").removeClass("tocdown");
 		});
 			
 	});
