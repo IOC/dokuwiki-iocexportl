@@ -26,7 +26,7 @@ static $max_menu = 100;
 static $max_navmenu = 50;
 static $media_path = 'lib/exe/fetch.php?media=';
 $menu_html = '';
-static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'creditcodi', 'creditnom', 'familia');
+static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
 $tree_names = array();
 static $web_folder = 'WebContent';
 
@@ -69,13 +69,16 @@ if ($res === TRUE) {
     $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 2);
     //Get template source
     $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
-    //$text_template = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html, $text_template, 1);
     $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
     //Create index page
     $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $menu_html);
+    $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
     $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
     $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
     $html = preg_replace('/@IOCMETA@/',createMeta($data[1]), $html, 1);
+    $html = preg_replace('/@IOCMETABC@/',createMetaBC($data[1]), $html, 1);
+    $html = preg_replace('/@IOCMETABR@/',createMetaBR($data[1]), $html, 1);
+    addMetaMedia($data[1],$zip);
     $html = preg_replace('/@IOCPATH@/', '', $html);
     $zip->addFromString('index.html', $html);
     //Create search page
@@ -87,6 +90,12 @@ if ($res === TRUE) {
     $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
     $zip->addFromString('search.html', $html);
     if (isset($data[0]['intro'])){
+        if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $menu_html, $matches)){
+            //            print_r($matches);die;
+            $menu_html_intro = $matches[1];
+            $menu_html = preg_replace('/@IOCSTARTINTRO@.*?@IOCENDINTRO@/', '', $menu_html, 1);
+            //            print_r($menu_html);die;
+        }
         //Intro
         foreach ($data[0]['intro'] as $page){
            $text = io_readFile(wikiFN($page[1]));
@@ -95,6 +104,7 @@ if ($res === TRUE) {
            $instructions = get_latex_instructions($text);
            $html = p_latex_render('iocxhtml', $instructions, $info);
            $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
+           $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_intro, $html, 1);
            $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
            $html = preg_replace('/@IOCTOC@/', '', $html, 1);
            $html = preg_replace('/@IOCPATH@/', '', $html);
@@ -400,7 +410,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
-            $menu_html = '<li id="'.$id.'">';
+            $menu_html = '<li id="'.$id.'" class="tocsection">';
             $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
             $menu_html .= '<ul>';
         }elseif ($type === 'activity'){
@@ -425,11 +435,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $menu_html = '';
         if (isset($elements['intro'])){
             //Intro
+            $menu_html .= '@IOCSTARTINTRO@';
             foreach ($elements['intro'] as $kp => $page){
                 $href = '@IOCPATH@'.basename(wikiFN($page[1]),'.txt').'.html';
-                $menu_html .= setMenu('root', $page[0], $href, 'c'.$kp);
+                //$menu_html .= setMenu('root', $page[0], $href, 'c'.$kp);
+                $menu_html .= setMenu('root', $page[0], $href, basename(str_replace(':','/',$page[1])));
                 array_push($files, '"'.str_replace('@IOCPATH@', '', $href).'"');
             }
+            $menu_html .= '@IOCENDINTRO@';
             unset($elements['intro']);
         }
         foreach ($elements as $ku => $unit){
@@ -546,14 +559,72 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * Create Meta data
      */
     function createMeta($data){
-        $meta = '<div class="meta">';
-        $meta .= '<strong>'.(isset($data['familia'])?$data['familia']:'').'</strong>';
-        $meta .= '<h1>'.(isset($data['creditnom'])?$data['creditnom']:'').'</h1>';
-        $meta .= '<p>'.(isset($data['creditcodi'])?$data['creditcodi']:'').'</p>';
-        $meta .= '<p>'.(isset($data['autoria'])?$data['autoria']:'').'</p>';
-        $meta .= '<strong>'.(isset($data['ciclenom'])?$data['ciclenom']:'').'</strong>';
+
+        $meta .= '<h1 class="nocount">'.(isset($data['creditnom'])?$data['creditnom']:'').'</h1>';
+        $meta .= '<div class="metainfo">';
+        $meta .= '<img src="img/portada.png" alt="'.(isset($data['familia'])?$data['familia']:'').'" />';
+        $meta .= '<ul>';
+        $authors = (isset($data['autoria'])?$data['autoria']:'');
+        if (!empty($authors)){
+            $meta .= '<li><strong>Redacció</strong></li>';
+        }
+        $authors = preg_split('/\s?\\\\\s?/', $authors);
+        foreach ($authors as $auth){
+            if (!empty($auth)){
+                $meta .= '<li>'.$auth.'</li>';
+            }
+        }
+        $meta .= '</ul>';
         $meta .= '</div>';
         return $meta;
+    }
+
+    /**
+    *
+    * Create Meta data located at the bottom centered
+    */
+    function createMetaBC($data){
+
+        $meta .= '<ul>';
+        $meta .= '<li>'.(isset($data['familia'])?$data['familia']:'').'</li>';
+        $meta .= '<li><strong>'.(isset($data['creditcodi'])?$data['creditcodi']:'').'</strong></li>';
+        $meta .= '<li><strong>'.(isset($data['ciclenom'])?$data['ciclenom']:'').'</strong></li>';
+        return $meta;
+    }
+
+    /**
+    *
+    * Create Meta data located at the bottom right aligned
+    */
+    function createMetaBR($data){
+
+        $meta .= 'Primera edició: <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
+        $meta .= ' &copy; Departament d\'Ensenyament';
+        return $meta;
+    }
+
+    /**
+     *
+     * Add media files from meta info
+     * @param Array $data
+     * @param ZIP $zip
+     */
+    function addMetaMedia($data, &$zip){
+        if (isset($data['familypic'])){
+            preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['familypic'],$matches);
+            resolve_mediaid(getNS($matches[1]),&$matches[1],&$exists);
+            if ($exists){
+                $zip->addFile(mediaFN($matches[1]), 'img/portada.png');
+            }
+        }
+
+        if (isset($data['copylogo'])){
+            preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['copylogo'],$matches);
+            resolve_mediaid(getNS($matches[1]),&$matches[1],&$exists);
+            if ($exists){
+                $zip->addFile(mediaFN($matches[1]), 'img/license.png');
+            }
+        }
     }
 
      /**

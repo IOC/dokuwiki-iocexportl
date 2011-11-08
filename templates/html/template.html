@@ -76,14 +76,14 @@
 		<div class="head">Institut Obert de Catalunya</div>
 		<div class="headdocument">@IOCHEADDOCUMENT@</div>
         <div id="search" class="search">
-         <form id="frmsearch" action="search.html" method="get">
+         <form id="frmsearch" action="@IOCPATH@search.html" method="get">
          <input type="text" name="q"/>
         </form>
         </div>
 	</header>
    <div id="upbutton" class="hidden upbutton"><img src="@IOCPATH@img/uparrow.png" alt="Pujar a l'inici de p&agrave;gina"/></div>
    <aside id="aside">
-    <div id="menu" class="scroll">
+    <div id="menu">
       <ul>
        <li name="toc"><a href="#"><img src="@IOCPATH@img/toc.png" alt="Index"/></a></li>
        <li name="settings"><a href="#"><img src="@IOCPATH@img/settings.png" alt="Ajust"/></a></li>
@@ -153,10 +153,11 @@
    </div>
    </section>
  <section>
- <div id="printer" class="hidden">
+ <div id="favorites" class="hidden">
  </div>
  </section>   
  <div id="bridge" class="hidden"></div>
+ <div id="favcounter" class="hidden"><a href="#"></a></div>
  <div id="navmenu" class="navmenu">@IOCNAVMENU@</div>
 	<div id="content" lang="ca" class="hyphenate text">
      <article lang="ca">

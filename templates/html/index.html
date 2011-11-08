@@ -73,7 +73,7 @@
 <div class="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
 
 	<header id="header">
-        <div class="head hidden">Institut Obert de Catalunya</div>
+        <div class="head"><img src="img/logo.png" alt="Institut Obert de Catalunya"/><img src="img/license.png"/></div>
 		<div class="headdocument hidden">@IOCHEADDOCUMENT@</div>
         <div id="search" class="search">
          <form id="frmsearch" action="search.html" method="get">
@@ -81,19 +81,26 @@
         </form>
         </div>
 	</header>
-   <div id="upbutton" class="hidden upbutton"><img src="img/uparrow.png" alt="Pujar a l'inici de p&agrave;gina"/></div>
+<!-- <div id="upbutton" class="hidden upbutton"><img src="img/uparrow.png" alt="Pujar a l'inici de p&agrave;gina"/></div> -->   
    <div id="content" lang="ca" class="hyphenate text">
      <article lang="ca" class="mainindex">
        <div class="meta">
-            @IOCMETA@
+        @IOCMETA@
        </div>
-      <div class="indextoc">
-       <div class="indexcontent">
-        <ul>@IOCTOC@</ul>
+       <div class="metainfobc">
+        @IOCMETABC@
        </div>
-      </div>
+       <div class="metainfobr">
+        @IOCMETABR@
+       </div>
 	 </article>
-     <div class="headtoc headtocdown"><h1>Taula de Continguts<img class="up" src="img/down.png"/></h1></div>
+    </div>
+    <div class="headtoc headtocdown"><h1 class="nocount">Taula de Continguts<img class="up" src="img/down.png"/></h1>
+     <div class="indextoc">
+      <div class="indexcontent">
+       <ul>@IOCTOC@</ul>
+      </div>
+     </div>
     </div>
 </div>
 
