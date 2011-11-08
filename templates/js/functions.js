@@ -6,7 +6,7 @@ define (function(){
 	var lfavorites = parseInt($("#favorites").css('left'),10);
 	var settings = parseInt($("#settings").css('top'),10);
 	var topheader = parseInt($("#header").css('height'),10);
-	var defaultsettings = '{"menu":[{"mvisible":1}],"toc":[{"tvisible":0}],"settings":[{"font":0,"fontsize":1,"contrast":1,"alignment":0,"hyphen":0}],"fav":[{"urls":"0"}]}';
+	var defaultsettings = '{"menu":[{"mvisible":1}],"toc":[{"tvisible":0}],"settings":[{"fontsize":1,"contrast":0,"alignment":0,"hyphen":0}],"fav":[{"urls":"0"}]}';
 	
 	$('#menu li > a').click(function(e) {
 		e.preventDefault();
@@ -77,16 +77,6 @@ define (function(){
     	showSearch();
     });
     
-    //Font
-    $('#first-font').click(function() {
-		setFont(0);
-		setCookieProperty('font', 0);
-    });
-    
-    $('#second-font').click(function() {
-		setFont(1);
-		setCookieProperty('font', 1);
-    });
     //Font size
     $('#text-small').click(function() {
 		setFontsize(0);
@@ -109,42 +99,53 @@ define (function(){
     });
     
     //Contrast
-    $('#text-negre').click(function() {
+    $('#style-newspaper').click(function() {
    	 	setContrast(0);
 		setCookieProperty('contrast', 0);
     });
     
-    $('#text-gris').click(function() {
+    $('#style-novel').click(function() {
     	setContrast(1);
 		setCookieProperty('contrast', 1);
     });
     
-    $('#text-blanc').click(function() {
+    $('#style-ebook').click(function() {
     	setContrast(2);
 		setCookieProperty('contrast', 2);
     });
-    
-    //Alignment
-    $('#text-left').click(function() {
-    	setAlignment(1,0);
-		setCookieProperty('alignment', 0);
+
+    $('#style-inverse').click(function() {
+    	setContrast(3);
+		setCookieProperty('contrast', 3);
+    });
+
+    $('#style-athelas').click(function() {
+    	setContrast(4);
+		setCookieProperty('contrast', 4);
     });
     
-    $('#text-justify').click(function() {
-    	setAlignment(2,1);
-		setCookieProperty('alignment', 1);
+    //Alignment
+    $('#text-alignment').click(function() {
+		if ($(this).attr("checked")){
+			setAlignment(1);
+			setCookieProperty('alignment', 1);
+		}else{
+    		setAlignment(0);
+			setCookieProperty('alignment', 0);
+		}
     });
     
     //Hyphenation
-    $('#hyphenation').click(function() {
-    	setHyphenation(0);
-		setCookieProperty('hyphen', 0);
+    $('#text-hyphen').click(function() {
+		if ($(this).attr("checked")){
+    		setHyphenation(0);
+			setCookieProperty('hyphen', 0);
+		}else{
+    		setHyphenation(1);
+			setCookieProperty('hyphen', 1);
+		}
     });
     
-    $('#hyphenatioff').click(function() {
-     	setHyphenation(1);
-		setCookieProperty('hyphen', 1);
-    });
     
     $('#reset').click(function() {
 		var object = $.parseJSON(defaultsettings);
@@ -152,6 +153,7 @@ define (function(){
 		for (obj in object.settings[0]){
 			setCookieProperty(obj,object.settings[0][obj]);
 		}
+		setCheckboxes(object);
     });
     
     $('#upbutton').click(function() {
@@ -186,15 +188,6 @@ define (function(){
     	$("input[name='q']").focus();
 	});
 
-	var setFont = (function (info){
-		var options=new Array("first-font","second-font");
-		other = (info==0)?1:0;
-    	$('#'+options[info]).addClass('font-selected');
-    	$('#'+options[other]).removeClass('font-selected');
-    	$("p").removeClass(options[other]);
-   	 	$("p").addClass(options[info]);
-	});
-
 	var setFontsize = (function (info){
 		var options=new Array("text-small","text-normal","text-big","text-huge");
 		$('#'+options[info]).addClass('font-selected');
@@ -210,35 +203,27 @@ define (function(){
 	});
 
 	var setContrast = (function (info){
-		var options=new Array("text-negre","text-gris","text-blanc");
-		$('#'+options[info]+' span').addClass('selected');
+		var options=new Array("style-newspaper","style-novel","style-ebook","style-inverse","style-athelas");
+		$('#'+options[info]).addClass('active');
 		$("body").addClass(options[info]);
 		for (i=0;i<options.length;i++){
 			if (i==info){
 				continue;
 			}
-			$('#'+options[i]+' span').removeClass('selected');
+			$('#'+options[i]).removeClass('active');
 			$("body").removeClass(options[i]);
-			
 		}
 	});
 
-	var setAlignment = (function (select, info){
+	var setAlignment = (function (info){
 		var options=new Array("text-left","text-justify");
-		others = (select==1)?2:1;
-		otheri = (info==0)?1:0;
-    	$("#alignment").addClass('selector'+select);
+		other = (info==0)?1:0;
    	 	$("article p").addClass(options[info]);
-    	$("#alignment").removeClass('selector'+others);
-    	$("article p").removeClass(options[otheri]);
+    	$("article p").removeClass(options[other]);
 	});
 
 	var setHyphenation = (function (info){
-		var options=new Array("selector1","selector2");
-		other = (info==0)?1:0;
 		state = (info==0)?false:true;
-    	$('#hyphen').addClass(options[info]);
-    	$('#hyphen').removeClass(options[other]);
    	 	Hyphenator.doHyphenation = state;
    	 	Hyphenator.toggleHyphenation();
 	});
@@ -248,7 +233,6 @@ define (function(){
 		if (info){
 			if (typeof value == 'number'){
 				var patt = new RegExp("\""+n+"\":\\d+", 'g');
-				console.log(n + ' ' + value);
 				info=info.replace(patt, "\""+n+"\":"+value);
 			}else{
 				var patt = new RegExp("\""+n+"\":\".*?\"", 'g');
@@ -259,15 +243,28 @@ define (function(){
 	});
 
 	var settings = (function (info){
-		setFont(info.settings[0]['font']);
 		setFontsize(info.settings[0]['fontsize']);
 		if (pageIndex()){
 			$("body").removeClass().addClass('index');
 		}else{
 			setContrast(info.settings[0]['contrast']);
 		}
-		setAlignment(info.settings[0]['alignment']+1,info.settings[0]['alignment']);
+		setAlignment(info.settings[0]['alignment']);
 		setHyphenation(info.settings[0]['hyphen']);
+		setCheckboxes(info);
+	});
+
+	var setCheckboxes = (function (info){
+		if(info.settings[0]['alignment']==1){
+			$("#text-alignment").attr("checked","checked");
+		}else{
+			$("#text-alignment").removeAttr("checked");
+		}
+		if(info.settings[0]['hyphen']==0){
+			$("#text-hyphen").attr("checked","checked");
+		}else{
+			$("#text-hyphen").removeAttr("checked");
+		}
 	});
 
 	var sidemenu = (function (info){
@@ -651,5 +648,23 @@ define (function(){
 	//Initialize menu and settings params
 	get_params();
 	setNumberHeader();
+	$("#slider-width").slider({
+				min:30,
+				max:90,
+				step:15,
+				range:'min',
+				slide: function( event, ui ) {
+                   console.log( ui.value );
+               }
+	});
+	$("#slider-font").slider({
+				min:75,
+				max:150,
+				step:15,
+				range:'min',
+				slide: function( event, ui ) {
+                   console.log( ui.value );
+               }
+	});
 	return showSearch;
 });

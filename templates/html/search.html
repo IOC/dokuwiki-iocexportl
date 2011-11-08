@@ -68,12 +68,12 @@
 	<script src="@IOCPATH@_/js/build.js" type="text/javascript"></script>
 </head>
 
-<body class="text-gris">
+<body class="pagesearch">
 
 <div class="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
 
 	<header id="header">
-		<div class="head"><img src="@IOCPATH@img/logo.png" alt="Institut Obert de Catalunya"/><img src="img/license.png"/></div>
+		<div class="head"><img src="img/logo.png" alt="Institut Obert de Catalunya"/><img src="img/license.png"/></div>
 		<div class="headdocument">@IOCHEADDOCUMENT@</div>
         <div id="search" class="search">
          <form id="frmsearch" action="@IOCPATH@search.html" method="get">
@@ -81,87 +81,11 @@
         </form>
         </div>
 	</header>
-   <div id="upbutton" class="upbutton" style="display:none;"><img src="@IOCPATH@img/uparrow.png" alt="Pujar a l'inici de p&agrave;gina"/></div>
-   <aside id="aside">
-    <div id="menu">
-      <ul>
-       <li name="toc"><a href="#"><img src="@IOCPATH@img/toc.png" alt="Index"/></a></li>
-       <li name="settings"><a href="#"><img src="@IOCPATH@img/settings.png" alt="Ajust"/></a></li>
-       <li name="printer"><a href="#"><img src="@IOCPATH@img/printer.png" alt="Imprimir"/></a></li>
-       <li name="favorites"><a href="#"><img src="@IOCPATH@img/favorites.png" alt="Favorits"/></a></li>       
-      </ul>
-     </div>
-   </aside>
-   <a id="sidebar-hide" title="Toggle sidebar display" href="#"><img src="@IOCPATH@img/arrows.png"/></a>
-   <section>
-     <div id="toc" class="hidden">
-      <div class="menucontent">
-        <ul>
-        @IOCMENUNAVIGATION@
-        </ul>
-      </div>
-    </div>
-   </section>
-   <section>
-   <div id="settings" class="hidden">
-    <div class="menucontent">
-     <div class="allsettings">
-     <div class="settings">
-      <p>Font</p>
-       <ul class="font">
-        <li id="first-font" class="font-selected">Georgia</li>
-        <li id="second-font">Helvetica</li>
-       </ul>
-     </div>
-     <div class="settings">
-      <p>Mida</p>
-       <ul class="fontsize">
-        <li id="text-small">A</li>
-        <li id="text-normal" class="font-selected">A</li>
-        <li id="text-big">A</li>
-        <li id="text-huge">A</li>
-       </ul>
-     </div>
-     <div class="settings">
-      <p>Contrast</p>
-       <ul class="contrast">
-        <li id="text-negre"><span>A</span></li>
-        <li id="text-gris"><span class="selected">A</span></li>
-        <li id="text-blanc"><span>A</span></li>
-       </ul>
-     </div>
-     <div id ="alignment" class="settings selector1">
-      <p>Justificaci&oacute;</p>
-       <ul>
-        <li><img id="text-left" src="@IOCPATH@img/left.png" alt="Alinea a la dreta"/></li>
-        <li><img id="text-justify" src="@IOCPATH@img/justify.png" alt="Justifica el text"/></li>
-       </ul>
-     </div>
-     <div id ="hyphen" class="settings selector1">
-      <p>Partici&oacute;</p>
-       <ul>
-        <li id="hyphenation"><img src="@IOCPATH@img/hyphenation.png" alt="Activa la partici&oacute; sil·l&agrave;bica"/></li>
-        <li id="hyphenatioff"><img src="@IOCPATH@img/hyphenatioff.png" alt="Desactivar la partici&oacute; sil·l&agrave;bica"/></li>
-       </ul>
-     </div>
-     <div class="settings">
-      <p>Default</p>
-      <span class="default"><img id="reset" src="@IOCPATH@img/reset-settings.png" alt="Alinea a la dreta"/></span>
-     </div>
-     </div>
-    </div>
-   </div>
-   </section>
- <section>
- <div id="favorites" class="hidden">
- </div>
- </section>   
- <div id="bridge" class="hidden"></div>
- <div id="favcounter" class="hidden"><a href="#"></a></div>
+   <div id="upbutton" class="hidden upbutton"><img src="@IOCPATH@img/uparrow.png" alt="Pujar a l'inici de p&agrave;gina"/></div>
  <div id="navmenu" class="navmenu">@IOCNAVMENU@</div>
 	<div id="content" lang="ca" class="hyphenate text">
      <article lang="ca">
-        <h1>@IOCTITLE@</h1>
+        <h1 class="nocount">@IOCTITLE@</h1>
     	@IOCCONTENT@
 	 </article>
     </div>

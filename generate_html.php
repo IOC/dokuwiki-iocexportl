@@ -67,6 +67,9 @@ if ($res === TRUE) {
     //Get index source
     $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
     $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 2);
+    //Get search source
+    $text_search = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'search.html');
+    $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 2);
     //Get template source
     $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
     $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
@@ -83,7 +86,7 @@ if ($res === TRUE) {
     $zip->addFromString('index.html', $html);
     //Create search page
     $navmenu = createNavigation('');
-    $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_template, 1);
+    $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_search, 1);
     $html = preg_replace('/@IOCTITLE@/', 'Cerca', $html, 1);
     $html = preg_replace('/@IOCTOC@/', '', $html, 1);
     $html = preg_replace('/@IOCPATH@/', '', $html);
@@ -513,7 +516,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         } elseif(!is_readable($directory)) {
             return FALSE;
         } else {
-            $ignore = array('index.html','template.html','build.js');
+            $ignore = array('index.html','search.html','template.html','build.js');
             $directoryHandle = opendir($directory);
             while ($contents = readdir($directoryHandle)) {
                 if($contents != '.' && $contents != '..') {
