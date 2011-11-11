@@ -67,8 +67,13 @@ class syntax_plugin_iocexportl_iocreference extends DokuWiki_Syntax_Plugin {
                 $renderer->doc .= '\MakeLowercase{\tablename}  \ref{'.trim($matches[1]).'}';
             }
             return TRUE;
-        }elseif($mode === 'xhtml' || $mode === 'iocxhtml'){
+        }elseif($mode === 'xhtml'){
             $match = preg_replace('/(:(?:figure|table):)([^:]+)(:)/','<a href="#$2">$2</a>',$data, 1);
+            $renderer->doc .= $match;
+            return TRUE;
+        }elseif($mode === 'iocxhtml'){
+            $match = preg_replace('/(:figure:)([^:]+)(:)/','<span class="figref"><a href="#$2"><span>figura</span></a></span>',$data, 1);
+            $match = preg_replace('/(:table:)([^:]+)(:)/','<span class="tabref"><a href="#$2"><span>taula</span></a></span>',$match, 1);
             $renderer->doc .= $match;
             return TRUE;
         }

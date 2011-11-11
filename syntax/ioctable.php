@@ -220,21 +220,23 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }else{
                             $renderer->doc .= '<div class="iocaccounting">';
                         }
-                        $renderer->doc .= '<a name="'.$id.'">';
-                        $renderer->doc .= '<strong>ID:</strong> '.$id.'<br />';
+                        $this->footer = (isset($params['footer']))?isset($params['footer']):'';
+                        $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';
+                        $renderer->doc .= '<span>Taula</span>';
                         $renderer->doc .= '</a>';
                         if (isset($params['title'])){
-                            $renderer->doc .= '<strong>T&iacute;tol:</strong> '.$params['title'].'<br />';
+                            $renderer->doc .= ' '.$params['title'];
                         }
-                        if (isset($params['footer'])){
-                            $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
-                        }
+                        $renderer->doc .= '</div>';
                         break;
                     case DOKU_LEXER_UNMATCHED :
                         $instructions = get_latex_instructions($text);
                         $renderer->doc .= p_latex_render($mode, $instructions, $info);
                         break;
                     case DOKU_LEXER_EXIT :
+                        if (!empty($this->footer)){
+                            $renderer->doc .= '<div class="foottable">'.$this->footer.'</div>';
+                        }
                         $renderer->doc .= '</div>';
                         $this->type = '';
                         break;

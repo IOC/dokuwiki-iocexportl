@@ -1196,10 +1196,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }
             if ($_SESSION['figure']){
                 $ret .= '<figure>'.DOKU_LF;
-                $title = $_SESSION['fig_title'];
-                if ($title) {
-                    $ret .= '<figcaption>'.$title.'</figcaption>'.DOKU_LF;
-                }
+                $figtitle = '<span>Figura</span>'.$_SESSION['fig_title'];
+                $ret .= '<figcaption>'.$figtitle.'</figcaption>';
             }elseif(!$this->table){
                 $ret .= '<div class="iocfigurec">'.DOKU_LF;
             }
@@ -1226,17 +1224,29 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }else{
                 $ret .= ' alt=""';
             }
-
-            if ( !is_null($width) )
+            /*if ( !is_null($width) )
                 $ret .= ' width="'.$this->_xmlEntities($width).'"';
 
             if ( !is_null($height) )
-                $ret .= ' height="'.$this->_xmlEntities($height).'"';
+                $ret .= ' height="'.$this->_xmlEntities($height).'"';*/
 
             $ret .= ' />';
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
             }elseif(!$this->table){
+                if ($title) {
+                    $title = preg_replace('/\/[+-]?\d+$/', '', $title);
+                    $src = mediaFN($src);
+                    if (file_exists($src)) {
+                        $info  = getimagesize($src);
+                        $width  = $info[0];
+                    }
+                    if ($width > 180){
+                        $width = 180;
+                    }
+                    $width = ($width)?'style="width:'.$width.'px"':"";
+                    $ret .= '<small '.$width.'>'.$title.'</small>'.DOKU_LF;
+                }
                 $ret .= '</div>'.DOKU_LF;
             }
 

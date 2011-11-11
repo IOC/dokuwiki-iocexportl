@@ -184,17 +184,18 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
             list($state, $data, $params) = $indata;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
-                        $matches = array();
+            $matches = array();
                         preg_match('/::([^:]*):/', $data, $matches);
                         $type = (isset($matches[1]))?$matches[1]:'';
-                        $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         //TEXT LARGE
                         if($type === 'text' && isset($params['large'])){
                             $type = 'textl';
                         }
                         $renderer->doc .= '<div class="ioc'.$type.'">';
+                        $renderer->doc .= '<div class="ioccontent">';
+                        $title = (isset($params['title']))?$renderer->_xmlEntities($params['title']):'';
                         if (!empty($title)){
-                            $renderer->doc .= '<span class="ioctitle">'.$title.'</span>';
+                            $renderer->doc .= '<p class="ioctitle">'.$title.'</p>';
                         }
                         break;
                     case DOKU_LEXER_UNMATCHED :
@@ -202,6 +203,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= p_latex_render($mode, $instructions, $info);
                         break;
                     case DOKU_LEXER_EXIT :
+                        $renderer->doc .= '</div>';
                         $renderer->doc .= '</div>';
                         break;
             }

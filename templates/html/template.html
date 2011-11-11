@@ -55,6 +55,9 @@
 	
 	<!-- CSS: screen, mobile & print are all in the same file -->
 	<link rel="stylesheet" href="@IOCPATH@_/css/style.css">
+
+	<!-- CSS: jQuery UI -->
+	<link rel="stylesheet" href="@IOCPATH@_/css/jquery-ui.css">
 	
 	<!-- all our JS is at the bottom of the page, except for Modernizr. -->
 	<script src="@IOCPATH@_/js/modernizr-1.7.min.js"></script>
@@ -68,12 +71,12 @@
 	<script src="@IOCPATH@_/js/build.js" type="text/javascript"></script>
 </head>
 
-<body class="text-gris">
+<body class="style-newspaper">
 
 <div class="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
 
 	<header id="header">
-		<div class="head"><img src="@IOCPATH@img/logo.png" alt="Institut Obert de Catalunya"/><img src="img/license.png"/></div>
+		<div class="head"><img src="@IOCPATH@img/logo.png" alt="Institut Obert de Catalunya"/><a href="@IOCREFLICENSE@"><img src="@IOCPATH@img/license.png" alt="Llic&egrave;ncia" class="license"/></a></div>
 		<div class="headdocument">@IOCHEADDOCUMENT@</div>
         <div id="search" class="search">
          <form id="frmsearch" action="@IOCPATH@search.html" method="get">
@@ -107,46 +110,41 @@
     <div class="menucontent">
      <div class="allsettings">
      <div class="settings">
-      <p>Font</p>
-       <ul class="font">
-        <li id="first-font" class="font-selected">Georgia</li>
-        <li id="second-font">Helvetica</li>
-       </ul>
+      <label>Font i color</label>
+		<div class="setting-option">
+	        <ul class="fontBackground">
+				<li id="style-newspaper" title="Newspaper" class="appearance-style-newspaper"><span>Newspaper</span></li>
+                <li id="style-novel" title="Novel" class="appearance-style-novel"><span>Novel</span></li>
+                <li id="style-ebook" title="eBook" class="appearance-style-ebook"><span>eBook</span></li>
+				<li id="style-inverse" title="Inverse" class="appearance-style-inverse active"><span>Inverse</span></li>
+				<li id="style-athelas" title="Athelas" class="appearance-style-athelas"><span>Athelas</span></li>
+			</ul>
+		</div>
+     </div>
+	<div class="settings">
+      <label>Amplada</label>
+		<div class="setting-option">
+	        <div id="slider-width"></div>
+		</div>
      </div>
      <div class="settings">
-      <p>Mida</p>
-       <ul class="fontsize">
-        <li id="text-small">A</li>
-        <li id="text-normal" class="font-selected">A</li>
-        <li id="text-big">A</li>
-        <li id="text-huge">A</li>
-       </ul>
+      <label>Mida de la font</label>
+		<div class="setting-option">
+	        <div id="slider-font"></div>
+		</div>
      </div>
      <div class="settings">
-      <p>Contrast</p>
-       <ul class="contrast">
-        <li id="text-negre"><span>A</span></li>
-        <li id="text-gris"><span class="selected">A</span></li>
-        <li id="text-blanc"><span>A</span></li>
-       </ul>
-     </div>
-     <div id ="alignment" class="settings selector1">
-      <p>Justificaci&oacute;</p>
-       <ul>
-        <li><img id="text-left" src="@IOCPATH@img/left.png" alt="Alinea a la dreta"/></li>
-        <li><img id="text-justify" src="@IOCPATH@img/justify.png" alt="Justifica el text"/></li>
-       </ul>
-     </div>
-     <div id ="hyphen" class="settings selector1">
-      <p>Partici&oacute;</p>
-       <ul>
-        <li id="hyphenation"><img src="@IOCPATH@img/hyphenation.png" alt="Activa la partici&oacute; sil·l&agrave;bica"/></li>
-        <li id="hyphenatioff"><img src="@IOCPATH@img/hyphenatioff.png" alt="Desactivar la partici&oacute; sil·l&agrave;bica"/></li>
-       </ul>
-     </div>
-     <div class="settings">
-      <p>Default</p>
-      <span class="default"><img id="reset" src="@IOCPATH@img/reset-settings.png" alt="Alinea a la dreta"/></span>
+      <label>Opcions</label>
+	  <div class="setting-option">
+       <form action="" class="sett-options">
+		<ul>
+		    <li><input type="checkbox" id="secondary-content" name="text-negre" /><label for="text-negre">Mostra recursos complementaris</label></li>
+		    <li><input type="checkbox" id="main-images" /><label for="text-gris">Mostra imatges</label></li>
+		    <li><input type="checkbox" id="text-alignment" /><label for="text-alignment">Text justificat</label></li>
+			<li><input type="checkbox" id="text-hyphen" /><label for="text-hyphen">Partici&oacute; sil·l&agrave;bica</label></li>
+		</ul>
+       </form>
+	  </div>
      </div>
      </div>
     </div>
@@ -166,7 +164,7 @@
 	 </article>
     </div>
     <footer>
-      <p><small class="footer">&copy; Copyright Institut Obert de Catalunya 2011. All Rights Reserved.</small></p>
+      <p><small>&copy; Copyright Institut Obert de Catalunya 2011. All Rights Reserved.</small></p>
     </footer>
 </div>
 

@@ -26,7 +26,7 @@ static $max_menu = 100;
 static $max_navmenu = 50;
 static $media_path = 'lib/exe/fetch.php?media=';
 $menu_html = '';
-static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
+static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
 $tree_names = array();
 static $web_folder = 'WebContent';
 
@@ -67,12 +67,15 @@ if ($res === TRUE) {
     //Get index source
     $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
     $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 2);
+    $text_index = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_index, 1);
     //Get search source
     $text_search = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'search.html');
     $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 2);
+    $text_search = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_search, 1);
     //Get template source
     $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
     $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
+    $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
     //Create index page
     $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $menu_html);
     $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
@@ -406,15 +409,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
         if ($type === 'root'){
             $menu_html = '<li id="'.$id.'" class="rootnode">';
-            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
+            $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
             $menu_html .= '</li>';
         }elseif ($type === 'unit'){
             $menu_html = '<li id="'.$id.'" class="parentnode">';
-            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
+            $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
-            $menu_html .= '<h4><a href="'.$href.'">'.$name.'</a></h4>';
+            $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
             $menu_html .= '<ul>';
         }elseif ($type === 'activity'){
             $menu_html = '<li id="'.$id.'">';
@@ -563,7 +566,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      */
     function createMeta($data){
 
-        $meta .= '<h1 class="nocount">'.(isset($data['creditnom'])?$data['creditnom']:'').'</h1>';
+        $meta .= '<h1 class="headmainindex">'.(isset($data['creditnom'])?$data['creditnom']:'').'</h1>';
         $meta .= '<div class="metainfo">';
         $meta .= '<img src="img/portada.png" alt="'.(isset($data['familia'])?$data['familia']:'').'" />';
         $meta .= '<ul>';
