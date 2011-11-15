@@ -19,11 +19,11 @@ require_once DOKU_INC.'inc/parser/xhtml.php';
 global $conf;
 
 static $def_unit_href = 'introduccio.html';
-static $def_section_href = 'continguts.html';
+static $def_section_href = 'continguts';
 $exportallowed = FALSE;
 $id = getID();
 static $max_menu = 100;
-static $max_navmenu = 50;
+static $max_navmenu = 70;
 static $media_path = 'lib/exe/fetch.php?media=';
 $menu_html = '';
 static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
@@ -60,6 +60,7 @@ $zip = new ZipArchive;
 $res = $zip->open(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
 if ($res === TRUE) {
     list($menu_html, $files_name) = createMenu($data[0]);
+    //Get build.js and add which filenames will be used to search
     $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
     $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
     $zip->addFromString('_/js/build.js', $build);
@@ -76,6 +77,7 @@ if ($res === TRUE) {
     $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
     $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
     $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
+    $text_template = preg_replace('/@IOCCOPYTEXT@/', $data[1]['copytext'], $text_template, 1);
     //Create index page
     $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $menu_html);
     $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
@@ -141,8 +143,8 @@ if ($res === TRUE) {
                 foreach ($section as $ka => $act){
                     $text = io_readFile(wikiFN($act));
                     list($header, $text) = extractHeader($text);
-                    $toc = getTOC($text);
-                    $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href,$def_section_href,''));
+                    //$toc = getTOC($text);
+                    $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href,$def_section_href.'.html',''));
                     preg_match_all('/\{\{([^}|?]*)[^}]*\}\}/', $text, $matches);
                     array_push($files, $matches[1]);
                     $instructions = get_latex_instructions($text);
@@ -228,7 +230,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $time = round($time_end - $time_start, 2);
             $result = array('zip', $media_path.$dest.':'.$filename.'&time='.gettimeofday(TRUE), $filename, $filesize, $time, $error);
         }else{
-            $result = 'Error en la creació del arixu: ' . $filename;
+            $result = 'Error en la creació del arxiu: ' . $filename;
         }
         echo json_encode($result);
     }
@@ -403,6 +405,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      */
     function setMenu($type='', $name='', $href='', $id=''){
         global $max_menu;
+        global $def_section_href;
 
         if (strlen($name) > $max_menu){
             $name = substr($name, 0, $max_menu) . '...';
@@ -417,7 +420,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
-            $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
+            $menu_html .= '<p id="'.$id.$def_section_href.'"><a href="'.$href.'">'.$name.'</a></p>';
             $menu_html .= '<ul>';
         }elseif ($type === 'activity'){
             $menu_html = '<li id="'.$id.'">';
@@ -436,6 +439,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     function createMenu($elements){
         global $web_folder;
         global $tree_names;
+        global $def_section_href;
 
         $files = array();
         $menu_html = '';
@@ -482,7 +486,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                      $section_name = $ks;
                 }
                 $tree_names[$ku][$ks]['sectionname']=$section_name;
-                $menu_html .= setMenu('section', $section_name, '#', $ku.$ks);
+                //Comprovar si existeix continguts.html $def_section_href i enllaçar la secció
+                $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$ks.'/'.$def_section_href.'.html';
+                $menu_html .= setMenu('section', $section_name, $act_href, $ku.$ks);
                 foreach ($section as $ka => $act){
                     $text = io_readFile(wikiFN($act));
                     $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html';
@@ -490,11 +496,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
                         $act_name = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
                         $tree_names[$ku][$ks][$ka]=$act_name;
+                        $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
                     }else{//File continguts has a short name
                         $act_name = 'Contingut';
                         $tree_names[$ku][$ks]['continguts']=$act_name;
                     }
-                    $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                 }
                 //Close menu activities
@@ -658,18 +664,20 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $navigation = '<ul class="webnav"><li><a href="'.$index_path.'index.html" title="Tornar a l\'inici">Inici</a></li>';
         if (!is_null($options)){
             foreach ($options as $k => $op){
-                if ((strlen($op) > $max_navmenu) && $k < (count($options)-1)){
-                    $op = substr($op, 0, $max_navmenu) . '...';
+                if ($op != 'Contingut'){
+                    if ((strlen($op) > $max_navmenu) && $k < (count($options)-1)){
+                        $op = substr($op, 0, $max_navmenu) . '...';
+                    }
+                    $navigation .= '<li>';
+                    if (!empty($refs[$k]) && (isset($options[$k+1]) && $options[$k+1] != 'Contingut')){
+                        $navigation .= '<a href="'.$refs[$k].'">';
+                    }
+                    $navigation .= $op;
+                    if (!empty($refs[$k]) && (isset($options[$k+1]) && $options[$k+1] != 'Contingut')){
+                        $navigation .= '</a>';
+                    }
+                    $navigation .= '</li>';
                 }
-                $navigation .= '<li>';
-                if (!empty($refs[$k])){
-                    $navigation .= '<a href="'.$refs[$k].'">';
-                }
-                $navigation .= $op;
-                if (!empty($refs[$k])){
-                    $navigation .= '</a>';
-                }
-                $navigation .= '</li>';
             }
         }
         $navigation .= '</ul>';

@@ -1,5 +1,4 @@
 define (["render"],function(render){
-
 	var ltoc = parseInt($("#toc").css('left'),10);
 	var lbridge = parseInt($("#bridge").css('left'),10);
 	var lfavcount = parseInt($("#favcounter").css('left'),10);
@@ -370,7 +369,7 @@ define (["render"],function(render){
 								url = url.replace(/fav_ok/, 'favorites');
 							}
 							$(obj).find('a>img').attr('src', url);
-							editFavorite(document.location.pathname);
+							editFavorite(document.location.pathname,false);
 					 	}
 				 	}
 				 }
@@ -434,7 +433,7 @@ define (["render"],function(render){
 	  		$(".metainfobr").addClass('hidden');
 			$("#header .head").css('margin-top', '0px');
 			$("#header .headdocument").removeClass('hidden');
-			$(".headtoc h1 img").addClass('rotateup');
+			$(".headtoc h1 img").removeClass('rotateup');
 			$(".headtoc").css('margin-top', -$("#content").outerHeight(true)+$(".headtoc h1").outerHeight(true)-40);
 			if (parseInt($(window).height()) > parseInt($(".indextoc").outerHeight(true))){
 				$(".headtoc").css('height','100%');
@@ -455,7 +454,7 @@ define (["render"],function(render){
 		    }
 			$("#header .head").css('margin-top', htop);
 			$("#header .headdocument").addClass('hidden');
-			$(".headtoc h1 img").removeClass('rotateup');			
+			$(".headtoc h1 img").addClass('rotateup');			
 			$(".headtoc").css('margin-top', -$(".headtoc h1").outerHeight(true));
 			$(".headtoc").css('height','auto');
 			$(".indextoc").hide();
@@ -464,25 +463,29 @@ define (["render"],function(render){
 	});
 
 	//Add or remove a url inside cookie
-	var editFavorite = (function(url){
+	var editFavorite = (function(url,idheader){
 		var info = getcookie();
 		if (info){
 			var object = $.parseJSON(info);
 			var urls = [];
-			if(object.fav[0]['urls'].indexOf(url)!==-1){
-				var patt = new RegExp(";;"+url+"\\|.*?(?=$|;;)", 'g');
+			var patt = new RegExp(";;"+url+"\\|.*?(?=$|;;)", 'g');
+			if(patt.test(object.fav[0]['urls'])){
 				urls=object.fav[0]['urls'].replace(patt, "");
 				setCookieProperty("urls", urls);
 				setFavCounter(urls);
 			}else{
-				title = $("h1").text();
-				title = title.replace(/ /,"");
+				if (idheader){
+					title = $("h2 > a[id="+idheader+"]").closest("h2").text();
+				}else{
+					title = $("h1").text();
+					title = title.replace(/ /,"");
+				}
 				if (title == ""){
 					title = url;
 				}
-				url = ";;" + url + "|" + title;
-				setCookieProperty("urls", object.fav[0]['urls']+url);
-				setFavCounter(object.fav[0]['urls']+url);
+				url = object.fav[0]['urls'] + ";;" + url + "|" + title;
+				setCookieProperty("urls", url);
+				setFavCounter(url);
 			}
 		}
 	});
@@ -501,12 +504,26 @@ define (["render"],function(render){
 	var setFavButton = (function (info){
 		if (info){
 			var url = document.location.pathname;
-			if(info.fav[0]['urls'].indexOf(url)!==-1){
+			var patt = new RegExp(";;"+url+"\\|.*?(?=$|;;)", 'g');
+			if(patt.test(info.fav[0]['urls'])){
 				var obj = $("#menu li[name=favorites]").find('a>img')
 				src = $(obj).attr('src');
 				src = src.replace(/\w+(?=\.png)/, 'fav_ok');
 				$(obj).attr('src', src);
 			}
+		}
+	});
+
+	var setFavHeaders = (function (info){
+		if (info){
+			var url = document.location.pathname;
+			var patt;
+			$("h2").each(function(i){
+				patt = new RegExp(";;"+url+"#"+$(this).children("a").attr("id")+"\\|.*?(?=$|;;)", 'g');
+				if(patt.test(info.fav[0]['urls'])){
+					$(this).children("span").removeClass().addClass("starmarked").show();
+				}
+			});
 		}
 	});
 
@@ -520,17 +537,20 @@ define (["render"],function(render){
 			var unit = '';
 			var section = '';
 			var info = '';
-			var list = '<ul>';
+			var list = '<div class="menucontent">';
+			list += '<ul class="favlist">';
+			result.sort();
 			for (url in result){
 				data = result[url].split("|");
 				unit = result[url].match(pattu);
-				unit = (unit)?unit + " -> ":'';
+				unit = (unit)?unit + "<span></span>":'';
 				section = result[url].match(patts);
-				section = (section)?section+" -> ":''
+				section = (section)?section+"<span></span>":''
 				info =  unit + section;
 				list += '<li><a href="'+data[0]+'">'+info+' '+data[1]+'</a></li>';				
 			}
 			list += '</ul>';
+			list += '</div>';
 			$("#favorites").html(list);
 			$("#favorites").removeClass("hidden");		
 			$("#bridge").removeClass('hidden').addClass("tinybridge");
@@ -596,6 +616,7 @@ define (["render"],function(render){
 			settings(object);
 			sidemenu(object);
 			setFavButton(object);
+			setFavHeaders(object);
 			if(pageIndex()){
 				indexToc(object.toc[0]['tvisible']==1);
 			}
@@ -643,8 +664,9 @@ define (["render"],function(render){
 	});
 	
 	//Show and hide list elements
-	$(".expander ul").hide();
-	$(".expander p").live("click", function() {
+/*	$(".expander ul").hide();
+	$(".expander .tocsection").live("hover", function() {
+		$(this) = $(this).children("p");
 		$(this).toggleClass("tocdown");
 	    var $nestList = $(this).siblings("ul");
 	    if ($(this).parent().children("ul").css('display') != 'none'){
@@ -658,7 +680,31 @@ define (["render"],function(render){
 			$(this).closest("li").children("p").removeClass("tocdown");
 		});
 	});
+*/
 	
+	//Show and hide list elements
+	$(".expander ul").hide();
+/*	$(".expander .tocsection").live({
+		mouseenter: function() {
+			var node = $(this).children("p").filter(":first-child");
+			if ($(node).hasClass("tocdown")){
+				return;
+			}
+			$(".tocsection > p").removeClass("tocdown");
+			$(node).addClass("tocdown");
+			var $nestList = $(node).siblings("ul");
+			if ($(node).parent().children("ul").css('display') != 'none'){
+				$(node).parent().children("ul").css('display','none', function(){
+					//$(this).closest("li").children("p").removeClass("tocdown");
+				});
+			}else{
+				$(node).parent().children("ul").show('fast');
+			}
+			$(node).parent().siblings().children().filter('ul').css('display', 'none', function(){
+				//$(this).closest("li").children("p").removeClass("tocdown");
+			});
+		}
+	});*/
 	//$(".expander p > a[href='#']").live("click", function(e) {
 	$("a[href='#']").live("click", function(e) {
 		e.preventDefault();
@@ -690,12 +736,16 @@ define (["render"],function(render){
 				'margin-top': $(window).height()-$(".headtoc h1").outerHeight(true)-$(".head").outerHeight(true)
 			},1500);
 			$("#header .headdocument").addClass('hidden');
-			$(".headtoc h1 img").removeClass('rotateup');
 			$(".metainfobc").removeClass('hidden');
 			$(".metainfobr").removeClass('hidden');
 			$(".headtoc").animate({
 				'margin-top': -$(".headtoc h1").outerHeight(true)
-			},1500, function(){$(".indextoc").hide();$(".headtoc").css('height','auto');});
+			},1500, function(){
+						$(".indextoc").hide();
+						$(".headtoc").css('height','auto');
+						$(".headtoc h1 img").addClass('rotateup');
+					}
+			);
 			$("#headtoc").removeClass("headtopup").addClass("headtopdown");
 			setCookieProperty('tvisible', 0);
 		}else{
@@ -703,10 +753,14 @@ define (["render"],function(render){
 				'margin-top': '0px'
 			},1500);
 			$("#header .headdocument").removeClass('hidden');
-			$(".headtoc h1 img").addClass('rotateup');
 			$(".headtoc").animate({
 				'margin-top': -$("#content").outerHeight(true)+$(".headtoc h1").outerHeight()-40
-			},1500,function(){$(".metainfobc").addClass('hidden');$(".metainfobr").addClass('hidden');});
+			},1500,function(){
+						$(".metainfobc").addClass('hidden');
+						$(".metainfobr").addClass('hidden');
+						$(".headtoc h1 img").removeClass('rotateup');
+					}
+			);
 			if (parseInt($(window).height()) > parseInt($(".indextoc").outerHeight(true))){
 				$(".headtoc").css('height','100%');
 			}
@@ -736,6 +790,32 @@ define (["render"],function(render){
 				   setFontsize(ui.value);
                   }
 	});
+
+	$("h2").each(function(i){
+		$(this).append('<span class="star"></span>').children("span").hide();		
+	});
+	
+	$("h2").live("hover", function(){
+			if ($(this).children("span").hasClass("star")){
+				if ($(this).children("span").css("display") !== 'none'){
+					$(this).children("span").hide();
+				}else{
+					$(this).children("span").show();
+				}
+			}
+	});
+
+	$("h2").live("click", function(){
+		var id = $(this).children("a").attr("id");
+		editFavorite(document.location.pathname+"#"+id,id);
+		if ($(this).children("span").hasClass("star")){
+			$(this).children("span").removeClass().addClass("starmarked");
+		}else{
+			$(this).children("span").removeClass().addClass("star");
+		}	
+	});
+
+
 	//Initialize menu and settings params
 	get_params();
 	setNumberHeader();

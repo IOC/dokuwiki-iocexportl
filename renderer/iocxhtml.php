@@ -1200,6 +1200,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 $ret .= '<figcaption>'.$figtitle.'</figcaption>';
             }elseif(!$this->table){
                 $ret .= '<div class="iocfigurec">'.DOKU_LF;
+                $ret .= '<ul>'.DOKU_LF;
+                $ret .= '<li>'.DOKU_LF;
             }
             //add image tag
             //$ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
@@ -1234,19 +1236,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
             }elseif(!$this->table){
+                $ret .= '</li>';
                 if ($title) {
                     $title = preg_replace('/\/[+-]?\d+$/', '', $title);
-                    $src = mediaFN($src);
-                    if (file_exists($src)) {
-                        $info  = getimagesize($src);
-                        $width  = $info[0];
-                    }
-                    if ($width > 180){
-                        $width = 180;
-                    }
-                    $width = ($width)?'style="width:'.$width.'px"':"";
-                    $ret .= '<small '.$width.'>'.$title.'</small>'.DOKU_LF;
+                    $ret .= '<li><small>'.$title.'</small></li>'.DOKU_LF;
                 }
+                $ret .= '</ul>';
                 $ret .= '</div>'.DOKU_LF;
             }
 
