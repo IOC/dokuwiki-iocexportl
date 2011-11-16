@@ -273,6 +273,18 @@ mark {
 /* Print styles!
 -------------------------------------------------------------------------------*/
 @media print {
+  #aside, #sidebar-hide, #navmenu, .search, footer div{
+  display:none!important;
+}
+
+article{
+ width:90%!important;
+}
+
+.headdocument{
+ text-shadow: none!important;
+ letter-spacing: 0.1em!important;
+}
 }
 
 /* Media queries!
@@ -280,20 +292,6 @@ mark {
 
 /* Consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
 @media screen and (max-device-width: 480px) {
- .navigation{
-  width: 40px !important;
- }
- 
- .navigation div{
-  font-size:11pt !important;
-  font-weight:bold !important;
-  top:60px !important;
-  right:1px !important;
- }
- 
- aside ul li a {
-  font-size:18pt !important;
- }
 }
 
 @media all and (orientation: portrait) {
@@ -441,6 +439,7 @@ footer div:before{
 footer div{
  height:100%;
  width:50%;
+ min-width:770px;
  display:inline-block;
  vertical-align:middle;
  margin:0;
@@ -528,7 +527,7 @@ h4 {
  content:'';
 }
 
-.nocount{
+h1 .nocount{
  margin-bottom:0;
 }
 
@@ -762,6 +761,14 @@ p {
  z-index: 2;
 }
 
+#toc .rootnode{
+ margin-top:2em;
+ text-align: right;
+}
+#toc .rootnode a{
+ font-size:100%;
+}
+ 
 #toc .parentnode > ul{
  display:block;
  margin-top:3em;
@@ -874,6 +881,9 @@ border-bottom:1px solid #989898;
  z-index: 3;
 }
 
+#favcounter:hover{
+ cursor:pointer;
+}
 
 #favcounter a:before{
  content:""
@@ -934,14 +944,15 @@ border-bottom:1px solid #989898;
 
 #favorites {
  position: fixed;
- top: 326px;
- left: 55px;
+ top:326px;
+ left:55px;
  display: block;
  overflow: auto;
- padding: 1%;
+ padding:1%;
  background-color: #ffffff;
  font-family: Georgia;
  font-size:80%;
+ max-width:70%;
  -moz-user-select: none;
  -moz-border-radius-bottomright: 10px;
  -moz-border-radius-topright: 10px;
@@ -1344,9 +1355,15 @@ div.solution{
  background: none repeat scroll 0 0 #F2F6FA;
  border: 2px solid #D9E4F0;
  display: none;
- margin: 1em 0;
+ margin: 1em auto;
  padding: 0.4em 1em;
- width:40%;
+ width:60%;
+ text-align:center;
+}
+
+.quiz .btn_solution, .quiz .btn_solution2, .quiz .btn_solution3{
+ display:block;
+ margin:0 auto;
 }
 
 /* Search results
@@ -1394,7 +1411,7 @@ div.solution{
 }
 
 .search-result li{
- margin: .5em 0 0;
+ margin: .2em 0 0;
  padding: 1em;
  list-style:none;
 }
@@ -1672,7 +1689,6 @@ figcaption span:after{
  clear:right;
  display:block;
  padding: 1em 0;
- font-size: 90%;
 }
 
 .ioctable .titletable{
@@ -1698,6 +1714,7 @@ figcaption span:after{
 
 /******************* FIGUREC **************************/
 .iocfigurec{
+ -moz-border-radius: 10px 0 10px 0;
  border-radius: 10px 0 10px 0;
  background-color:#EFEFEF;
  margin: 0 auto;
@@ -1759,8 +1776,9 @@ article table {
   border-bottom:1px solid;
   border-left:0 none;
   border-right:0 none; 
-          
+  font-size: 90%;
 }
+
 article table th{
  background-color: transparent;
  border-top:0 none;
@@ -1824,6 +1842,7 @@ article figure img{
 .iocexample .ioccontent p.ioctitle{
 	margin-bottom: 2em !important;
 	font-size:120%;
+	font-weight:bold;
 }
 
 .iocquote .ioccontent{
@@ -1858,6 +1877,7 @@ article figure img{
  clear: left;
  overflow: hidden;
  border-radius: 10px 0 10px 0;
+ -moz-border-radius: 10px 0 10px 0;
 }
  
 
@@ -1903,7 +1923,7 @@ article figure img{
  font-size:0.85em;
 }
 
-.style-inverse .ioctextl,.style-inverse .ioctext,.style-inverse .iocimportant,.style-inverse .iocnote,.style-inverse .iocreference,.style-inverse .iocfigurec small {
+.style-inverse .ioctextl,.style-inverse .ioctext,.style-inverse .iocimportant,.style-inverse .iocnote,.style-inverse .iocreference,.style-inverse .iocfigurec small{
  color:#000;
 }
 
@@ -1936,6 +1956,45 @@ article figure img{
 }
 
 .star:before{
+ content:"";
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+
+.mediaflash{
+ width:80%;
+ margin:0 auto;
+ text-align:center;
+}
+
+.mediavideo{
+ text-align:center;
+}
+
+.mediazip{
+ width:50%;
+ margin:0 auto;
+ background:url("../../img/zip.png") no-repeat scroll 5px 50% #EFEFEF;
+ border:1px solid #ccc;
+ height:35px;
+ padding:5px 5px 5px 45px;
+ border-radius: 10px 0 10px 0;
+ -moz-border-radius: 10px 0 10px 0;
+}
+
+.mediazip a{
+ color: #000000 !important;
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+
+.mediazip a:hover{
+ text-decoration:underline;
+}
+
+.mediazip a:before{
  content:"";
  display:inline-block;
  height:100%;

@@ -1260,11 +1260,36 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $att['class'] = "media$align";
             if($align == 'right') $att['align'] = 'right';
             if($align == 'left')  $att['align'] = 'left';
-            $ret .= html_flashobject(ml($src,array('cache'=>$cache),true,'&'),$width,$height,
+            $src = '../media/'.basename(str_replace(':', '/', $src));
+            $ret .= '<div class="mediaflash">';
+            $ret .= html_flashobject($src,$width,$height,
+                                    array('quality' => 'high'),
+                                    null,
+                                    $att,
+                                    $this->_xmlEntities($title));
+            $ret .= '</div>';
+            /*$ret .= html_flashobject(ml($src,array('cache'=>$cache),true,'&'),$width,$height,
                                      array('quality' => 'high'),
                                      null,
                                      $att,
-                                     $this->_xmlEntities($title));
+                                     $this->_xmlEntities($title));*/
+        }elseif($mime == 'application/zip'){
+            // well at least we have a title to display
+            if (!is_null($title)) {
+                $title  = $this->_xmlEntities($title);
+            }else{
+                $title = 'Arxiu sense t&iacute;tol';
+            }
+            resolve_mediaid(getNS($src),&$src,&$exists);
+            if ($exists){
+                $filesize = filesize(mediaFN($src));
+                $filesize = ' | '.filesize_h($filesize);
+            }
+            $src = '../media/'.basename(str_replace(':', '/', $src));
+            $ret .= '<div class="mediazip">';
+            $ret .= '<a href="../media/'.basename(str_replace(':', '/', $src)).'">'.$title.'</a>'.
+                    '<span>'.$filesize.'</span>';
+            $ret .= '</div>';
         }elseif($title){
             // well at least we have a title to display
             $ret .= $this->_xmlEntities($title);

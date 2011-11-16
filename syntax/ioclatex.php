@@ -113,6 +113,12 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
         return FALSE;
     }
 
+    /**
+     *
+     * Function returns whether latex command is a reseved word
+     * @param string $text
+     * @return boolean
+     */
     function reservedWords($text){
         $words = array('\\\\newpage','\\\\enlargethispage');
         return preg_match('/'.implode('|', $words).'/', $text);

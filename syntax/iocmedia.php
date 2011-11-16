@@ -18,8 +18,9 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 
-    static $vimeo = 'http://player.vimeo.com/video/@VIDEO@';
+    static $vimeo = 'http://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
     static $youtube = 'http://www.youtube.com/watch?v=@VIDEO@';
+    //http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1
 
    /**
     * Get an associative array with plugin info.
@@ -59,6 +60,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
      */
 
     function handle($match, $state, $pos, &$handler){
+        // remove {{ }}
         $command = substr($match,2,-2);
 
         // title
@@ -70,30 +72,55 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
         // get site and video
         list($site,$url) = explode('>',$command);
 
-        //remove imgb number
-        $match = preg_replace('/(vimeo|youtube).*?>/', '', $match);
-        return array($match, $site, $url, $title);
+        // what size?
+        list($url,$param) = explode('?',$url,2);
+        if(preg_match('/(\d+)x(\d+)/i',$param,$m)){
+            // custom
+            $width  = $m[1];
+            $height = $m[2];
+        }elseif(strpos($param,'small') !== false){
+            // small
+            $width  = 255;
+            $height = 210;
+        }elseif(strpos($param,'large') !== false){
+            // large
+            $width  = 520;
+            $height = 406;
+        }else{                                          // medium
+            $width  = 425;
+            $height = 350;
+        }
+
+        return array($site, $url, $title, $width, $height);
     }
 
    /**
     * output
     */
-    function render($mode, &$renderer, $indata) {
+    function render($mode, &$renderer, $data) {
         if ($mode === 'iocexportl'){
-            list($data, $site, $url, $title) = $indata;
+            list($site, $url, $title) = $data;
             if($site === 'vimeo' || $site === 'youtube'){
                 $_SESSION['qrcode'] = TRUE;
                 $type = ($site === 'vimeo')?self::$vimeo:self::$youtube;
-                $data = preg_replace('/@VIDEO@/', $url, $type);
-                qrcode_media_url($renderer, $data, $title, $site);
+                $url = preg_replace('/@VIDEO@/', $url, $type);
+                qrcode_media_url($renderer, $url, $title, $site);
             }
             return TRUE;
         }elseif ($mode === 'ioccounter'){
             $renderer->doc .= $title;
-        }elseif ($mode === 'xhtml'){
-            $renderer->doc .= '<a href="'.$data.'" title="'.$title.'">'.$data.'</a>';
-        }elseif ($mode === 'iocxhtml'){
-            $renderer->doc .= '<a href="'.$data.'" title="'.$title.'">'.$data.'</a>';
+        }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
+            list($site, $url, $title, $width, $height) = $data;
+            if($site === 'vimeo' || $site === 'youtube'){
+                $type = ($site === 'vimeo')?self::$vimeo:self::$youtube;
+                $url = preg_replace('/@VIDEO@/', $url, $type);
+            }
+            $renderer->doc .= '<div class="mediavideo">';
+            $renderer->doc .= html_flashobject(
+                            $url,
+                            $width,
+                            $height);
+            $renderer->doc .= '</div>';
         }
         return FALSE;
     }
