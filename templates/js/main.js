@@ -6,11 +6,8 @@ require.ready(function(){
 				render.infoTable();
 				render.infoFigure();
 			});
-			require(["quiz", "functions","searchtools"], function(quiz,func,Search){
+			require(["functions","quiz","searchtools"], function(func,quiz,Search){
 				Search.init();
-				if (/search\.html/.exec(document.location.pathname)){
-					func();
-				}
 			});
 		});
 	});

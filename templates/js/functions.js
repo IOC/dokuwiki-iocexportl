@@ -70,10 +70,6 @@ define (["render"],function(render){
 		}
 	});
 
-    $('#search').click(function() {
-    	showSearch();
-    });
-    
     //Contrast
     $('#style-newspaper').click(function() {
    	 	setContrast(0);
@@ -127,7 +123,7 @@ define (["render"],function(render){
     $('#main-images').click(function() {
 		if ($(this).attr("checked")){
 			setMainFig(1);
-			render.infoFigure();
+			//render.infoFigure();
 			setCookieProperty('ioc_html','mimages', 1);
 		}else{
 			setMainFig(0);
@@ -169,15 +165,11 @@ define (["render"],function(render){
 		}
     });
 
-    $('#favcounter a').click(function(e) {
-		e.preventDefault();
-    });
-    
-	var showSearch = (function (){
-		$("#imgsearch").addClass("hidden");
-    	$("#frmsearch").removeClass("hidden");
-    	$("#frmsearch").addClass("visible");
-    	$("input[name='q']").focus();
+   
+	$("#frmsearch input[name='q']").on('keypress', function (event){
+		if (event.which === 13){
+			$("#frmsearch").submit();
+		}
 	});
 
 	var setFontsize = (function (info){
@@ -189,8 +181,8 @@ define (["render"],function(render){
 			}
 			$("article").removeClass(options[i]);
 		}
-		render.infoTable();
-		render.infoFigure();
+		//render.infoTable();
+		//render.infoFigure();
 		setCookieProperty('ioc_html','fontsize', info);
 	});
 
@@ -248,8 +240,8 @@ define (["render"],function(render){
 			}
 			$("article").removeClass(options[i]);
 		}
-		render.infoTable();
-		render.infoFigure();
+		//render.infoTable();
+		//render.infoFigure();
 		setCookieProperty('ioc_html','width', info);
 	});
 
@@ -376,6 +368,16 @@ define (["render"],function(render){
 							}
 							$(obj).find('a>img').attr('src', url);
 							editFavorite(document.location.pathname,false);
+					 	}else{
+							if(type === 'help_icon'){
+								url = $(obj).find('a>img').attr('src');
+								if (/help_icon\./.test(url)){
+									url = url.replace(/help_icon/, 'help_icon_active');
+								}else{
+									url = url.replace(/help_icon_active/, 'help_icon');
+								}
+								$(obj).find('a>img').attr('src', url);
+						 	}
 					 	}
 				 	}
 				 }
@@ -410,7 +412,7 @@ define (["render"],function(render){
 		        	  $(this).show();
 		          });
 		          $('#'+parent_node+"> ul").show();
-		          $('#'+parent_node+"> ul").closest("li").children("p").addClass("tocdown");
+		          $('#'+parent_node+"> p > .buttonexp").addClass("tocdown");
 		      }
 		}
         if (node != ''){
@@ -532,9 +534,37 @@ define (["render"],function(render){
 			$("h2").each(function(i){
 				patt = new RegExp(";;"+url+"#"+$(this).children("a").attr("id")+"\\|.*?(?=$|;;)", 'g');
 				if(patt.test(info.fav[0]['urls'])){
-					$(this).children("span").removeClass().addClass("starmarked").show();
+					$(this).children("span[name='star']").removeClass().addClass("starmarked").show();
 				}
 			});
+		}
+	});
+
+	var setCheckExercises = (function (info){
+		if (info){
+			var url = document.location.pathname;
+			var patt;
+			$("h2").each(function(i){
+				patt = new RegExp(";;"+url+"\\|"+$(this).children("a").attr("id"), 'g');
+				if(patt.test(info.quiz[0]['urls'])){
+					$(this).children("span[name='check']").addClass("check").css('display','inline-block');
+				}
+			});
+		}
+	});
+
+	var editCheckExercise = (function(url,idheader){
+		console.log(url +' ' +idheader);
+		var info = getcookie('ioc_quizzes');
+		if (info){
+			var object = $.parseJSON(info);
+			var urls = [];
+			var patt = new RegExp(";;"+url+"\\|"+idheader, 'g');
+			if(!patt.test(object.quiz[0]['urls'])){
+				url = object.quiz[0]['urls'] + ";;" + url + "|" + idheader;
+				$("h2 > a[id='"+idheader+"']").siblings("span[name='check']").addClass("check").css('display','inline-block');
+				setCookieProperty('ioc_quizzes','urls', url);
+			}
 		}
 	});
 
@@ -637,6 +667,13 @@ define (["render"],function(render){
 			}else{
 				setcookie('ioc_bookmarks',defaultbookmarks);
 			}
+			info = getcookie('ioc_quizzes');
+			if (info!=null && info!=""){
+				object = $.parseJSON(info);
+				setCheckExercises(object);
+			}else{
+				setcookie('ioc_quizzes',defaultbookquizzes);
+			}
 
 		}else{
 			if(ispageIndex()){
@@ -684,49 +721,21 @@ define (["render"],function(render){
 	});
 	
 	//Show and hide list elements
-/*	$(".expander ul").hide();
-	$(".expander .tocsection").live("hover", function() {
-		$(this) = $(this).children("p");
-		$(this).toggleClass("tocdown");
-	    var $nestList = $(this).siblings("ul");
-	    if ($(this).parent().children("ul").css('display') != 'none'){
-			$(this).parent().children("ul").css('display','none', function(){
-				$(this).closest("li").children("p").removeClass("tocdown");
-			});
-		}else{
-			$(this).parent().children("ul").show('fast');
-		}
-		$(this).parent().siblings().children().filter('ul').css('display', 'none', function(){
-			$(this).closest("li").children("p").removeClass("tocdown");
-		});
-	});
-*/
-	
-	//Show and hide list elements
 	$(".expander ul").hide();
-/*	$(".expander .tocsection").live({
-		mouseenter: function() {
-			var node = $(this).children("p").filter(":first-child");
-			if ($(node).hasClass("tocdown")){
-				return;
-			}
-			$(".tocsection > p").removeClass("tocdown");
-			$(node).addClass("tocdown");
-			var $nestList = $(node).siblings("ul");
-			if ($(node).parent().children("ul").css('display') != 'none'){
-				$(node).parent().children("ul").css('display','none', function(){
-					//$(this).closest("li").children("p").removeClass("tocdown");
-				});
-			}else{
-				$(node).parent().children("ul").show('fast');
-			}
-			$(node).parent().siblings().children().filter('ul').css('display', 'none', function(){
-				//$(this).closest("li").children("p").removeClass("tocdown");
-			});
+	$(".expander .tocsection .buttonexp").on("click", function() {
+		$("#toc .buttonexp").removeClass("tocdown");
+		var parent = $(this).closest("li");
+		if ($(this).closest("p").siblings("ul").css('display') == 'none'){
+			$(this).addClass("tocdown");
 		}
-	});*/
-	//$(".expander p > a[href='#']").live("click", function(e) {
-	//$("a[href='#']").live("click", function(e) {
+	    if ($(parent).children("ul").css('display') != 'none'){
+			$(parent).children("ul").css('display','none');
+		}else{
+			$(parent).children("ul").show('fast');
+		}
+		$(parent).siblings().children().filter('ul').css('display', 'none');
+	});
+
 	$(document).on("click", "a[href='#']", function(e) {
 		e.preventDefault();
 	});
@@ -813,18 +822,21 @@ define (["render"],function(render){
 	});
 
 	$("h2").each(function(i){
-		$(this).append('<span class="star"></span>').children("span").hide();		
+		if(ispageExercise()){
+			$(this).append('<span name="check"></span>');
+		}
+		$(this).append('<span class="star" name="star"></span>').children("span").hide();
 	});
 	
 	$("h2 > a").hover( 
 		function(){
-			if ($(this).siblings("span").hasClass("star")){
-				$(this).siblings("span").show();
+			if ($(this).siblings("span[name='star']").hasClass("star")){
+				$(this).siblings("span[name='star']").show();
 			}
 		},
 		function(){
-			if ($(this).siblings("span").hasClass("star")){
-				$(this).siblings("span").hide();
+			if ($(this).siblings("span[name='star']").hasClass("star")){
+				$(this).siblings("span[name='star']").hide();
 			}
 		}
 	);
@@ -832,11 +844,11 @@ define (["render"],function(render){
 	$(document).on("click", "h2", function(){
 		var id = $(this).children("a").attr("id");
 		editFavorite(document.location.pathname+"#"+id,id);
-		if ($(this).children("span").hasClass("star")){
-			$(this).children("span").removeClass().addClass("starmarked");
-			$(this).children("span").show();
+		if ($(this).children("span[name='star']").hasClass("star")){
+			$(this).children("span[name='star']").removeClass().addClass("starmarked");
+			$(this).children("span[name='star']").show();
 		}else{
-			$(this).children("span").removeClass().addClass("star");
+			$(this).children("span[name='star']").removeClass().addClass("star");
 		}	
 	});
 
@@ -848,8 +860,8 @@ define (["render"],function(render){
 	setNumTabRef();
 	if(ispageExercise()){
 		$("h2").each(function(i){
-			$(this).addClass('nocount');		
+			$(this).addClass('nocount');
 		});
 	}
-	return showSearch;
+	return {"editCheckExercise":editCheckExercise};
 });

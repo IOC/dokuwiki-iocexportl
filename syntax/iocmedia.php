@@ -19,8 +19,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 
     static $vimeo = 'http://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
-    static $youtube = 'http://www.youtube.com/watch?v=@VIDEO@';
-    //http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1
+    static $youtube = 'http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1';
 
    /**
     * Get an associative array with plugin info.

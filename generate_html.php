@@ -82,6 +82,7 @@ if ($res === TRUE) {
     $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $menu_html);
     $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
     $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/', '', $menu_html_index);
+    $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
     $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
     $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
     $html = preg_replace('/@IOCMETA@/',createMeta($data[1]), $html, 1);
@@ -98,14 +99,13 @@ if ($res === TRUE) {
     $html = preg_replace('/@IOCPATH@/', '', $html);
     $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
     $zip->addFromString('search.html', $html);
-    //Remove menu index tags
+    //Remove menu index and expander tags
     $menu_html = preg_replace('/@IOCSTARTINDEX@|@IOCENDINDEX@/', '', $menu_html);
+    $menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $menu_html);
     if (isset($data[0]['intro'])){
         if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $menu_html, $matches)){
-            //            print_r($matches);die;
             $menu_html_intro = $matches[1];
             $menu_html = preg_replace('/@IOCSTARTINTRO@.*?@IOCENDINTRO@/', '', $menu_html, 1);
-            //            print_r($menu_html);die;
         }
         //Intro
         foreach ($data[0]['intro'] as $page){
@@ -319,6 +319,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $result = array();
                     if (preg_match('/^[I|i]ndex/', $content)){
                         $result = explode(DOKU_LF,$content);
+                        $result = array_filter($result);
                         @array_shift($result);
                         $ns = str_replace('/', ':', $ns);
                         $sort = TRUE;
@@ -399,7 +400,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Create side menu elements
      */
-    function setMenu($type='', $name='', $href='', $id=''){
+    function setMenu($type='', $name='', $href='', $id='',$index=FALSE){
         global $max_menu;
         global $def_section_href;
 
@@ -407,7 +408,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $name = substr($name, 0, $max_menu) . '...';
         }
         if ($type === 'root'){
-            $menu_html = '<li id="'.$id.'" class="rootnode">';
+            $class = ($index)?'indexnode':'rootnode';
+            $menu_html = '<li id="'.$id.'" class="'.$class.'">';
             $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
             $menu_html .= '</li>';
         }elseif ($type === 'unit'){
@@ -416,7 +418,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
-            $menu_html .= '<p id="'.$id.$def_section_href.'"><a href="'.$href.'">'.$name.'</a></p>';
+            $menu_html .= '<p id="'.$id.$def_section_href.'"><a href="'.$href.'">'.$name.'</a>';
+            $menu_html .= '@IOCSTARTEXPANDER@<span class="buttonexp"></span>@IOCENDEXPANDER@';
+            $menu_html .= '</p>';
             $menu_html .= '<ul>';
         }elseif ($type === 'activity'){
             $menu_html = '<li id="'.$id.'">';
@@ -506,7 +510,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             //Link to index
             $menu_html .= '@IOCSTARTINDEX@';
             $href = '@IOCPATH@index.html';
-            $menu_html .= setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href);
+            $menu_html .= setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
             $menu_html .= '@IOCENDINDEX@';
             $menu_html .= '@IOCENDUNIT@';
         }

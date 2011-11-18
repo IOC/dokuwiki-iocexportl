@@ -1,8 +1,9 @@
-define (function(){
-	var checkquiz = function(e){
+define (["functions"],function(func){
+	var checkquiz = function(e,func){
 	  var target = jQuery(e);
 	  var form = target.parents('form');
 	  var quiz = form.parent();
+	  var div = quiz.parent();
 	  var quiztype = form.find("input[name='qtype']").val();
 	  var numitems = form.find("input[name='qnum']").val();
 	  var solution = form.find("input[name='qsol']").val();
@@ -54,6 +55,7 @@ define (function(){
 	  if(quiztype !== 'vf'){
 		if (values){
 		  res = '<p class="ok">Correcte</p>';
+		  func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 		}else{
 		  res = '<p class="ko">Erroni</p>';
 		}
@@ -61,6 +63,7 @@ define (function(){
 		  var resp = values.join(',');
 		  if (solution == resp){
 			res = '<p class="ok">Correcte</p>';
+			func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 		  }else{
 			res = '<p class="ko">Erroni</p>';
 		  }
@@ -71,6 +74,8 @@ define (function(){
 	var checkquiz2 = function(e){
 	  var target = jQuery(e);
 	  var form = target.parents('form');
+	  var quiz = form.parent();
+	  var div = quiz.parent();
 	  var solutions = [];
 	  
 	  form.find('select').each(function(){
@@ -97,7 +102,10 @@ define (function(){
 			  break;
 		  }
 	  }
-	  if (resp == '') resp = '<p class="ok">Correcte</p>';
+	  if (resp == ''){
+		  resp = '<p class="ok">Correcte</p>';
+		  func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
+	  }
 	  showsolution(target, resp);
 	} 
 
@@ -134,9 +142,8 @@ define (function(){
 		}
 		return false;
 	}
-	
-	$('.btn_solution').click(function (){
-		checkquiz(this);
+	$('.btn_solution').on("click",function (){
+		checkquiz(this,func);
 	});
 	
 	$('.btn_solution2').click(function (){

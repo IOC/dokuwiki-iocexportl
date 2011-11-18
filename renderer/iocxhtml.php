@@ -1169,8 +1169,23 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     function _media ($src, $title=NULL, $align=NULL, $width=NULL,
                       $height=NULL, $cache=NULL, $render = true) {
 
-        $ret = '';
+        static $documents = array('application/vnd.oasis.opendocument.text',
+                        'application/vnd.oasis.opendocument.spreadsheet',
+                        'application/vnd.oasis.opendocument.presentation',
+                        'application/vnd.oasis.opendocument.graphics',
+                        'application/vnd.ms-excel',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-powerpoint',
+                        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
+        );
+        $ret = '';
+        $path = '';
+        if ($_SESSION['activities']){
+            $path = '../';
+        }
         list($ext,$mime,$dl) = mimetype($src);
         if(substr($mime,0,5) == 'image'){
             // first get the $title
@@ -1205,7 +1220,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }
             //add image tag
             //$ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
-            $ret .= '<img src="../media/'.basename(str_replace(':', '/', $src)).'"';
+            $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
 /*            if ($width && $height){
                 $ret .= ' width="'.$width.'" height="'.$height.'"';
             }*/
@@ -1260,7 +1275,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $att['class'] = "media$align";
             if($align == 'right') $att['align'] = 'right';
             if($align == 'left')  $att['align'] = 'left';
-            $src = '../media/'.basename(str_replace(':', '/', $src));
+            $src = $path.'media/'.basename(str_replace(':', '/', $src));
             $ret .= '<div class="mediaflash">';
             $ret .= html_flashobject($src,$width,$height,
                                     array('quality' => 'high'),
@@ -1268,12 +1283,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                                     $att,
                                     $this->_xmlEntities($title));
             $ret .= '</div>';
-            /*$ret .= html_flashobject(ml($src,array('cache'=>$cache),true,'&'),$width,$height,
-                                     array('quality' => 'high'),
-                                     null,
-                                     $att,
-                                     $this->_xmlEntities($title));*/
-        }elseif($mime == 'application/zip'){
+        }elseif($dl){
             // well at least we have a title to display
             if (!is_null($title)) {
                 $title  = $this->_xmlEntities($title);
@@ -1283,11 +1293,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             resolve_mediaid(getNS($src),&$src,&$exists);
             if ($exists){
                 $filesize = filesize(mediaFN($src));
-                $filesize = ' | '.filesize_h($filesize);
+                $filesize = ' ( '.filesize_h($filesize) .' )';
             }
-            $src = '../media/'.basename(str_replace(':', '/', $src));
-            $ret .= '<div class="mediazip">';
-            $ret .= '<a href="../media/'.basename(str_replace(':', '/', $src)).'">'.$title.'</a>'.
+            $src = $path.'media/'.basename(str_replace(':', '/', $src));
+            $ret .= '<div class="mediaf file'.$ext.'">';
+            $ret .= '<a href="'.$path.'media/'.basename(str_replace(':', '/', $src)).'">'.$title.'</a>'.
                     '<span>'.$filesize.'</span>';
             $ret .= '</div>';
         }elseif($title){

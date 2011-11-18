@@ -223,12 +223,12 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
     }
 
     function printquiz($text, $mode, $renderer){
-        if ($this->class != 'complete' && $this->class != 'relations'){
-            preg_match('/(.*?\n)+(?=\n+  \*)/', $text, $matches);
-            $text = str_replace($matches[0], '', $text);
-            $instructions = get_latex_instructions($matches[0]);
-            $renderer->doc .=  p_latex_render('iocxhtml', $instructions, $info);
-        }
+        //Get and print statement
+        preg_match('/^(?<!  \*)(.*?\n)+(?=\n+  \*)/', $text, $matches);
+        $text = str_replace($matches[0], '', $text);
+        $instructions = get_latex_instructions($matches[0]);
+        $renderer->doc .=  p_latex_render('iocxhtml', $instructions, $info);
+        //Get options
         preg_match_all('/  \*(.*?)\n/', $text, $matches);
         $renderer->doc .= '<div id="id_'.$this->class.'_'.md5($text).'" class="quiz">';
         $renderer->doc .= '<form action="">';
@@ -245,6 +245,12 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
         $cont = 1;
         $renderer->doc .= '</tr>';
         foreach ($matches[1] as $k => $m){
+            if (($this->class === 'complete' || $this->class === 'relations') &&
+                preg_match('/^\s*-/',$m)){
+                $instructions = get_latex_instructions($m);
+                p_latex_render('iocxhtml', $instructions, $info);
+                continue;
+            }
             $renderer->doc .= '<tr>';
             $renderer->doc .= '<td>'.($k+1).'</td>';
             $instructions = get_latex_instructions($m);
