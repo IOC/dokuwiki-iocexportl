@@ -18,6 +18,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
 
+    var $footer;
     /**
      * return some info
      */
@@ -180,13 +181,14 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                         if (isset($params['title'])){
                             $_SESSION['fig_title'] = $params['title'];
                         }
+                        $this->footer = (isset($params['footer']))?$params['footer']:'';
                         $_SESSION['figure'] = TRUE;
                         $instructions = get_latex_instructions($text);
                         $renderer->doc .= p_latex_render($mode, $instructions, $info);
                         $_SESSION['figure'] = FALSE;
                         $_SESSION['fig_title'] = '';
-                        if (isset($params['footer'])){
-                            $renderer->doc .= $params['footer'].'<br />';
+                        if (!empty($this->footer)){
+                            $renderer->doc .= '<div class="footfigure">'.$this->footer.'</div>';
                         }
                         break;
                     case DOKU_LEXER_EXIT :

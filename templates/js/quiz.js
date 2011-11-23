@@ -8,6 +8,7 @@ define (["functions"],function(func){
 	  var numitems = form.find("input[name='qnum']").val();
 	  var solution = form.find("input[name='qsol']").val();
 	  var solutions = solution.split(',');
+	  var ok = false;
 	  
 	  if (quiztype == 'vf'){
 		var values = [];
@@ -55,20 +56,24 @@ define (["functions"],function(func){
 	  if(quiztype !== 'vf'){
 		if (values){
 		  res = '<p class="ok">Correcte</p>';
+		  ok = true;
 		  func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 		}else{
 		  res = '<p class="ko">Erroni</p>';
+		  ok = false;
 		}
 	  }else{
 		  var resp = values.join(',');
 		  if (solution == resp){
 			res = '<p class="ok">Correcte</p>';
+			ok = true;
 			func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 		  }else{
 			res = '<p class="ko">Erroni</p>';
+			ok = false;
 		  }
 	  }
-	  showsolution(target, res);
+	  showsolution(target, res, ok);
 	}
 
 	var checkquiz2 = function(e){
@@ -77,6 +82,7 @@ define (["functions"],function(func){
 	  var quiz = form.parent();
 	  var div = quiz.parent();
 	  var solutions = [];
+	  var ok = false;
 	  
 	  form.find('select').each(function(){
 		  var select = jQuery(this);
@@ -99,21 +105,28 @@ define (["functions"],function(func){
 	  for(i=0, l=solutions.length; i<l; i++){
 		  if (solutions[i] == 'F'){
 			  resp = '<p class="ko">Erroni</p>';
+			  ok = false;
 			  break;
 		  }
 	  }
 	  if (resp == ''){
 		  resp = '<p class="ok">Correcte</p>';
+		  ok = true;
 		  func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 	  }
-	  showsolution(target, resp);
+	  showsolution(target, resp, ok);
 	} 
 
-	var showsolution = function(target, text){
+	var showsolution = function(target, text, ok){
 	  var form = target.parents('form');
 	  var quiz = target.parents('div');
 	  
 	  if (quiz.is('div.quiz')){
+		if (ok){
+			jQuery(form).parent().children(".quiz_result").removeClass("quiz_ko").addClass("quiz_ok");
+		}else{
+			jQuery(form).parent().children(".quiz_result").removeClass("quiz_ok").addClass("quiz_ko");
+		}
 		jQuery(form).parent().children(".quiz_result").hide().fadeOut("slow").html(text).fadeIn("slow");
 	  }else{
 		alert(text);

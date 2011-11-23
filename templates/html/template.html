@@ -88,11 +88,11 @@
    <aside id="aside">
     <div id="menu">
       <ul>
-       <li name="toc"><a href="#" title="&Iacute;ndex"><img src="@IOCPATH@img/toc.png" alt="Index"/></a></li>
-       <li name="settings"><a href="#" title="Opcions"><img src="@IOCPATH@img/settings.png" alt="Ajust"/></a></li>
-       <li name="printer"><a href="#" title="Imprimir"><img src="@IOCPATH@img/printer.png" alt="Imprimir"/></a></li>
-       <li name="favorites"><a href="#" title="Afegir la p&agrave;gina actual a favorits"><img src="@IOCPATH@img/favorites.png" alt="Favorits"/></a></li>
-       <li name="help_icon" class="help_icon"><a href="#" title="Ajuda"><img src="@IOCPATH@img/help_icon.png" alt="Ajuda"/></a></li>
+       <li name="toc"><div><img src="@IOCPATH@img/toc.png" alt="Index"/></div></li>
+       <li name="settings"><div><img src="@IOCPATH@img/settings.png" alt="Ajust"/></div></li>
+       <li name="printer"><div><img src="@IOCPATH@img/printer.png" alt="Imprimir"/></div></li>
+       <li name="favorites"><div><img src="@IOCPATH@img/favorites.png" alt="Favorits"/></div></li>
+       <li name="help_icon" class="help_icon"><div><img src="@IOCPATH@img/help_icon.png" alt="Ajuda"/></div></li>
       </ul>
      </div>
    </aside>
@@ -152,11 +152,30 @@
    </div>
    </section>
  <section>
- <div id="favorites" class="hidden">
- </div>
+ <div id="favorites" class="hidden"></div>
  </section>   
  <div id="bridge" class="hidden"></div>
- <div id="favcounter" class="hidden"><a href="#"></a></div>
+ <div id="help" class="hidden">
+  <div class="helptitle">Dreceres del teclat<hr></div>
+  <div class="helpsection"><span>General</span>
+   <ul>
+    <li><span class="shortcut">t</span>: Anar al men&uacute; de navegaci&oacute;</li>
+    <li><span class="shortcut">o</span>: Anar a opcions</li>
+    <li><span class="shortcut">s</span>: Guardar la p&agrave;gina actual a favorits</li>
+    <li><span class="shortcut">p</span>: Imprimir la p&agrave;gina actual</li>
+    <li><span class="shortcut">?</span>: Mostrar/Ocultar l&#39;ajuda</li>
+   </ul>
+  </div>
+  <div class="helpsection"><span>Navegaci&oacute;</span>
+   <ul>
+    <li><span class="shortcut">i</span>: Anar a l&#39;&iacute;ndex general</li>
+    <li><span class="shortcut">h</span>: Anar a l&#39;inici de p&agrave;gina</li>
+    <li><span class="shortcut">j</span>: Anar cap endavant dintre la p&agrave;gina</li>
+    <li><span class="shortcut">k</span>: Anar cap enrere dintre la p&agrave;gina</li>
+   </ul>
+   </div>
+ </div>
+ <div id="favcounter" name="favcounter" class="hidden"><span></span></div>
  <div id="navmenu" class="navmenu">@IOCNAVMENU@</div>
 	<div id="content" lang="ca" class="hyphenate text">
      <article lang="ca" class="sheet">
@@ -167,6 +186,14 @@
     <footer>
       <div><small>@IOCCOPYTEXT@</small></div>
     </footer>
-</div>  
+ </div>
+ <div id="help-tooltips">
+  <div id="help-toc" class="hidden tooltip">TOC Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div> 
+  <div id="help-settings" class="hidden tooltip">SETTINGS Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-printer" class="hidden tooltip">PRINTER Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-favorites" class="hidden tooltip">FAVORITES Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-favcounter" class="hidden tooltip">FAVCOUNTER Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-help_icon" class="hidden tooltip">HELPICONAquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+</div> 
 </body>
 </html>

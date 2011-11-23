@@ -17,6 +17,7 @@ require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
 
+    var $footer;
     var $id;
     var $type;
     var $vertical;
@@ -220,7 +221,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }else{
                             $renderer->doc .= '<div class="iocaccounting">';
                         }
-                        $this->footer = (isset($params['footer']))?isset($params['footer']):'';
+                        $this->footer = (isset($params['footer']))?$params['footer']:'';
                         $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';
                         $renderer->doc .= '<span>Taula</span>';
                         $renderer->doc .= '</a>';

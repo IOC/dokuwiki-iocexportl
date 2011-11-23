@@ -275,7 +275,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $class = 'code'; //we always need the code class to make the syntax highlighting apply
             if($type != 'code') $class .= ' '.$type;
 
-            $this->doc .= "<pre class=\"$class $language\">".p_xhtml_cached_geshi($text, $language, '').'</pre>'.DOKU_LF;
+            $this->doc .= "<pre class=\"$class $language\">".$this->p_iocxhtml_cached_geshi($text, $language, '').'</pre>'.DOKU_LF;
         }
 
         if($filename){
@@ -1309,5 +1309,45 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
 
         return $ret;
+    }
+
+    function p_iocxhtml_cached_geshi($code, $language, $wrapper='pre') {
+        global $conf, $config_cascade;
+        $language = strtolower($language);
+
+        // remove any leading or trailing blank lines
+        $code = preg_replace('/^\s*?\n|\s*?\n$/','',$code);
+
+        $cache = getCacheName($language.$code,".code");
+        $ctime = @filemtime($cache);
+        if($ctime && !$_REQUEST['purge'] &&
+        $ctime > filemtime(DOKU_INC.'inc/geshi.php') &&                 // geshi changed
+        $ctime > @filemtime(DOKU_INC.'inc/geshi/'.$language.'.php') &&  // language syntax definition changed
+        $ctime > filemtime(reset($config_cascade['main']['default']))){
+            // dokuwiki changed
+            $highlighted_code = io_readFile($cache, false);
+
+        } else {
+
+            $geshi = new GeSHi($code, $language, DOKU_INC . 'inc/geshi');
+            $geshi->set_encoding('utf-8');
+            $geshi->enable_classes();
+            $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+            $geshi->set_line_style('background: #fcfcfc;');
+            $geshi->set_header_type(GESHI_HEADER_PRE);
+            $geshi->set_link_target($conf['target']['extern']);
+
+            // remove GeSHi's wrapper element (we'll replace it with our own later)
+            // we need to use a GeSHi wrapper to avoid <BR> throughout the highlighted text
+            $highlighted_code = trim(preg_replace('!^<pre[^>]*>|</pre>$!','',$geshi->parse_code()),"\n\r");
+            io_saveFile($cache,$highlighted_code);
+        }
+
+        // add a wrapper element if required
+        if ($wrapper) {
+            return "<$wrapper class=\"code $language\">$highlighted_code</$wrapper>";
+        } else {
+            return $highlighted_code;
+        }
     }
 }

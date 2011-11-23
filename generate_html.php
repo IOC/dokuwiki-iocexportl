@@ -18,7 +18,7 @@ require_once DOKU_INC.'inc/parser/xhtml.php';
 
 global $conf;
 
-static $def_unit_href = 'introduccio.html';
+//static $def_unit_href = 'introduccio.html';
 static $def_section_href = 'continguts';
 $exportallowed = FALSE;
 $id = getID();
@@ -136,6 +136,8 @@ if ($res === TRUE) {
             $menu_html_unit = $matches[1];
             $menu_html = preg_replace('/@IOCSTARTUNIT@.*?@IOCENDUNIT@/', '', $menu_html, 1);
         }
+        $def_unit_href = $unit['def_unit_href'];
+        unset($unit['def_unit_href']);
         foreach ($unit as $ks => $section){
             if (is_array($section)){
                 //Activities
@@ -143,7 +145,7 @@ if ($res === TRUE) {
                 foreach ($section as $ka => $act){
                     $text = io_readFile(wikiFN($act));
                     list($header, $text) = extractHeader($text);
-                    $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href,$def_section_href.'.html',''));
+                    $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$def_section_href.'.html',''));
                     preg_match_all('/\{\{([^}|?]*)[^}]*\}\}/', $text, $matches);
                     array_push($files, $matches[1]);
                     $instructions = get_latex_instructions($text);
@@ -317,6 +319,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $ns = preg_replace('/:/' ,'/', $ns);
                     $content = io_readFile($conf['datadir'].'/'.$ns.'/index.txt');
                     $result = array();
+                    $def_unit_href='';
+                    $unit_act = '';
                     if (preg_match('/^[I|i]ndex/', $content)){
                         $result = explode(DOKU_LF,$content);
                         $result = array_filter($result);
@@ -335,8 +339,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         if (!preg_match('/:(pdfindex|imatges|index)$/', $pagename)){
                             preg_match('/:(u\d+):/', $pagename, $unit);
                             preg_match('/:(a\d+):/', $pagename, $section);
+                            if (empty($section) && empty($def_unit_href)){
+                                $def_unit_href = preg_replace('/([^:]*:)+/','',$pagename);
+                            }
                             if (!empty($unit[1]) && !isset($data[$unit[1]])){
                                 $data[$unit[1]] = array();
+                                $unit_act = $unit[1];
+                            }
+                            if (isset($data[$unit_act]) && empty($data[$unit_act]['def_unit_href'])){
+                                $data[$unit_act]['def_unit_href'] = $def_unit_href;
                             }
                             if (!empty($section[1]) && !isset($data[$unit[1]][$section[1]])){
                                 $data[$unit[1]][$section[1]] = array();
@@ -459,9 +470,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '@IOCSTARTUNIT@';
             $tree_names[$ku] = array();
             //Section
-            $menu_html .= setMenu('unit',$unit['iocname'], '#', $ku);
+            $menu_html .= setMenu('unit',$unit['iocname'], '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$unit['def_unit_href'].'.html', $ku);
             unset($unit['iocname']);
             //First main pages
+            unset($unit['def_unit_href']);
             foreach ($unit as $ks => $section){
                 if (!is_array($section)){
                     $text = io_readFile(wikiFN($section));
