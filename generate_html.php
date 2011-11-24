@@ -163,7 +163,7 @@ if ($res === TRUE) {
             }else{
                 $text = io_readFile(wikiFN($section));
                 list($header, $text) = extractHeader($text);
-                $navmenu = createNavigation('../../',array($unitname,$tree_names[$ku][$ks]), array($def_unit_href,''));
+                $navmenu = createNavigation('../../',array($unitname,$tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
                 preg_match_all('/\{\{([^}|]+)[^}]*\}\}/', $text, $matches);
                 array_push($files, $matches[1]);
                 $instructions = get_latex_instructions($text);

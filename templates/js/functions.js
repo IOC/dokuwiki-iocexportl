@@ -17,32 +17,59 @@ define (["render"],function(render){
 	$('#menu li div img').hover(
 		function(e){
 			if(showtooltips){
-				showhelp($(this).closest("li"),true);
+				showhelp($(this).closest("li"),true,false);
 			}
 		},
 		function(e){
 			if(showtooltips){
-				showhelp($(this).closest("li"),false);
+				showhelp($(this).closest("li"),false,false);
 			}
 		}
+	);
+	
+	$('#sidebar-hide img').hover(
+			function(e){
+				if(showtooltips){
+					showhelp($(this).parent(),true,false);
+				}
+			},
+			function(e){
+				if(showtooltips){
+					showhelp($(this).parent(),false,false);
+				}
+			}
+	);
+	
+	$('#search > form > input').hover(
+			function(e){
+				if(showtooltips){
+					showhelp($(this).closest("div"),true,false);
+				}
+			},
+			function(e){
+				if(showtooltips){
+					showhelp($(this).closest("div"),false,false);
+				}
+			}
 	);
 	
 	$('#favcounter span').hover(
 			function(e){
 				if(showtooltips){
-					showhelp($(this).parent(),true);
+					showhelp($(this).parent(),true,false);
 				}
 			},
 			function(e){
 				if(showtooltips){
-					showhelp($(this).parent(),false);
+					showhelp($(this).parent(),false,false);
 				}
 			}
 		);
 
 	$('#content').click(function(e) {
-		setmenu(null);
-		$("#help").addClass("hidden");
+		if (!$("#help").hasClass("hidden")){
+			setmenu($("#menu li[name='help_icon']"));
+		}
 	});
 
 	$('#sidebar-hide').click(function(e) {
@@ -206,23 +233,31 @@ define (["render"],function(render){
 	});
 	
 	$(window).on('keypress', function (event){
+		if(ispageIndex() || ispageSearch()){
+			return;
+		}
 		//ESC
 		if (event.which === 0){
-			$("#help").addClass("hidden");
+			event.preventDefault();
+			if (!$("#help").hasClass("hidden")){
+				setmenu($("#menu li[name='help_icon']"));
+			}
 		}else{
 			//?
 			if (event.which === 63){
-				$("#help").toggleClass("hidden");
+				setmenu($("#menu li[name='help_icon']"));
 			}else{
 				if (!focussearch){
 					switch(event.which){
+						//b
+						case 98:$(window).scrollTop($("footer").offset().top);
+							 break;
+					
 						//h
 						case 104:$(window).scrollTop(0);
 								 break;
 						//i
-						case 105:if(!ispageIndex()){
-									document.location.href = $("#navmenu ul > li > a").attr("href");
-								 }
+						case 105:document.location.href = $("#navmenu ul > li > a").attr("href");
 				 		 		 break;
 		 		 		//j
 						case 106:$(window).scrollTop($(window).scrollTop()+100)
@@ -231,24 +266,16 @@ define (["render"],function(render){
 						case 107:$(window).scrollTop($(window).scrollTop()-100);
 						 		 break;
 				 		//o
-						case 111:if(!ispageIndex()){
-									setmenu($("#menu li[name='settings']"));
-								 }
+						case 111:setmenu($("#menu li[name='settings']"));
 						 		 break;
 						//p
-						case 112:if(!ispageIndex()){
-									setmenu($("#menu li[name='printer']"));
-								 }
+						case 112:setmenu($("#menu li[name='printer']"));
 						 		 break;
 				 		//s
-						case 115:if(!ispageIndex()){
-									setmenu($("#menu li[name='favorites']"));
-								 }
+						case 115:setmenu($("#menu li[name='favorites']"));
 						 		 break;
 				 		//t					 		 
-						case 116:if(!ispageIndex()){
-									setmenu($("#menu li[name='toc']"));
-								 }
+						case 116:setmenu($("#menu li[name='toc']"));
 				 		 		 break;
 					}
 				}
@@ -455,14 +482,14 @@ define (["render"],function(render){
 							editFavorite(document.location.pathname,false);
 					 	}else{
 							if(type === 'help_icon'){
+								$("#help").toggleClass("hidden");
 								url = $(obj).find('div>img').attr('src');
 								if (/help_icon\./.test(url)){
 									url = url.replace(/help_icon/, 'help_icon_active');
 									showtooltips = true;
-									showhelp($(obj),true);
 								}else{
 									url = url.replace(/help_icon_active/, 'help_icon');
-									showhelp($(obj),false);
+									hidetooltips();
 									showtooltips = false;
 								}
 								$(obj).find('div>img').attr('src', url);
@@ -479,21 +506,42 @@ define (["render"],function(render){
 			var type = $(this).attr("name");
 			var tooltip = $('#help-'+type);
 			var item_pos = $(this).offset();
-			tooltip.css('top',item_pos.top-tooltip.outerHeight() - 45);
+			tooltip.css('top',item_pos.top-tooltip.outerHeight(true) - 12);
 		});
 		var item = $("#favcounter").offset();
-		$("#help-favcounter").css('top',item.top-$("#help-favcounter").outerHeight() - 55);
+		$("#help-favcounter").css('top',item.top-$("#help-favcounter").outerHeight(true) - 25);
+		item = $("#sidebar-hide").offset();
+		$("#help-sidebar-hide").css({top:item.top-$("#help-sidebar-hide").outerHeight(true) - 25,
+									left:item.left + 40
+		});
+		item = $("#search input[type='text']").offset();
+		$("#help-search").css({top:item.top + $("#help-search").outerHeight(true) + 15,
+							  left:item.left + ($("#help-search").outerWidth(true)/2) - 157
+		});
+	});
+	
+	var hidetooltips = (function (){
+		$("#help-tooltips > div").each(function(){
+			$(this).addClass("hidden");
+		});
 	});
 
 	
-	var showhelp = (function (obj, show){
-		var type = $(obj).attr("name");
+	var showhelp = (function (obj, show, header){
+		var type = (header)?'header':$(obj).attr("name");
 		var tooltip = $('#help-'+type);
 		if(show){
 			tooltip.removeClass('hidden');
-			tooltip.fadeTo("slow", 1);
+			tooltip.fadeTo("fast", 1);
 		}else{
-			tooltip.fadeTo("slow", 0, function(){tooltip.addClass('hidden');});
+			tooltip.fadeTo("fast", 0, function(){tooltip.addClass('hidden');});
+		}
+
+		if (header && show){
+			var item_pos = $(obj).offset();
+			tooltip.css({top:item_pos.top - (tooltip.outerHeight()/2) + 13,
+						left:item_pos.left + $(obj).width() + 40
+			});
 		}
 	});
 	
@@ -543,6 +591,11 @@ define (["render"],function(render){
 	var ispageIndex = (function (){
 		var url = document.location.pathname;
 		return /index\.html|.*?\/(?!.*?\.html$)/.test(url);
+	});
+	
+	var ispageSearch = (function (){
+		var url = document.location.pathname;
+		return /search\.html/.test(url);
 	});
 	
 	var ispageExercise = (function (){
@@ -673,7 +726,6 @@ define (["render"],function(render){
 	});
 
 	var editCheckExercise = (function(url,idheader){
-		console.log(url +' ' +idheader);
 		var info = getcookie('ioc_quizzes');
 		if (info){
 			var object = $.parseJSON(info);
@@ -836,6 +888,10 @@ define (["render"],function(render){
 	jQuery(window).resize(function() {
 		if (ispageIndex()){
 			indexToc($(".indextoc").css('display') !== 'none');
+		}else{
+			if(!ispageSearch()){
+				calpostooltips();
+			}
 		}
 	});
 	
@@ -947,15 +1003,34 @@ define (["render"],function(render){
 		$(this).append('<span class="star" name="star"></span>').children("span").hide();
 	});
 	
+	$("h1 > a").hover( 
+			function(){
+				if(showtooltips){
+					showhelp($(this),true,true);
+				}
+			},
+			function(){
+				if(showtooltips){
+					showhelp($(this),false,true);
+				}
+			}
+	);
+	
 	$("h2 > a,h3 > a,h4 > a").hover( 
 		function(){
 			if ($(this).siblings("span[name='star']").hasClass("star")){
 				$(this).siblings("span[name='star']").show();
 			}
+			if(showtooltips){
+				showhelp($(this),true,true);
+			}
 		},
 		function(){
 			if ($(this).siblings("span[name='star']").hasClass("star")){
 				$(this).siblings("span[name='star']").hide();
+			}
+			if(showtooltips){
+				showhelp($(this),false,true);
 			}
 		}
 	);
@@ -987,6 +1062,8 @@ define (["render"],function(render){
 			$(this).addClass('nocount');
 		});
 	}
-	calpostooltips();
+	if(!ispageIndex() && !ispageSearch()){
+		calpostooltips();
+	}
 	return {"editCheckExercise":editCheckExercise};
 });

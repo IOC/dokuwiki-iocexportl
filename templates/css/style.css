@@ -316,7 +316,7 @@ header {
  min-width: 550px;
  min-height: 40px;
  background-color: #f5f1e8;
- z-index: 100;
+ z-index: 4;
 }
 
 nav {
@@ -428,6 +428,7 @@ border-right:none;
 }
 
 #sidebar-hide:hover{
+ cursor:pointer;
  opacity: 1;
 }
 #content {
@@ -483,6 +484,7 @@ h1 {
  font-weight:normal;
  border-bottom: 1px solid #000000;
  margin-bottom:2em;
+ line-height:1em;
 }
 
 h1:before{
@@ -496,6 +498,7 @@ h2 {
  font-size: 130%;
  font-weight:normal;
  margin:2em 0 1em 0;
+ line-height:1em;
 }
 
 h2:before{
@@ -512,7 +515,7 @@ h3 {
  font-size: 110%;
  font-weight:normal;
  letter-spacing: -0.05em;
- line-height: 1.14;
+ line-height: 1.14em;
  margin:1.5em 0 0.5em;
 }
 
@@ -530,7 +533,7 @@ h4 {
  font-weight:normal;
  margin-bottom:0.5em;
  letter-spacing: -0.05em;
- line-height: 1.14
+ line-height: 1.14em;
 }
 
 h4 a:hover{
@@ -1294,7 +1297,7 @@ border-bottom:1px solid #989898;
  position:fixed;
  top:65px;
  right:15px;
- z-index:49;
+ z-index:2;
 }
 
 .upbutton:hover{
@@ -1360,9 +1363,9 @@ div.solution{
  background: none repeat scroll 0 0 #F2F6FA;
  border: 2px solid #D9E4F0;
  display: none;
- margin: 1em 0;
+ margin: 0.4em auto;
  padding: 0.4em 1em;
- width:40%;
+ width:80%;
 }
 
 .quiz_result {
@@ -2184,37 +2187,46 @@ article figure img{
 /******************* TOOLTIPS **************************/
 
 .tooltip {
-    -moz-font-feature-settings: normal;
-    -moz-font-language-override: normal;
-    background-color:#000;
-    border: 2px solid #FFFFFF;
-    border-radius: 10px 10px 10px 10px;
-    box-shadow: 0 0 7px black;
-    color: white;
-    display: inline-block;
-    font-family: sans-serif;
-    font-size: 100%;
-    font-size-adjust: none;
-    font-stretch: condensed;
-    font-style: normal;
-    font-variant: normal;
-    left: 70px;
-    line-height: normal;
-    max-width: 350px;
-    padding: 10px 20px;
-    pointer-events: none;
-    position: fixed;
-    text-decoration: none;
-    top:0;
-    opacity:0;
-    z-index: 2;
+ -moz-font-feature-settings: normal;
+ -moz-font-language-override: normal;
+ background-color:#000;
+ border: 2px solid #FFFFFF;
+ border-radius: 10px 10px 10px 10px;
+ box-shadow: 0 0 7px black;
+ color: white;
+ display: inline-block;
+ font-family: sans-serif;
+ font-size: 80%;
+ font-size-adjust: none;
+ font-stretch: condensed;
+ font-style: normal;
+ font-variant: normal;
+ left: 70px;
+ line-height: normal;
+ max-width: 350px;
+ padding: 10px 25px 10px 20px;
+ pointer-events: none;
+ position: fixed;
+ text-decoration: none;
+ top:0;
+ opacity:0;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ -webkit-box-sizing:border-box;
+ z-index: 5;
 }
+
+.tooltip span{
+ color: #FFFF00;
+ font-weight:bold;
+}
+
 .tooltip img {
-    border: 0 none;
-    float: left;
-    right: -8px;
-    position: absolute;
-    top: -8px;
+ border: 0 none;
+ float: left;
+ right: -8px;
+ position: absolute;
+ top: -8px;
 }
 
 .arrow-left:after {
@@ -2226,9 +2238,9 @@ article figure img{
  border: 2px solid #FFFFFF;
  content: "";
  height: 25px;
- left: 25px;
+ left: 28px;
  position: absolute;
- top: 25px;
+ top: 26px;
  width: 25px;
 }
 
@@ -2258,6 +2270,31 @@ article figure img{
  position: absolute;
  left: 20px;
  top: -20px;
+ width: 25px;
+ height: 25px;
+ -webkit-transform: rotate(45deg);
+ -moz-transform:    rotate(45deg);
+ -ms-transform:     rotate(45deg);
+ -o-transform:      rotate(45deg);
+}
+
+.arrow-top {
+ width: 70px;
+ height: 16px;
+ overflow: hidden;
+ position: absolute;
+ left: 50%;
+ margin-left: -35px;
+ top: -16px;
+}
+
+.arrow-top:after {
+ content: "";
+ background-color: #000;
+ border: 2px solid #FFFFFF;
+ position: absolute;
+ left: 20px;
+ top: 5px;
  width: 25px;
  height: 25px;
  -webkit-transform: rotate(45deg);

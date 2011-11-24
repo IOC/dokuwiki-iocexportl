@@ -68,7 +68,8 @@
 	   });
 	   Hyphenator.run();
 	</script>
-	<script src="@IOCPATH@_/js/build.js" type="text/javascript"></script>
+    <script src="@IOCPATH@_/js/build.js" type="text/javascript"></script> 
+<!-- <script data-main="@IOCPATH@_/js/main" src="@IOCPATH@_/js/require.js" type="text/javascript"></script>-->
 </head>
 
 <body class="style-newspaper">
@@ -78,7 +79,7 @@
 	<header id="header">
 		<div class="head"><img src="@IOCPATH@img/logo.png" alt="Institut Obert de Catalunya"/><a href="@IOCREFLICENSE@"><img src="@IOCPATH@img/license.png" alt="Llic&egrave;ncia" class="license"/></a></div>
 		<div class="headdocument">@IOCHEADDOCUMENT@</div>
-        <div id="search" class="search">
+        <div id="search" class="search" name="search">
          <form id="frmsearch" action="@IOCPATH@search.html" method="get">
           <input type="text" name="q"/>
         </form>
@@ -96,7 +97,7 @@
       </ul>
      </div>
    </aside>
-   <a id="sidebar-hide" title="Toggle sidebar display" href="#"><img src="@IOCPATH@img/arrows.png"/></a>
+   <div id="sidebar-hide" name="sidebar-hide"><img src="@IOCPATH@img/arrows.png"/></div>
    <section>
      <div id="toc" class="hidden">
       <div class="menucontent">
@@ -170,6 +171,7 @@
    <ul>
     <li><span class="shortcut">i</span>: Anar a l&#39;&iacute;ndex general</li>
     <li><span class="shortcut">h</span>: Anar a l&#39;inici de p&agrave;gina</li>
+    <li><span class="shortcut">b</span>: Anar al final de p&agrave;gina</li>
     <li><span class="shortcut">j</span>: Anar cap endavant dintre la p&agrave;gina</li>
     <li><span class="shortcut">k</span>: Anar cap enrere dintre la p&agrave;gina</li>
    </ul>
@@ -188,12 +190,15 @@
     </footer>
  </div>
  <div id="help-tooltips">
-  <div id="help-toc" class="hidden tooltip">TOC Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div> 
-  <div id="help-settings" class="hidden tooltip">SETTINGS Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
-  <div id="help-printer" class="hidden tooltip">PRINTER Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
-  <div id="help-favorites" class="hidden tooltip">FAVORITES Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
-  <div id="help-favcounter" class="hidden tooltip">FAVCOUNTER Aquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
-  <div id="help-help_icon" class="hidden tooltip">HELPICONAquest document està subjecte a una llicència oberta de Creative Commons, es reserva el dret de reconeixement de l'autoria, d'exigir que no se'n faci cap mena d'ús comercial. Si altereu o transformeu aquesta obra, o en genereu obres derivades, només podeu distribuir l'obra generada amb una llicència idèntica a aquesta.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-toc" class="hidden tooltip"><span>Taula de continguts:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div> 
+  <div id="help-settings" class="hidden tooltip"><span>Opcions:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-printer" class="hidden tooltip"><span>Imprimir:</span>  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-favorites" class="hidden tooltip"><span>Favorits:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-favcounter" class="hidden tooltip"><span>Comptador i llistat de favorits:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-help_icon" class="hidden tooltip"><span>Ajuda:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-sidebar-hide" class="hidden tooltip"><span>Mostrar/Ocultar barra lateral:</span>  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
+  <div id="help-search" class="hidden tooltip"><span>Cerca:</span>  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed semper sapien non nunc venenatis nec faucibus orci molestie. Vestibulum fringilla, libero at pretium iaculis, ante magna tempus ante, viverra feugiat turpis risus non risus.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-top"></span></div>
+  <div id="help-header" class="hidden tooltip"><span>Cap&ccedil;alera:</span>  Text d'ajuda.<img src="@IOCPATH@img/info.png" alt="Help" height="32" width="32" /><span class="arrow-left"></span></div>
 </div> 
 </body>
 </html>
