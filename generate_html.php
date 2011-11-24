@@ -26,7 +26,7 @@ static $max_menu = 100;
 static $max_navmenu = 70;
 static $media_path = 'lib/exe/fetch.php?media=';
 $menu_html = '';
-static $meta_params = array('autoria', 'ciclenom', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
+static $meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
 $tree_names = array();
 static $web_folder = 'WebContent';
 
@@ -146,7 +146,7 @@ if ($res === TRUE) {
                     $text = io_readFile(wikiFN($act));
                     list($header, $text) = extractHeader($text);
                     $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$def_section_href.'.html',''));
-                    preg_match_all('/\{\{([^}|?]*)[^}]*\}\}/', $text, $matches);
+                    preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
                     array_push($files, $matches[1]);
                     $instructions = get_latex_instructions($text);
                     $html = p_latex_render('iocxhtml', $instructions, $info);
@@ -164,7 +164,7 @@ if ($res === TRUE) {
                 $text = io_readFile(wikiFN($section));
                 list($header, $text) = extractHeader($text);
                 $navmenu = createNavigation('../../',array($unitname,$tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
-                preg_match_all('/\{\{([^}|]+)[^}]*\}\}/', $text, $matches);
+                preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
                 array_push($files, $matches[1]);
                 $instructions = get_latex_instructions($text);
                 $html = p_latex_render('iocxhtml', $instructions, $info);
@@ -593,14 +593,35 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $meta .= '<div class="metainfo">';
         $meta .= '<img src="img/portada.png" alt="'.(isset($data['familia'])?$data['familia']:'').'" />';
         $meta .= '<ul>';
+
+        $coord = (isset($data['coordinacio'])?$data['coordinacio']:'');
+        if (!empty($coord)){
+            $meta .= '<li><strong>Coordinaci&oacute;</strong></li>';
+        }
+        $coord = preg_split('/\s?\\\\\s?/', $coord);
+        foreach ($coord as $co){
+            if (!empty($co)){
+                $meta .= '<li>'.$co.'</li>';
+            }
+        }
         $authors = (isset($data['autoria'])?$data['autoria']:'');
         if (!empty($authors)){
-            $meta .= '<li><strong>Redacció</strong></li>';
+            $meta .= '<li><strong>Redacci&oacute;</strong></li>';
         }
         $authors = preg_split('/\s?\\\\\s?/', $authors);
         foreach ($authors as $auth){
             if (!empty($auth)){
                 $meta .= '<li>'.$auth.'</li>';
+            }
+        }
+        $adapt = (isset($data['adaptacio'])?$data['adaptacio']:'');
+        if (!empty($adapt)){
+            $meta .= '<li><strong>Adaptaci&oacute;</strong></li>';
+        }
+        $adapt = preg_split('/\s?\\\\\s?/', $adapt);
+        foreach ($adapt as $ad){
+            if (!empty($ad)){
+                $meta .= '<li>'.$ad.'</li>';
             }
         }
         $meta .= '</ul>';

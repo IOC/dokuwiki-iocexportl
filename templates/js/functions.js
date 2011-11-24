@@ -67,9 +67,8 @@ define (["render"],function(render){
 		);
 
 	$('#content').click(function(e) {
-		if (!$("#help").hasClass("hidden")){
-			setmenu($("#menu li[name='help_icon']"));
-		}
+		setmenu(null);
+		$("#help").addClass("hidden");
 	});
 
 	$('#sidebar-hide').click(function(e) {
@@ -239,13 +238,12 @@ define (["render"],function(render){
 		//ESC
 		if (event.which === 0){
 			event.preventDefault();
-			if (!$("#help").hasClass("hidden")){
-				setmenu($("#menu li[name='help_icon']"));
-			}
+			$("#help").addClass("hidden");
+			setmenu(null);
 		}else{
 			//?
 			if (event.which === 63){
-				setmenu($("#menu li[name='help_icon']"));
+				$("#help").toggleClass("hidden");
 			}else{
 				if (!focussearch){
 					switch(event.which){
@@ -420,7 +418,7 @@ define (["render"],function(render){
 
 	var sidemenu = (function (info){
 		if (ispageIndex()){
-			setbackground(false);
+			//setbackground(false);
 		}else{
 			$("#toc").css('left', ltoc);
 			$("#settings").css('left', ltoc);
@@ -482,7 +480,6 @@ define (["render"],function(render){
 							editFavorite(document.location.pathname,false);
 					 	}else{
 							if(type === 'help_icon'){
-								$("#help").toggleClass("hidden");
 								url = $(obj).find('div>img').attr('src');
 								if (/help_icon\./.test(url)){
 									url = url.replace(/help_icon/, 'help_icon_active');
@@ -628,7 +625,7 @@ define (["render"],function(render){
 			$("#headtoc").removeClass("headtopdown").addClass("headtopup");
 			$(".indextoc").show();
 		}else{
-	  		$(".meta").css('margin-top','0');
+	  		$(".meta").css('margin-top','5px');
 			$(".metainfobc").removeClass('hidden');
 			$(".metainfobr").removeClass('hidden');
 		    $(".metainfobc").css('margin-top',$(window).height()-$(".headtoc h1").outerHeight(true)-$(".metainfobc").outerHeight()-5);
@@ -904,11 +901,11 @@ define (["render"],function(render){
 			$(this).addClass("tocdown");
 		}
 	    if ($(parent).children("ul").css('display') != 'none'){
-			$(parent).children("ul").css('display','none');
+			$(parent).children("ul").hide('fast');
 		}else{
 			$(parent).children("ul").show('fast');
 		}
-		$(parent).siblings().children().filter('ul').css('display', 'none');
+		$(parent).siblings().children().filter('ul').hide('fast');
 	});
 
 	$(document).on("click", "a[href='#']", function(e) {
@@ -931,9 +928,9 @@ define (["render"],function(render){
 			mtop = parseInt($(".meta").outerHeight(true));
 		}
 		$(".meta").animate({
-				'margin-top': parseInt($(".meta").css('margin-top'),10) == 0 ?
+				'margin-top': parseInt($(".meta").css('margin-top'),10) == 5 ?
 					-mtop :
-					0,
+					'5px',
 				'visible':'inline'
 		},1500);
 		if ($(".indextoc").css('display') !== 'none'){

@@ -1090,8 +1090,9 @@ select.ko{
  vertical-align:baseline;
 }
 div.solution{
- background: none repeat scroll 0 0 #F2F6FA;
- border: 2px solid #D9E4F0;
+ color: #000000 !important;
+ background: none repeat scroll 0 0 #EFEFEF;
+ border: 2px solid #CCCCCC;
  display: none;
  margin: 0.4em auto;
  padding: 0.4em 1em;
@@ -1112,7 +1113,7 @@ div.solution{
  background-color:#cd3700;
  border: 2px solid #b22222;
 }
-.quiz .btn_solution, .quiz .btn_solution2, .quiz .btn_solution3{
+.quiz .btn_solution, .quiz .btn_solution2, .btn_solution3{
  display:block;
  margin:0 auto;
 }
@@ -1126,7 +1127,13 @@ div.solution{
  margin-top: 0.3em;
 }
 .index{
- background-color:#F5F1E8;
+ background-attachment: fixed;
+ background-clip: border-box;
+ background-color: #F5F1E8;
+ background-image: url("../../img/edi_family_icon.png");
+ background-origin: padding-box;
+ background-position: -100px 46px;
+ background-repeat: no-repeat;
 }
 .mainindex{
  padding: 20px 0 35px 0; 
@@ -1302,8 +1309,9 @@ margin:0 auto;
  font-size:10pt;
 }
 .metainfo li strong{
- letter-spacing: -0.05em;
- font-size:10pt;
+ display: block;
+ font-size: 11pt;
+ margin-top: 0.7em;
 }
 .metainfobc{
  font-family: Helvetica Neue,Helvetica-Normal,Helvetica,Corbel,Helmet,Free Sans,Droid Sans,sans-serif;
@@ -1683,6 +1691,9 @@ article figure img{
 }
 .mediaf a:hover{
  text-decoration:underline;
+}
+.mediaf span{
+ color: #000000 !important;
 }
 .mediazip a:before{
  content:"";
