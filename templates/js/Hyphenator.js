@@ -55,46 +55,8 @@ var Hyphenator = (function (window) {
 	 * if (supportedLang.hasOwnProperty(lang))
 	 */
 	supportedLang = {
-		'be': 'be.js',
 		'ca': 'ca.js',
-		'cs': 'cs.js',
-		'da': 'da.js',
-		'bn': 'bn.js',
-		'de': 'de.js',
-		'el': 'el-monoton.js',
-		'el-monoton': 'el-monoton.js',
-		'el-polyton': 'el-polyton.js',
-		'en': 'en-us.js',
-		'en-gb': 'en-gb.js',
-		'en-us': 'en-us.js',
-		'es': 'es.js',
-		'fi': 'fi.js',
-		'fr': 'fr.js',
-		'grc': 'grc.js',
-		'gu': 'gu.js',
-		'hi': 'hi.js',
-		'hu': 'hu.js',
-		'hy': 'hy.js',
-		'it': 'it.js',
-		'kn': 'kn.js',
-		'la': 'la.js',
-		'lt': 'lt.js',
-		'lv': 'lv.js',
-		'ml': 'ml.js',
-		'no': 'no-nb.js',
-		'no-nb': 'no-nb.js',
-		'nl': 'nl.js',
-		'or': 'or.js',
-		'pa': 'pa.js',
-		'pl': 'pl.js',
-		'pt': 'pt.js',
-		'ru': 'ru.js',
-		'sl': 'sl.js',
-		'sv': 'sv.js',
-		'ta': 'ta.js',
-		'te': 'te.js',
-		'tr': 'tr.js',
-		'uk': 'uk.js'
+		'en': 'en-us.js'
 	},
 
 	/**
@@ -1251,7 +1213,9 @@ var Hyphenator = (function (window) {
 			myBox.style.cursor = 'pointer';
 			myBox.style.WebkitBorderBottomLeftRadius = '4px';
 			myBox.style.MozBorderRadiusBottomleft = '4px';
-			bdy.appendChild(myBox);
+			if (bdy){//Avoid errors related with problems when is no load object
+				bdy.appendChild(myBox);
+			}
 		}
 	},
 
