@@ -118,7 +118,8 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= html_flashobject(
                             $url,
                             $width,
-                            $height);
+                            $height,
+                            array('wmode' => 'opaque'));
             $renderer->doc .= '</div>';
         }
         return FALSE;

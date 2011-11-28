@@ -1297,8 +1297,10 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }
             $src = $path.'media/'.basename(str_replace(':', '/', $src));
             $ret .= '<div class="mediaf file'.$ext.'">';
+            $ret .= '<div class="mediacontent">';
             $ret .= '<a href="'.$path.'media/'.basename(str_replace(':', '/', $src)).'">'.$title.'</a>'.
                     '<span>'.$filesize.'</span>';
+            $ret .= '</div>';
             $ret .= '</div>';
         }elseif($title){
             // well at least we have a title to display

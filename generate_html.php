@@ -675,6 +675,21 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $zip->addFile(mediaFN($matches[1]), 'img/license.png');
             }
         }
+
+        if(isset($data['familia'])){
+            $urlfamily = DOKU_PLUGIN_TEMPLATES;
+            if (preg_match('/administraci/i', $data['familia'])){
+                $urlfamily .= 'gad';
+            }elseif (preg_match('/electricitat/i', $data['familia'])){
+                $urlfamily .= 'iea';
+            }elseif (preg_match('/socioculturals/', $data['familia'])){
+                $urlfamily .= 'edi';
+            }else{
+                $urlfamily .= 'asix';
+            }
+            $urlfamily .= '_family_icon.png';
+            $zip->addFile($urlfamily, 'img/family_icon.png');
+        }
     }
 
      /**

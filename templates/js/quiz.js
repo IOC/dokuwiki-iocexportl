@@ -1,4 +1,4 @@
-define (["functions"],function(func){
+define (["functions","render"],function(func,render){
 	var checkquiz = function(e,func){
 	  var target = jQuery(e);
 	  var form = target.parents('form');
@@ -133,14 +133,16 @@ define (["functions"],function(func){
 	  }
 	} 
 
-	var showsol = function(target){
+	var showsol = function(target,render){
 		var form = jQuery(target).parents('form');
 		if (jQuery(form).children(".solution").css('display') == 'block' ){
-			jQuery(form).children(".solution").hide("slow");
+			jQuery(form).children(".solution").slideUp("slow");
 			jQuery(target).attr('value','Mostra');
 		}else{
-			jQuery(form).children(".solution").show("slow");
+			jQuery(form).children(".solution").slideDown("slow");
 			jQuery(target).attr('value','Oculta');
+			render.infoTable();
+			render.infoFigure();
 		}
 	}
 
@@ -164,7 +166,7 @@ define (["functions"],function(func){
 	});
 	
 	$('.btn_solution3').click(function (){
-		showsol(this);
+		showsol(this,render);
 	});
 	
 	return this;

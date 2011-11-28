@@ -642,6 +642,42 @@ p {
  height:100%;
 }
 
+.button_start{
+ background: none repeat scroll 0 0 #555555;
+ border-radius: 5px 5px 5px 5px;
+ border:1px solid #444;
+ box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
+ color: #FFFFFF;
+ display: block;
+ font-family: arial,helvetica;
+ font-size: 18px;
+ font-weight: bold;
+ height: 29px;
+ position: absolute;
+ right: 232px;
+ text-align: center;
+ top: 6px;
+ vertical-align: middle;
+ opacity:0.95;
+ padding:0 10px;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ -webkit-box-sizing:border-box;
+ z-index: 1;
+}
+
+.button_start:before{
+ content:"";
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+
+.button_start:hover{
+ cursor:pointer;
+ opacity:1;
+}
+
 .navmenu {
  background-color:#dad5ca;
  font-family:Helvetica Neue,Helvetica-Normal,Helvetica,Corbel,Helmet,Free Sans,Droid Sans,sans-serif;
@@ -1390,6 +1426,7 @@ div.solution{
 .quiz .btn_solution, .quiz .btn_solution2, .btn_solution3{
  display:block;
  margin:0 auto;
+ width: 80px;/*Chrome bug*/ 
 }
 
 /* Search results
@@ -1411,7 +1448,7 @@ div.solution{
  background-attachment: fixed;
  background-clip: border-box;
  background-color: #F5F1E8;
- background-image: url("../../img/edi_family_icon.png");
+ background-image: url("../../img/family_icon.png");
  background-origin: padding-box;
  background-position: -100px 46px;
  background-repeat: no-repeat;
@@ -1599,7 +1636,7 @@ margin-bottom:1em;
  width: 100%;
 }
 
-.headtoc h1:hover{
+.hover{
 cursor:pointer;
 }
 
@@ -1732,6 +1769,7 @@ figcaption span:after{
  clear:right;
  display:block;
  padding: 1em 0;
+ font-size: 90%;
 }
 
 .ioctable .titletable{
@@ -1753,6 +1791,18 @@ figcaption span:after{
 .foottable{
  margin: -1.5em auto 0;
  text-align: right;
+}
+
+table .leftalign{ 
+ text-align: left;
+}
+
+table .centeralign{ 
+ text-align: center; 
+}
+
+table .rightalign{ 
+ text-align: right; 
 }
 
 /******************* FIGUREC **************************/
@@ -2066,28 +2116,27 @@ article figure img{
  background-color: #EFEFEF;
  border: 1px solid #CCCCCC;
  border-radius: 10px 0 10px 0;
+ display:table;
  margin: 1em auto;
- height: 55px;
+ height: 76px;
  padding: 10px 10px 10px 75px;
  width: 50%;
  border-radius: 10px 0 10px 0;
  -moz-border-radius: 10px 0 10px 0;
  -webkit-border-radius:10px 0 10px 0;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ -webkit-box-sizing:border-box;
+}
+
+.mediacontent{
+ display:table-cell;
+ vertical-align: middle; 
 }
 
 .mediaf a{
  color: #000000 !important;
- display:inline-block;
  font-size: 95%;
- height:100%;
- vertical-align:middle;
-}
-
-.mediaf a:before{
- content:"";
- display:inline-block;
- height:100%;
- vertical-align:middle;
 }
 
 .mediaf a:hover{
@@ -2202,7 +2251,6 @@ article figure img{
  -moz-font-feature-settings: normal;
  -moz-font-language-override: normal;
  background-color:#000;
- border: 2px solid #FFFFFF;
  border-radius: 10px 10px 10px 10px;
  box-shadow: 0 0 7px black;
  color: white;
@@ -2233,32 +2281,23 @@ article figure img{
  font-weight:bold;
 }
 
-.tooltip img {
- border: 0 none;
- float: left;
- right: -8px;
- position: absolute;
- top: -8px;
-}
-
 .arrow-left:after {
-  -webkit-transform: rotate(45deg);
+ -webkit-transform: rotate(45deg);
  -moz-transform:    rotate(45deg);
  -ms-transform:     rotate(45deg);
  -o-transform:      rotate(45deg);
  background-color: #000000;
- border: 2px solid #FFFFFF;
  content: "";
  height: 25px;
- left: 28px;
+ left: 29px;
  position: absolute;
- top: 26px;
+ top: 27px;
  width: 25px;
 }
 
 .arrow-left {
  height: 70px;
- left: -36px;
+ left: -34px;
  margin-top: -40px;
  overflow: hidden;
  position: absolute;
@@ -2278,7 +2317,6 @@ article figure img{
 .arrow-bottom:after {
  content: "";
  background-color: #000;
- border: 2px solid #FFFFFF;
  position: absolute;
  left: 20px;
  top: -20px;
@@ -2303,7 +2341,6 @@ article figure img{
 .arrow-top:after {
  content: "";
  background-color: #000;
- border: 2px solid #FFFFFF;
  position: absolute;
  left: 20px;
  top: 5px;
