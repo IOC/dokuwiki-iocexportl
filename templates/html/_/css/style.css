@@ -508,7 +508,7 @@ p {
  position: absolute;
  right: 232px;
  text-align: center;
- text-shadow: 1px 1px 1px #FFFFFF;
+ text-shadow: 1px 1px 0 #FFFFFF;
  top: 6px;
  line-height:27px;
  white-space:nowrap;

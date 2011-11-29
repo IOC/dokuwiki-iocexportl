@@ -10,7 +10,9 @@ define(function() {
 			var info = img.parents('figure').children().filter('figcaption');
 			var foot = img.parents('.iocfigure').children().filter('.footfigure');
 			info.css('width',width);
+			info.css('max-width','75%');
 			foot.css('width',width);
+			foot.css('max-width','75%');
 		});
 	};
 
@@ -21,7 +23,9 @@ define(function() {
 			var info = table.parents('.iocaccounting,.ioctable').children().filter('.titletable');
 			var foot = table.parents('.iocaccounting,.ioctable').children().filter('.foottable');
 			info.css('width',width);
+			info.css('max-width','100%');
 			foot.css('width',width);
+			foot.css('max-width','100%');
 		});
 	};
 	
