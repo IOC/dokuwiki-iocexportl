@@ -1180,11 +1180,14 @@ div.solution{
 .highlight{
  font-size:110%;
  background:#ffff00;
+ font-weight: bold;
+ color:#000;
 }
 .urlpath{
  font-size:85%;
  font-style:italic;
  margin-top: 0.3em;
+ color:#000;
 }
 .index{
  background-attachment: fixed;
@@ -1206,11 +1209,13 @@ div.solution{
  font-family: Helvetica Neue,Helvetica-Normal,Helvetica,Corbel,Helmet,Free Sans,Droid Sans,sans-serif;
 }
 .search-result a{
- font-size:12pt;
+ font-size:100%;
  font-weight: bold;
+ color:#333!important;
 }
 .search-result a:hover{
  text-decoration:underline;
+ color:#6f6f6f!important;
 }
 .search-result li{
  margin: .2em 0 0;
@@ -1224,8 +1229,9 @@ div.solution{
  background: none repeat scroll 0 0 #DAD5CA;
 }
 .summary{
- font-size:10pt;
+ font-size:80%;
  margin-top: 0.3em;
+ color:#000;
 }
 .headtoc{
  position: relative;

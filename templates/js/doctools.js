@@ -1,4 +1,4 @@
-define (function(){
+define (["functions"],function(functions){
 /// XXX: make it cross browser
 	var DOCUMENTATION_OPTIONS = {
 			  URL_ROOT: '',
@@ -74,8 +74,7 @@ jQuery.fn.highlightText = function(text, className) {
     if (node.nodeType == 3) {
       var val = node.nodeValue;
       var pos = val.toLowerCase().indexOf(text);
-//      if (pos >= 0 && !jQuery.className.has(node.parentNode, className)) {
-      if (pos >= 0) {
+      if (pos >= 0 && !jQuery(node.parentNode).hasClass(className)) {
         var span = document.createElement("span");
         span.className = className;
         span.appendChild(document.createTextNode(val.substr(pos, text.length)));
@@ -98,13 +97,24 @@ jQuery.fn.highlightText = function(text, className) {
 
 
 var highlightSearchWords = function() {
-  var params = $.getQueryParameters();
+  var params = jQuery.getQueryParameters();
   var terms = (params.highlight) ? params.highlight[0].split(/\s+/) : [];
   if (terms.length) {
-    var body = $('#content');
+    var body = jQuery('#content');
+	var hyphen = false;
+	//Trick to solve problem with Chrome and IE
     window.setTimeout(function() {
-      $.each(terms, function() {
+      jQuery.each(terms, function() {
+		if(Hyphenator.doHyphenation){
+			Hyphenator.toggleHyphenation();
+			hyphen = true;
+		}
         body.highlightText(this.toLowerCase(), 'highlight');
+		if(hyphen){
+			Hyphenator.doHyphenation = false;
+			Hyphenator.toggleHyphenation();
+		}
+        functions.postosearchword();
       });
     }, 10);
   }

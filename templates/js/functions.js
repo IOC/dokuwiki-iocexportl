@@ -390,6 +390,7 @@ define (["render"],function(render){
 			setMainFig(info.settings[0]['mimages']);
 			setSecContent(info.settings[0]['scontent']);
 			setCheckboxes(info);
+			postohashword();
 		}
 	});
 
@@ -604,6 +605,28 @@ define (["render"],function(render){
 		var patt = new RegExp(options+"\.html$","g")
 		return patt.test(url);
 	});
+	
+	var postohashword = (function (){
+		var url = document.location.hash;
+		if (url){
+			url = url.replace(/#/,'');
+			var offset = $("a[id='"+url+"']").offset();
+			if (offset !== null){
+				$(window).scrollTop(offset.top-110);
+			}
+		}
+	});
+	
+	var postosearchword = (function (){
+		var url = document.location.search;
+		if (/highlight/.test(url)){
+				var offset = $(".highlight:first").offset();
+				if (offset !== null){
+					$(window).scrollTop(offset.top-80);
+				}
+		}
+	});
+	
 
 	var indexToc = (function(show){
 	  	if (show){
@@ -1082,5 +1105,7 @@ define (["render"],function(render){
 	if(!ispageIndex() && !ispageSearch()){
 		calpostooltips();
 	}
-	return {"editCheckExercise":editCheckExercise};
+	return {"editCheckExercise":editCheckExercise,
+			"ispageSearch":ispageSearch,
+			"postosearchword":postosearchword};
 });
