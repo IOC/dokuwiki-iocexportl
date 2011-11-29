@@ -67,15 +67,18 @@ if ($res === TRUE) {
     getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
     //Get index source
     $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
-    $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 2);
+    $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 3);
+    $text_index = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_index, 1);
     $text_index = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_index, 1);
     //Get search source
     $text_search = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'search.html');
-    $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 2);
+    $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 3);
+    $text_search = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_search, 1);
     $text_search = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_search, 1);
     //Get template source
     $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
-    $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 2);
+    $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 3);
+    $text_template = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_template, 1);
     $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
     $text_template = preg_replace('/@IOCCOPYTEXT@/', $data[1]['copytext'], $text_template, 1);
     //Create index page

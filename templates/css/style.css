@@ -1325,8 +1325,8 @@ border-bottom:1px solid #989898;
   color:#D6DBDF;
 }
 
-.style-inverse h1{
-  border-color:#D6DBDF;
+.style-inverse h1, .style-inverse .borderth{
+  border-color:#D6DBDF !important;
 }
 
 .style-inverse article{
@@ -1813,6 +1813,10 @@ figcaption span:after{
  content:" " counter(counth1) "." counter(ctable) ". ";
 }
 
+.ioctable .borderth{
+ border-bottom:1px solid #000;
+}
+
 .tabref span:after{
  content:" " counter(counth1);
 }
@@ -2174,6 +2178,7 @@ article figure img{
 
 .mediaf span{
  color: #000000 !important;
+ white-space: nowrap;
 }
 
 .mediazip a:before{

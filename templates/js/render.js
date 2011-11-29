@@ -24,5 +24,12 @@ define(function() {
 			foot.css('width',width);
 		});
 	};
-	return {"infoTable":infoTable,"infoFigure":infoFigure};
+	
+	var thTable = function(){
+		jQuery('div.ioctable table th').each(function(key, value){
+			var th = jQuery(this);
+			th.closest("tr").addClass("borderth");
+		});
+	};
+	return {"infoTable":infoTable,"infoFigure":infoFigure,"thTable":thTable};
 });
