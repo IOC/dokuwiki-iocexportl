@@ -502,6 +502,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         // initialize the row counter used for classes
         $this->_counter['row_counter'] = 0;
         $class = 'table';
+        if ($_SESSION['activity']){
+            $class .= ' tabminheight';
+        }
         /*if ($pos !== null) {
             $class .= ' ' . $this->startSectionEdit($pos, 'table');
         }*/

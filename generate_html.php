@@ -153,6 +153,9 @@ if ($res === TRUE) {
                 $_SESSION['activities'] = TRUE;
                 foreach ($section as $ka => $act){
                     $text = io_readFile(wikiFN($act));
+                    if (basename(wikiFN($act),'.txt') === 'activitats'){
+                        $_SESSION['activity'] = TRUE;
+                    }
                     list($header, $text) = extractHeader($text);
                     $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$def_section_href.'.html',''));
                     preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
@@ -167,6 +170,9 @@ if ($res === TRUE) {
                     $html = preg_replace('/@IOCPATH@/', '../../../', $html);
                     $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
                     $zip->addFromString($web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html', $html);
+                    if (basename(wikiFN($act),'.txt') === 'activitats'){
+                        $_SESSION['activity'] = FALSE;
+                    }
                 }
                 $_SESSION['activities'] = FALSE;
             }else{

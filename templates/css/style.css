@@ -1830,6 +1830,10 @@ figcaption span:after{
  text-align: right;
 }
 
+.tabminheight table tr{ 
+ height: 3em;
+}
+
 table .leftalign{ 
  text-align: left;
 }
