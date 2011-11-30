@@ -466,6 +466,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $menu_html .= setMenu('root', $page[0], $href, basename(str_replace(':','/',$page[1])));
                 array_push($files, '"'.str_replace('@IOCPATH@', '', $href).'"');
             }
+            //Link to index
+            $menu_html .= '@IOCSTARTINDEX@';
+            $href = '@IOCPATH@index.html';
+            $menu_html .= setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
+            $menu_html .= '@IOCENDINDEX@';
             $menu_html .= '@IOCENDINTRO@';
             unset($elements['intro']);
         }
