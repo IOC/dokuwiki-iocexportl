@@ -62,7 +62,13 @@ if ($res === TRUE) {
     list($menu_html, $files_name) = createMenu($data[0]);
     //Get build.js and add which filenames will be used to search
     $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
+    preg_match('/^([^.]*\.)*([^\.]*\.[^\/]*)\/.*?$/',$data[1]['creditcodi'],$matches);
     $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
+    $cookiename = '';
+    if (isset($matches[2])){
+        $cookiename = str_replace(".", "_", $matches[2]);
+    }
+    $build = preg_replace('/@IOCCOOKIENAME@/', $cookiename, $build);
     $zip->addFromString('_/js/build.js', $build);
     getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
     //Get index source

@@ -1962,3 +1962,25 @@ article figure img{
  -ms-transform:     rotate(45deg);
  -o-transform:      rotate(45deg);
 }
+.infomessage{
+ position:fixed;
+ top:50px;
+ right:10px;
+ background-color:#000;
+ color:#fff;
+ font-weight:bold;
+ padding:15px;
+ max-width:350px;
+ opacity:.8;
+ -moz-border-radius: 10px;
+ -webkit-border-radius:10px;
+ border-radius: 10px;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ -webkit-box-sizing:border-box;
+ z-index:3;
+}
+.infomessage span{
+ color: #FFFF00;
+ font-weight:bold;
+}
