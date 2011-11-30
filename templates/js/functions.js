@@ -231,50 +231,55 @@ define (["render"],function(render){
 		focussearch = false;
 	});
 	
-	$(window).on('keypress', function (event){
+	$(window).on('keyup', function (event){
 		if(ispageIndex() || ispageSearch()){
 			return;
 		}
 		//ESC
-		if (event.which === 0){
+		if (event.keyCode === 27){
 			event.preventDefault();
 			$("#help").addClass("hidden");
 			setmenu(null);
-		}else{
-			if (!focussearch){
-				switch(event.which){
-					//?
-					case 63:$("#help").toggleClass("hidden");
-				 		 break;
-					//b
-					case 98:$(window).scrollTop($("footer").offset().top);
+		}
+	});
+	
+	$(window).on('keypress', function (event){
+		if(ispageIndex() || ispageSearch()){
+			return;
+		}
+		if (!focussearch){
+			switch(event.which){
+				//?
+				case 63:$("#help").toggleClass("hidden");
+			 		 break;
+				//b
+				case 98:$(window).scrollTop($("footer").offset().top);
+					 break;
+			
+				//h
+				case 104:$(window).scrollTop(0);
 						 break;
-				
-					//h
-					case 104:$(window).scrollTop(0);
-							 break;
-					//i
-					case 105:document.location.href = $("#navmenu ul > li > a").attr("href");
-			 		 		 break;
-	 		 		//j
-					case 106:$(window).scrollTop($(window).scrollTop()+100)
-					 		 break;
-					//k
-					case 107:$(window).scrollTop($(window).scrollTop()-100);
-					 		 break;
-			 		//o
-					case 111:setmenu($("#menu li[name='settings']"));
-					 		 break;
-					//p
-					case 112:setmenu($("#menu li[name='printer']"));
-					 		 break;
-			 		//s
-					case 115:setmenu($("#menu li[name='favorites']"));
-					 		 break;
-			 		//t					 		 
-					case 116:setmenu($("#menu li[name='toc']"));
-			 		 		 break;
-				}
+				//i
+				case 105:document.location.href = $("#navmenu ul > li > a").attr("href");
+		 		 		 break;
+ 		 		//j
+				case 106:$(window).scrollTop($(window).scrollTop()+100)
+				 		 break;
+				//k
+				case 107:$(window).scrollTop($(window).scrollTop()-100);
+				 		 break;
+		 		//o
+				case 111:setmenu($("#menu li[name='settings']"));
+				 		 break;
+				//p
+				case 112:setmenu($("#menu li[name='printer']"));
+				 		 break;
+		 		//s
+				case 115:setmenu($("#menu li[name='favorites']"));
+				 		 break;
+		 		//t					 		 
+				case 116:setmenu($("#menu li[name='toc']"));
+		 		 		 break;
 			}
 		}
 	});
@@ -932,10 +937,19 @@ define (["render"],function(render){
 		$(parent).siblings().children().filter('ul').hide('fast');
 	});
 
-	$(document).on("click", "a[href='#']", function(e) {
+	$(document).on("click", "a[href^='#']", function(e) {
 		e.preventDefault();
+		//An anchor
+		if ($(this).attr("href") !== '#'){
+			var url = $(this).attr("href");
+			url = url.replace(/#/,'');
+			var offset = $("article a[name='"+url+"']").offset();
+			if (offset !== null){
+				$(window).scrollTop($(window).scrollTop()+offset.top-60);
+			}
+		}
 	});
-
+	
 	$.expr[':'].parents = function(a,i,m){
 	    return $(a).parents(m[3]).children('ul').length < 1;
 	};
