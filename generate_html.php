@@ -92,6 +92,8 @@ if ($res === TRUE) {
     $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
     $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/', '', $menu_html_index);
     $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
+    $menu_html_index = preg_replace('/@IOCACTIVITYICONSTART@|@IOCACTIVITYICONEND@/', '', $menu_html_index);
+    $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
     $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
     $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
     $html = preg_replace('/@IOCMETA@/',createMeta($data[1]), $html, 1);
@@ -108,9 +110,11 @@ if ($res === TRUE) {
     $html = preg_replace('/@IOCPATH@/', '', $html);
     $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
     $zip->addFromString('search.html', $html);
-    //Remove menu index and expander tags
+    //Remove menu index ,expander and icon/name tags
     $menu_html = preg_replace('/@IOCSTARTINDEX@|@IOCENDINDEX@/', '', $menu_html);
     $menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $menu_html);
+    $menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/', '', $menu_html);
+    $menu_html = preg_replace('/@IOCACTIVITYNAMESTART@|@IOCACTIVITYNAMEEND@/', '', $menu_html);
     if (isset($data[0]['intro'])){
         if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $menu_html, $matches)){
             $menu_html_intro = $matches[1];
@@ -429,6 +433,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     function setMenu($type='', $name='', $href='', $id='',$index=FALSE){
         global $max_menu;
         global $def_section_href;
+        $types = array('activitats','annexos','exercicis');
 
         if (strlen($name) > $max_menu){
             $name = substr($name, 0, $max_menu) . '...';
@@ -450,7 +455,20 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '<ul>';
         }elseif ($type === 'activity'){
             $menu_html = '<li id="'.$id.'">';
-            $menu_html .= '<a href="'.$href.'">'.$name.'</a>';
+            preg_match('/\/([^\.\/]*)\.html$/',$href,$type);
+            if (in_array($type[1], $types)){
+                if (strtolower($type[1]) === 'activitats'){
+                    $img = 'activity';
+                }elseif (strtolower($type[1]) === 'annexos'){
+                    $img = 'appendix';
+                }elseif (strtolower($type[1]) === 'exercicis'){
+                    $img = 'exercise';
+                }
+                $menu_html .= '@IOCACTIVITYICONSTART@<a href="'.$href.'"><img src="img/'.$img.'.png" title="'.$name.'"/></a>@IOCACTIVITYICONEND@';
+                $menu_html .= '@IOCACTIVITYNAMESTART@<a href="'.$href.'">'.$name.'</a>@IOCACTIVITYNAMEEND@';
+            }else{
+                $menu_html .= '<a href="'.$href.'">'.$name.'</a>';
+            }
             $menu_html .= '</li>';
         }else{
             $menu_html = '</ul></li>';

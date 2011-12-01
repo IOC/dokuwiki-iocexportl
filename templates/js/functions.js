@@ -666,12 +666,8 @@ define (["render"],function(render){
 			$("#header .headdocument").removeClass('hidden');
 			$(".headtoc h1 img").hide();
 			$(".headtoc").css('margin-top', -$("#content").outerHeight(true)+$(".headtoc h1").outerHeight(true)-40);
-			if (parseInt($(window).height()) > parseInt($(".indextoc").outerHeight(true))){
-				$(".headtoc").css('height','100%');
-			}else{
-				$(".headtoc").css('height','auto');
-			}
-			$("#headtoc").removeClass("headtopdown").addClass("headtopup");
+			$(".headtoc").css('min-height','100%');
+			$(".headtoc").removeClass("headtocdown").addClass("headtocup");
 			$(".headtoc h1").removeClass("hover");
 			$(".indextoc").show();
 			$("#button_start").show();
@@ -689,9 +685,8 @@ define (["render"],function(render){
 			$("#header .headdocument").addClass('hidden');
 			$(".headtoc h1 img").show();			
 			$(".headtoc").css('margin-top', -$(".headtoc h1").outerHeight(true));
-			$(".headtoc").css('height','auto');
+			$(".headtoc").css('min-height','0');
 			$(".indextoc").hide();
-			$("#headtoc").removeClass("headtopup").addClass("headtopdown");
 			$(".headtoc h1").addClass("hover");
 			$("#button_start").hide();
 		}
@@ -1011,10 +1006,8 @@ define (["render"],function(render){
 					}
 			);
 			$(".headtoc h1 img").slideUp("slow");
-			if (parseInt($(window).height()) > parseInt($(".indextoc").outerHeight(true))){
-				$(".headtoc").css('height','100%');
-			}
-			$("#headtoc").removeClass("headtopdown").addClass("headtopup");
+			$(".headtoc").css('min-height','100%');
+			$(".headtoc").removeClass("headtocdown").addClass("headtocup");
 			$(".headtoc h1").removeClass("hover");
 			$(".indextoc").show();
 			$("#button_start").slideDown("slow");
@@ -1045,13 +1038,13 @@ define (["render"],function(render){
 			'margin-top': -$(".headtoc h1").outerHeight(true)
 		},1500, function(){
 					$(".indextoc").hide();
-					$(".headtoc").css('height','auto');
+					$(".headtoc").css('min-height','0');
 				}
 		);
 		$(this).slideUp("slow");
+		$(".headtoc").removeClass("headtocup").addClass("headtocdown");
 		$(".headtoc h1 img").slideDown("slow");
 		$(".headtoc h1").addClass("hover");
-		$("#headtoc").removeClass("headtopup").addClass("headtopdown");
 		setCookieProperty(cookiegeneral,'tvisible', 0);
 	});
 	

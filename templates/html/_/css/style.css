@@ -732,8 +732,43 @@ border-bottom:1px solid #989898;
 #toc .tocsection > ul li:first-child {
  margin-top:.7em;
 }
+.indextocheader{
+ height:80px;
+}
+.indextocheader .activityicon {
+    background: url("../../img/icons.png") no-repeat scroll 0 0 transparent;
+    float: left;
+    height: 60px;
+    width: 65px;
+}
+.indextocheader #activity{
+ background-position: 0 0;
+ margin-left: 18%;
+ margin-right: 18%;
+}
+.indextocheader #activity:hover{
+ background-position: -65px 0;
+}
+.indextocheader #exercise{
+ background-position: -130px 0;
+ margin-right: 18%;
+}
+.indextocheader #exercise:hover{
+ background-position: -195px 0;
+}
+.indextocheader #appendix{
+ background-position: -260px 0;
+ margin-right: 18%;
+}
+.indextocheader #appendix:hover{
+ background-position: -325px 0;
+}
+.indextoc .tocsection ul li{
+ display:inline;
+}
 .indextoc .tocsection p a{
- counter-increment:section; 
+ counter-increment:section;
+ font-weight: bold; 
 }
 .indextoc .tocsection p a:before{
  content:counter(section) ". ";
@@ -1241,6 +1276,7 @@ div.solution{
  bottom:0;
  width: 100%;
  height:auto;
+ min-height:100%;
  z-index:2;
 }
 .headtoc img{
@@ -1249,11 +1285,11 @@ div.solution{
     vertical-align: middle;
 }
 .headtocup{
- background-image: linear-gradient(bottom, #555555 90%, #000000 150%);
- background-image: -o-linear-gradient(bottom, #555555 90%, #000000 150%);
- background-image: -moz-linear-gradient(bottom, #555555 90%, #000000 150%);
- background-image: -webkit-linear-gradient(bottom, #555555 90%, #000000 150%);
- background-image: -ms-linear-gradient(bottom, #555555 90%, #000000 150%);
+ background-image: linear-gradient(bottom, #555555 97%, #000000 105%);
+ background-image: -o-linear-gradient(bottom, #555555 97%, #000000 105%);
+ background-image: -moz-linear-gradient(bottom, #555555 97%, #000000 105%);
+ background-image: -webkit-linear-gradient(bottom, #555555 97%, #000000 105%);
+ background-image: -ms-linear-gradient(bottom, #555555 97%, #000000 105%);
  background-color:#555;
 }
 .headtocdown{
@@ -1272,6 +1308,7 @@ div.solution{
  font-weight:bold;
  font-size:28pt;
  text-align:center;
+ text-shadow: 2px 3px 1px #000;
  height:80px;
  width:100%;
 }
@@ -1283,7 +1320,7 @@ div.solution{
 }
 .indextoc{
  position: relative;
- font-size: 10pt;
+ font-size: 12pt;
  padding-bottom:1em;
  width: 100%;
  z-index:2;
@@ -1291,7 +1328,7 @@ div.solution{
 .indexcontent{
  clear:both;
  margin: 0 auto;
- width: 50%;
+ width: 55%;
  padding: 20px 25px;
  background:#fff;
  text-align:left;
@@ -1299,6 +1336,12 @@ div.solution{
  -moz-border-radius:20px;
  -webkit-border-radius:20px;
  border-radius:20px;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ -webkit-box-sizing:border-box;
+ box-shadow: 5px 6px 12px #000000;
+ -moz-box-shadow: 5px 6px 12px #000000;
+ -webkit-box-shadow: 5px 6px 12px #000000;
 }
 .indexcontent p, .indexcontent ul {
  margin:0;
@@ -1333,8 +1376,16 @@ margin-bottom:1em;
 .indexcontent ul li p:hover{
  cursor:pointer;
 }
+.indexcontent .tocsection{
+ margin-bottom:5px;
+}
+.indexcontent .tocsection p{
+ max-width:82%;
+}
 .indexcontent .tocsection ul{
-   padding-left: 2em;
+ float:right;
+ margin-top:-1.4em;
+ padding-left: 2em;
 }
 .indexcontent .parentnode ul a:hover{
    text-decoration:underline;
@@ -1363,9 +1414,15 @@ cursor:pointer;
  vertical-align:top;
 }
 .metainfo{
-width:70%;
-min-width:70%;
-margin:0 auto;
+ display: table;
+ margin: 0 auto;
+ width: 60%;
+}
+.metainfo ul{
+ display: table-cell;
+ vertical-align: top;
+ white-space: nowrap;
+ width: 60%;
 }
 .metainfo li{
  display:block;
@@ -1417,9 +1474,9 @@ margin:0 auto;
  z-index: 1;
 }
 .meta img{
- float:left;
- max-width:250px;
- margin-right:1.5em;
+ display: table-cell;
+ margin-right: 1.5em;
+ max-width: 250px;
 }
 .meta h1{
  text-align:center;
