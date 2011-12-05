@@ -121,7 +121,7 @@ if ($res === TRUE) {
             $menu_html = preg_replace('/@IOCSTARTINTRO@.*?@IOCENDINTRO@/', '', $menu_html, 1);
         }
         //Intro
-        foreach ($data[0]['intro'] as $page){
+        foreach ($data[0]['intro'] as $i=>$page){
            $text = io_readFile(wikiFN($page[1]));
            list($header, $text) = extractHeader($text);
            $navmenu = createNavigation('',array($page[0]), array(''));
@@ -133,6 +133,7 @@ if ($res === TRUE) {
            $html = preg_replace('/@IOCTOC@/', '', $html, 1);
            $html = preg_replace('/@IOCPATH@/', '', $html);
            $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+           $html = createrefstopages($html, $data[0]['intro'], '', $i, '', '');
            $zip->addFromString(basename(wikiFN($page[1]),'.txt').'.html', $html);
          }
          unset($data[0]['intro']);
@@ -173,6 +174,7 @@ if ($res === TRUE) {
                     $html = preg_replace('/@IOCTOC@/', $toc, $html, 1);
                     $html = preg_replace('/@IOCPATH@/', '../../../', $html);
                     $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+                    $html = createrefstopages($html, $unit, $ku, $ks, $ka, '../../../');
                     $zip->addFromString($web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html', $html);
                     if (basename(wikiFN($act),'.txt') === 'activitats'){
                         $_SESSION['activity'] = FALSE;
@@ -193,6 +195,7 @@ if ($res === TRUE) {
                 $html = preg_replace('/@IOCTOC@/', '', $html, 1);
                 $html = preg_replace('/@IOCPATH@/', '../../', $html);
                 $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+                $html = createrefstopages($html, $unit, $ku, '', $ks, '../../');
                 $zip->addFromString($web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html', $html);
             }
         }
@@ -314,6 +317,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $id;
         global $conf;
         global $toexport;
+        global $def_section_href;
 
         $file = wikiFN($id);
         if (@file_exists($file)) {
@@ -375,7 +379,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                             $data[$unit[1]]['iocname'] = $match[2];
                             preg_match('/([^:]*:)+([^\.]*)$/', $pagename, $name);
                             if (!empty($section[1])){
-                                $data[$unit[1]][$section[1]][$name[2]] = $pagename;
+                                //Put default section at first place
+                                if ($name[2] === $def_section_href){
+                                    $data[$unit[1]][$section[1]] = array_merge(array($name[2] => $pagename),$data[$unit[1]][$section[1]]);
+                                }else{
+                                    $data[$unit[1]][$section[1]][$name[2]] = $pagename;
+                                }
                              }else{
                                 $data[$unit[1]][$name[2]] = $pagename;
                             }
@@ -773,4 +782,156 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
         $navigation .= '</ul>';
         return $navigation;
+    }
+
+    function createrefstopages($html, $data, $unit, $section, $activity, $href){
+        global $tree_names;
+        global $def_section_href;
+        $textprev = 'Anar a la p&agrave;gina anterior:<br />';
+        $textnext = 'Anar a la p&agrave;gina seg&uuml;ent:<br />';
+        //Intro
+        if (empty($unit)){
+            $prev = $section-1;
+            $next = $section+1;
+            $content = '';
+            if ($prev >=0){
+                $phref = $href.basename(str_replace(':', '/', $data[$prev][1])).'.html';
+                $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$data[$prev][0].'</a></div>';
+            }
+            $html = preg_replace('/@IOCPREVPAGE@/',$content, $html);
+            $content = '';
+            if ($next <= (count($data)-1)){
+                $href = $href.basename(str_replace(':', '/', $data[$next][1])).'.html';
+                $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'">'.$data[$next][0].'</a></div>';
+            }
+            $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
+        }else{
+            if (empty($section)){//NO SECTION
+                $cont = 0;
+                reset($data);
+                while($cont < count($data) && key($data) !== $activity){
+                    next($data);
+                    $cont++;
+                }
+                $prev = $cont-1;
+                $next = $cont+1;
+                if ($prev >= 0){
+                    list($prev_key,$prev_item) = goAssocArrayNumeric($data,$prev);
+                    if (is_array($data[$prev_key])){//First intro element
+                        $prev_key = FALSE;
+                    }
+                }else{
+                    $prev_key = FALSE;
+                }
+                if ($next < count($data)){
+                    list($next_key,$next_item) = goAssocArrayNumeric($data,$next);
+                }else{
+                    $next_key = FALSE;
+                }
+                if ($prev_key){
+                    $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $prev_item)).'.html';
+                    $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$tree_names[$unit][$prev_key].'</a></div>';
+                }
+                $html = preg_replace('/@IOCPREVPAGE@/',$content, $html);
+                if ($next_key && !is_array($data[$next_key])){
+                    $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $next_item)).'.html';
+                    $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$next_key].'</a></div>';
+                }else{
+                    reset($data);
+                    $section = key($data);
+                    $cont = 0;
+                    while($cont < count($data) && !is_array($data[$section])){
+                        next($data);
+                        $section = key($data);
+                    }
+                    if (is_array($data[$section])){
+                        $phref = $href.'WebContent/'.$unit.'/'.$section.'/'.$def_section_href.'.html';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$section]['sectionname'].'</a></div>';
+                    }else{
+                        $content = '';
+                    }
+                }
+                $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
+            }else{//INSIDE SECTION
+                preg_match('/a(\d+)/', $section, $num_section);
+                $num_section = $num_section[1];
+                reset($data[$section]);
+     			$cont = 0;
+                while($cont < count($data[$section]) && key($data[$section]) !== $activity){
+                    next($data[$section]);
+                    $cont++;
+                }
+                $prev = $cont-1;
+                $next = $cont+1;
+                if ($prev >= 0){
+                    list($prev_key,$prev_item) = goAssocArrayNumeric($data[$section],$prev);
+                }else{
+                    $prev_key = FALSE;
+                }
+                if ($next < count($data[$section])){
+                    list($next_key,$next_item) = goAssocArrayNumeric($data[$section],$next);
+                }else{
+                    $next_key = FALSE;
+                }
+                if ($prev_key){
+                    $phref = $href.'WebContent/'.$unit.'/'.$section.'/'.basename(str_replace(':', '/', $prev_item)).'.html';
+                    if (basename(str_replace(':', '/', $prev_item)) === $def_section_href){
+                        $name = $tree_names[$unit][$section]['sectionname'];
+                    }else{
+                        $name = $tree_names[$unit][$section][$prev_key];
+                    }
+                    $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$name.'</a></div>';
+                }else{
+                    if (isset($data['a'.intval($num_section-1)])){
+                        end($data['a'.intval($num_section-1)]);
+                        $phref = $href.'WebContent/'.$unit.'/'.'a'.intval($num_section-1).'/'.basename(str_replace(':', '/', key($data['a'.intval($num_section-1)]))).'.html';
+                        $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.end($tree_names[$unit]['a'.intval($num_section-1)]).'</a></div>';
+                    }else{
+                        end($data);
+                        $section = key($data);
+                        $cont = 0;
+                        while($cont < count($data) && is_array($data[$section])){
+                            prev($data);
+                            $section = key($data);
+                        }
+                        if (!is_array($data[$section])){//Look whether intro exists when we're at first section
+                            $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $section)).'.html';
+                            $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$tree_names[$unit][$section].'</a></div>';
+                        }else{
+                            $content = '';
+                        }
+                    }
+                }
+                $html = preg_replace('/@IOCPREVPAGE@/',$content, $html);
+                if ($next_key){
+                    $phref = $href.'WebContent/'.$unit.'/'.$section.'/'.basename(str_replace(':', '/', $next_item)).'.html';
+                    $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$section][$next_key].'</a></div>';
+                }else{
+                    if (isset($data['a'.intval($num_section+1)])){
+                        reset($data['a'.intval($num_section+1)]);
+                        $phref = $href.'WebContent/'.$unit.'/'.'a'.intval($num_section+1).'/'.basename(str_replace(':', '/', key($data['a'.intval($num_section+1)]))).'.html';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.reset($tree_names[$unit]['a'.intval($num_section+1)]).'</a></div>';
+                    }else{
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
+                    }
+                }
+                $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
+            }
+        }
+        return $html;
+    }
+
+
+    function goAssocArrayNumeric($arrAssoc, $key=-1)
+    {
+        $i = -1;
+        foreach ($arrAssoc as $k => $v)
+        {
+            $i++;
+            if ($i == $key)
+            {
+                return array($k,$v);
+            }
+        }
+        return FALSE;
     }

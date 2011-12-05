@@ -291,11 +291,13 @@ define (["render"],function(render){
 	var setFontsize = (function (info){
 		var options=new Array("text-tiny","text-small","text-normal","text-big","text-huge");
 		$("article").addClass(options[info]);
+		$(".pnpage").addClass(options[info]);
 		for (i=0;i<options.length;i++){
 			if (i==info){
 				continue;
 			}
 			$("article").removeClass(options[i]);
+			$(".pnpage").removeClass(options[i]);
 		}
 		render.infoTable();
 		render.infoFigure();
@@ -348,7 +350,7 @@ define (["render"],function(render){
 	});
 
 	var setArticleWidth = (function (info){
-		var options=new Array("x-narrow","narrow","medium","wide","x-wide");
+		var options=new Array("x-narrow","narrow","medium","wide","x-wide","x-extra-wide");
 		$("article").addClass(options[info]);
 		for (i=0;i<options.length;i++){
 			if (i==info){
@@ -356,6 +358,10 @@ define (["render"],function(render){
 			}
 			$("article").removeClass(options[i]);
 		}
+		var width = parseInt($("article").outerWidth(true)) + 20;
+		$(".pnpage").css({width:width,
+						  "margin-left":-(width/2),
+						});
 		render.infoTable();
 		render.infoFigure();
 		setCookieProperty(cookiegeneral,'width', info);
@@ -1050,7 +1056,7 @@ define (["render"],function(render){
 	
 	$("#slider-width").slider({
 				min:0,
-				max:4,
+				max:5,
 				step:1,
 				range:'min',
 				animate:true,

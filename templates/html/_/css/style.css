@@ -69,8 +69,8 @@ input,select {
 }
 pre {
  white-space: pre; 
- white-space: pre-wrap; 
- white-space: pre-line; 
+  
+  
  word-wrap: break-word; 
 }
 input[type="radio"] {
@@ -732,37 +732,6 @@ border-bottom:1px solid #989898;
 #toc .tocsection > ul li:first-child {
  margin-top:.7em;
 }
-.indextocheader{
- height:80px;
-}
-.indextocheader .activityicon {
-    background: url("../../img/icons.png") no-repeat scroll 0 0 transparent;
-    float: left;
-    height: 60px;
-    width: 65px;
-}
-.indextocheader #activity{
- background-position: 0 0;
- margin-left: 18%;
- margin-right: 18%;
-}
-.indextocheader #activity:hover{
- background-position: -65px 0;
-}
-.indextocheader #exercise{
- background-position: -130px 0;
- margin-right: 18%;
-}
-.indextocheader #exercise:hover{
- background-position: -195px 0;
-}
-.indextocheader #appendix{
- background-position: -260px 0;
- margin-right: 18%;
-}
-.indextocheader #appendix:hover{
- background-position: -325px 0;
-}
 .indextoc .tocsection ul li{
  display:inline;
 }
@@ -1065,6 +1034,9 @@ border-bottom:1px solid #989898;
 .x-wide{
  width:70%;
 }
+.x-extra-wide{
+ width:85%;
+}
 .style-newspaper{
  background:url("../../img/side_column.png") repeat-y scroll 0 0 #ececec;
  background-size:60px 2px;
@@ -1213,7 +1185,7 @@ div.solution{
 .quiz .btn_solution, .quiz .btn_solution2, .btn_solution3{
  display:block;
  margin:0 auto;
- width: 80px; 
+ width: 5em; 
 }
 .highlight{
  font-size:110%;
@@ -1329,7 +1301,7 @@ div.solution{
  clear:both;
  margin: 0 auto;
  width: 55%;
- padding: 20px 25px;
+ padding: 30px 25px;
  background:#fff;
  text-align:left;
  -moz-user-select: none;
@@ -1371,7 +1343,9 @@ margin-bottom:1em;
  margin-bottom:.6em;
 }
 .indexcontent .parentnode li{
+ display:table;
  margin:0 0 0.1em;
+ width:100%;
 }
 .indexcontent ul li p:hover{
  cursor:pointer;
@@ -1380,12 +1354,15 @@ margin-bottom:1em;
  margin-bottom:5px;
 }
 .indexcontent .tocsection p{
- max-width:82%;
+ display: table-cell;
+ width: 78%;
 }
 .indexcontent .tocsection ul{
- float:right;
- margin-top:-1.4em;
- padding-left: 2em;
+ display:table-cell;
+ padding: 0;
+ text-align: left;
+ min-width:100px;
+ width: 12%;
 }
 .indexcontent .parentnode ul a:hover{
    text-decoration:underline;
@@ -1416,7 +1393,7 @@ cursor:pointer;
 .metainfo{
  display: table;
  margin: 0 auto;
- width: 60%;
+ width: 65%;
 }
 .metainfo ul{
  display: table-cell;
@@ -1583,7 +1560,7 @@ table .rightalign{
 }
 article {
  margin: 68px auto 40px;
- padding: 30px 30px 50px;
+ padding: 30px 30px 170px;
  width:50%;
  min-width:300px;
  min-height:250px;
@@ -1897,6 +1874,7 @@ article figure img{
  font-size: 80%;
  background-color:#efefef;
  color: #000000;
+ overflow-x: auto;
 }
 .code a:hover{
  text-decoration:underline;
@@ -2043,4 +2021,102 @@ article figure img{
 .infomessage span{
  color: #FFFF00;
  font-weight:bold;
+}
+.pnpage{
+ position:absolute;
+ display:inline-block;
+ bottom:80px;
+ background-color:#000;
+ color:#fff;
+ left:50%;
+ height:auto;
+ opacity:0.85;
+ padding:10px 20px;
+ vertical-align:middle;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ -webkit-box-sizing:border-box;
+}
+.pnpage:before{
+ content:"";
+ display: inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+.pnpage .left-corner:after {
+ background-color: #000000;
+ content: "";
+ height: 25px;
+ left: 33px;
+ position: absolute;
+ top: -20px;
+ width: 25px;
+ -webkit-transform: rotate(45deg);
+ -moz-transform:    rotate(45deg);
+ -ms-transform:     rotate(45deg);
+ -o-transform:      rotate(45deg);
+}
+.pnpage .left-corner{
+ bottom: -16px;
+ height: 16px;
+ left: 0;
+ margin-left: -35px;
+ overflow: hidden;
+ position: absolute;
+ width: 45px;
+}
+.pnpage .right-corner:after {
+ background-color: #000000;
+ content: "";
+ height: 25px;
+ right: 32px;
+ position: absolute;
+ top: -20px;
+ width: 25px;
+ -webkit-transform: rotate(45deg);
+ -moz-transform:    rotate(45deg);
+ -ms-transform:     rotate(45deg);
+ -o-transform:      rotate(45deg);
+}
+.pnpage .right-corner{
+ bottom: -16px;
+ height: 16px;
+ right: 0;
+ margin-right: -35px;
+ overflow: hidden;
+ position: absolute;
+ width: 45px;
+}
+.pnpage a{
+ color: #FFFF00;
+}
+.pnpage a:hover{
+ text-decoration:underline;
+}
+#nextpage{
+ float:right;
+ text-align:right;
+ width:49.5%;
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+#nextpage:before{
+ content:"";
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+#prevpage{
+ float:left;
+ width:49.5%;
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
+}
+#prevpage:before{
+ content:"";
+ display:inline-block;
+ height:100%;
+ vertical-align:middle;
 }
