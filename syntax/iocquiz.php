@@ -292,17 +292,24 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             //Default option
             $options .= '<option value="sol_0">@IOCDOTS@</option>'.DOKU_LF;
             $max_length = 1;
+            $max_option_length = 80;
             foreach ($sol as $opt){
                 $pos = array_search($opt, $aux, TRUE);
                 if (is_numeric($pos)){
                     if (is_numeric(array_search($pos, $used, TRUE))){
                         continue;
                     }else{
+                        $title = '';
                         array_push($used, $pos);
+                        $opt = str_replace(array('<p>','</p>'), '', $opt);
+                        if (strlen($opt) > $max_option_length){
+                            $title = ' title="'.$opt.'"';
+                            $opt = substr($opt, 0, $max_option_length) . '...';
+                        }
                         if (strlen($opt) > $max_length){
                             $max_length = strlen($opt);
                         }
-                        $options .= '<option value="sol_'.($pos+1).'">'.$opt.'</option>'.DOKU_LF;
+                        $options .= '<option value="sol_'.($pos+1).'"'.$title.'>'.$opt.'</option>'.DOKU_LF;
                     }
                 }
             }

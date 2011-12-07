@@ -1081,7 +1081,6 @@ border-bottom:1px solid #989898;
 }
 
 #favorites .favlist li:before{
- background: url("../../img/fav_ok.png") no-repeat scroll 2px 50% transparent;
  content: "";
  display: inline;
  padding-left: 14px;
@@ -1089,6 +1088,20 @@ border-bottom:1px solid #989898;
  -moz-background-size: 10px auto;           /* Gecko 1.9.2 (Firefox 3.6) */  
  -o-background-size: 10px auto;           /* Opera 9.5 */  
  -webkit-background-size: 10px auto; 
+}
+
+#favorites .favcontent:before{
+ content:"";
+ background: url("../../img/fav_ok.png") no-repeat scroll 2px 50% transparent;
+}
+
+#favorites .favactivity:before{
+ content:"";
+ background: url("../../img/activity.png") no-repeat scroll 2px 50% transparent;
+}
+
+#favorites .favexercise:before{
+ background: url("../../img/exercise.png") no-repeat scroll 2px 50% transparent;
 }
 
 #favorites .favlist span:before{
@@ -1466,6 +1479,10 @@ div.solution{
  display:block;
  margin:0 auto;
  width: 5em;/*Chrome bug*/ 
+}
+
+.quiz select{
+ max-width:16em;
 }
 
 /* Search results
@@ -1929,7 +1946,6 @@ article {
  padding: 30px 30px 170px;
  width:50%;
  min-width:300px;
- min-height:250px;
  counter-reset:counth1;
  text-align:left;
  box-sizing:border-box;
@@ -2472,7 +2488,7 @@ article figure img{
  color:#fff;
  left:50%;
  height:auto;
- opacity:0.85;
+ opacity:0.9;
  padding:10px 20px;
  vertical-align:middle;
  box-sizing:border-box;

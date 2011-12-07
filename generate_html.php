@@ -120,11 +120,15 @@ if ($res === TRUE) {
             $menu_html_intro = $matches[1];
             $menu_html = preg_replace('/@IOCSTARTINTRO@.*?@IOCENDINTRO@/', '', $menu_html, 1);
         }
+        //var to attach all url media files
+        $files = array();
         //Intro
         foreach ($data[0]['intro'] as $i=>$page){
            $text = io_readFile(wikiFN($page[1]));
            list($header, $text) = extractHeader($text);
            $navmenu = createNavigation('',array($page[0]), array(''));
+           preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
+           array_push($files, $matches[1]);
            $instructions = get_latex_instructions($text);
            $html = p_latex_render('iocxhtml', $instructions, $info);
            $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
@@ -137,6 +141,15 @@ if ($res === TRUE) {
            $zip->addFromString(basename(wikiFN($page[1]),'.txt').'.html', $html);
          }
          unset($data[0]['intro']);
+         //Attach media files
+         foreach($files as $sf){
+             foreach($sf as $f){
+                 resolve_mediaid(getNS($f),&$f,&$exists);
+                 if ($exists){
+                     $zip->addFile(mediaFN($f), '/media/'.basename(mediaFN($f)));
+                 }
+             }
+         }
     }
      //Content468
      foreach ($data[0] as $ku => $unit){
@@ -462,6 +475,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '@IOCSTARTEXPANDER@<span class="buttonexp"></span>@IOCENDEXPANDER@';
             $menu_html .= '</p>';
             $menu_html .= '<ul>';
+        }elseif ($type === 'intro'){
+            $menu_html = '<li id="'.$id.'">';
+            $menu_html .= '<a href="'.$href.'">'.$name.'</a>';
+            $menu_html .= '</li>';
         }elseif ($type === 'activity'){
             $menu_html = '<li id="'.$id.'">';
             preg_match('/\/([^\.\/]*)\.html$/',$href,$type);
@@ -528,7 +545,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
                     $act_name = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
                     $tree_names[$ku][$ks]=$act_name;
-                    $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks);
+                    $menu_html .= setMenu('intro', $act_name, $act_href, $ku.$ks);
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                     unset($unit[$ks]);
                 }
@@ -803,6 +820,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             if ($next <= (count($data)-1)){
                 $href = $href.basename(str_replace(':', '/', $data[$next][1])).'.html';
                 $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'">'.$data[$next][0].'</a></div>';
+            }else{
+                $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
             }
             $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
         }else{
@@ -838,17 +857,17 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$next_key].'</a></div>';
                 }else{
                     reset($data);
-                    $section = key($data);
+                    $sect = key($data);
                     $cont = 0;
-                    while($cont < count($data) && !is_array($data[$section])){
+                    while($cont < count($data) && !is_array($data[$sect])){
                         next($data);
-                        $section = key($data);
+                        $sect = key($data);
                     }
-                    if (is_array($data[$section])){
-                        $phref = $href.'WebContent/'.$unit.'/'.$section.'/'.$def_section_href.'.html';
-                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$section]['sectionname'].'</a></div>';
+                    if (is_array($data[$sect])){
+                        $phref = $href.'WebContent/'.$unit.'/'.$sect.'/'.$def_section_href.'.html';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$sect]['sectionname'].'</a></div>';
                     }else{
-                        $content = '';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
                     }
                 }
                 $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
@@ -888,15 +907,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.end($tree_names[$unit]['a'.intval($num_section-1)]).'</a></div>';
                     }else{
                         end($data);
-                        $section = key($data);
+                        $sect = key($data);
                         $cont = 0;
-                        while($cont < count($data) && is_array($data[$section])){
+                        while($cont < count($data) && is_array($data[$sect])){
                             prev($data);
-                            $section = key($data);
+                            $sect = key($data);
                         }
-                        if (!is_array($data[$section])){//Look whether intro exists when we're at first section
-                            $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $section)).'.html';
-                            $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$tree_names[$unit][$section].'</a></div>';
+                        if (!is_array($data[$sect])){//Look whether intro exists when we're at first section
+                            $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $sect)).'.html';
+                            $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$tree_names[$unit][$sect].'</a></div>';
                         }else{
                             $content = '';
                         }
