@@ -726,7 +726,9 @@ define (["render"],function(render){
 		if (info){
 			var object = $.parseJSON(info);
 			var urls = [];
-			var patt = new RegExp(";;"+url+"\\|.*?(?=$|;;)", 'g');
+			//escape parentheses
+			var escapedurl = url.replace(/\(|\)/g,'\\$&');
+			var patt = new RegExp(";;"+escapedurl+"\\|.*?(?=$|;;)", 'g');
 			if(patt.test(object.fav[0]['urls'])){
 				urls=object.fav[0]['urls'].replace(patt, "");
 				setCookieProperty(cookiefavorites,'urls', urls);
