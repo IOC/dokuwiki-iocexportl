@@ -5,7 +5,6 @@ define (["render"],function(render){
 	var lfavcount = parseInt($("#favcounter").css('left'),10);
 	var lfavorites = parseInt($("#favorites").css('left'),10);
 	var topheader = parseInt($("#header").css('height'),10);
-	var aheight = $("article").height()+50;
 	var paddingarticle = parseInt($("article").css('padding-bottom'),10);
 	var defaultsettings = '{"menu":[{"mvisible":1}],"toc":[{"tvisible":0}],"settings":[{"fontsize":2,"contrast":0,"alignment":0,"hyphen":0,"width":2,"mimages":1,"scontent":1}]}';
 	var defaultbookmarks = '{"fav":[{"urls":"0"}]}';
@@ -960,8 +959,9 @@ define (["render"],function(render){
 	});
 	
 	var setArticleMinHeight = (function(){
-		if (($(".content").height()-200) < $(window).height()){
-			$("article").css("height",$(window).height()-aheight);
+		var top = $(".pnpage").offset().top;
+		if (top < $(window).height()){
+			$("article").css("height",$(".pnpage").offset().top+30);
 		}
 	});
 	
