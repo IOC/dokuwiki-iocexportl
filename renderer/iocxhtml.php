@@ -661,7 +661,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
 
     function doublequoteclosing() {
         global $lang;
-        $this->doc .= $lang['doublequoteclosing'];;
+        $this->doc .= $lang['doublequoteclosing'];
     }
 
     function php($text, $wrapper='dummy') {

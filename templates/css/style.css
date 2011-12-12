@@ -1807,6 +1807,7 @@ cursor:pointer;
  display: table-cell;
  margin-right: 1.5em;
  max-width: 250px;
+ max-height: 350px;
 }
 
 .meta h1{
@@ -1902,6 +1903,29 @@ table .centeralign{
 table .rightalign{ 
  text-align: right; 
 }
+
+
+/***************** ACCOUNTING ************************/
+.iocaccounting .titletable{
+ margin: 0 auto 0.4em;
+}
+.iocaccounting .titletable a > span{
+ counter-increment:ctable;
+ font-weight:bold;
+}
+
+.iocaccounting .titletable a > span:after{
+ content:" " counter(counth1) "." counter(ctable) ". ";
+}
+
+.iocaccounting table th {
+    background-color: #CCCCCC;
+}
+
+.iocaccounting table td, .iocaccounting table th {
+    border: 1px solid;
+}
+
 
 /******************* FIGUREC **************************/
 .iocfigurec{

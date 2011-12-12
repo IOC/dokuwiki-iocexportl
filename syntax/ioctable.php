@@ -217,9 +217,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         preg_match('/::([^:]*):/', $text, $matches);
                         $this->type = (isset($matches[1]))?$matches[1]:'';
                         if($this->type === 'table'){
-                            $renderer->doc .= '<div class="ioctable">';
+                            $renderer->doc .= '<div class="ioctable donthyphenate">';
                         }else{
-                            $renderer->doc .= '<div class="iocaccounting">';
+                            $renderer->doc .= '<div class="iocaccounting donthyphenate">';
                         }
                         $this->footer = (isset($params['footer']))?$params['footer']:'';
                         $renderer->doc .= '<div class="titletable"><a name="'.$id.'">';

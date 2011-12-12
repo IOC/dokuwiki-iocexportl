@@ -5,6 +5,7 @@ define (["render"],function(render){
 	var lfavcount = parseInt($("#favcounter").css('left'),10);
 	var lfavorites = parseInt($("#favorites").css('left'),10);
 	var topheader = parseInt($("#header").css('height'),10);
+	var aheight = $("article").height()+50;
 	var paddingarticle = parseInt($("article").css('padding-bottom'),10);
 	var defaultsettings = '{"menu":[{"mvisible":1}],"toc":[{"tvisible":0}],"settings":[{"fontsize":2,"contrast":0,"alignment":0,"hyphen":0,"width":2,"mimages":1,"scontent":1}]}';
 	var defaultbookmarks = '{"fav":[{"urls":"0"}]}';
@@ -778,7 +779,7 @@ define (["render"],function(render){
 		if (info){
 			var url = document.location.pathname;
 			var patt;
-			$("h2").each(function(i){
+			$("h2,h3,h4").each(function(i){
 				patt = new RegExp(";;"+url+"#"+$(this).children("a").attr("id")+"\\|.*?(?=$|;;)", 'g');
 				if(patt.test(info.fav[0]['urls'])){
 					$(this).children("span[name='star']").removeClass().addClass("starmarked").show();
@@ -957,8 +958,9 @@ define (["render"],function(render){
 	});
 	
 	var setArticleMinHeight = (function(){
-		var height = $(window).height();
-		$("article").css("min-height",height-318);
+		if (($(".content").height()-200) < $(window).height()){
+			$("article").css("height",$(window).height()-aheight);
+		}
 	});
 	
 	
@@ -1174,7 +1176,8 @@ define (["render"],function(render){
 	setNumberHeader();
 	setNumFigRef();
 	setNumTabRef();
-	setArticleMinHeight();
+	$(document).ready(setArticleMinHeight());
+
 	if(ispagenoHeader()){
 		$("h1,h2,h3").each(function(i){
 			$(this).addClass('nocount');
