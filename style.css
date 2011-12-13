@@ -30,6 +30,13 @@ width:auto !important;
 
 /* Quizes
 -------------------------------------------------------------------------------*/
+.quiz td p {
+    display: inline;
+}
+.quiz td {
+    padding: 1em;
+}
+
 p.ok, p.ko{
  height:0.5em;
 }

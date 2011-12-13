@@ -959,10 +959,10 @@ define (["render"],function(render){
 	});
 	
 	var setArticleMinHeight = (function(){
-		if (!ispageIndex()){
+		if (!ispageIndex() && !ispageSearch()){
 			var top = $("footer").offset().top;
 			if (top > 0 && top < $(window).height()){
-				$("article").css("height",top+30);
+				$("article").css("height",top-80);
 			}
 		}
 	});
@@ -1160,17 +1160,17 @@ define (["render"],function(render){
 		}
 	);
 
-	$(document).on("click", "h2,h3,h4", function(){
+	$(document).on("click", "h2 > a,h3 > a,h4 > a", function(){
 		if (islocalChrome()){
 			return;
 		}
-		var id = $(this).children("a").attr("id");
+		var id = $(this).attr("id");
 		editFavorite(document.location.pathname+"#"+id,id);
-		if ($(this).children("span[name='star']").hasClass("star")){
-			$(this).children("span[name='star']").removeClass().addClass("starmarked");
-			$(this).children("span[name='star']").show();
+		if ($(this).siblings("span[name='star']").hasClass("star")){
+			$(this).siblings("span[name='star']").removeClass().addClass("starmarked");
+			$(this).siblings("span[name='star']").show();
 		}else{
-			$(this).children("span[name='star']").removeClass().addClass("star");
+			$(this).siblings("span[name='star']").removeClass().addClass("star");
 		}	
 	});
 

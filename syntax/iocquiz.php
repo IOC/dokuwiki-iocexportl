@@ -222,7 +222,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
       }
     }
 
-    function printquiz($text, $mode, $renderer){
+    function printquiz($text, $mode, $renderer, $export = FALSE){
         //Get and print statement
         preg_match('/^(?<!  \*)(.*?\n)+(?=\n+  \*)/', $text, $matches);
         $text = str_replace($matches[0], '', $text);

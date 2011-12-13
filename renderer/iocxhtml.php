@@ -195,6 +195,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if (!isset($_SESSION['draft'])){
             $_SESSION['draft'] = FALSE;
         }
+        if (!isset($_SESSION['export_html'])){
+            $_SESSION['export_html'] = FALSE;
+        }
         if (!isset($_SESSION['figfooter'])){
             $_SESSION['figfooter'] = '';
         }
@@ -1216,14 +1219,18 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 $ret .= '<figure>'.DOKU_LF;
                 $figtitle = '<span>Figura</span>'.$_SESSION['fig_title'];
                 $ret .= '<figcaption>'.$figtitle.'</figcaption>';
-            }elseif(!$this->table){
+            }elseif(!$this->table && $_SESSION['export_html']){
                 $ret .= '<div class="iocfigurec">'.DOKU_LF;
                 $ret .= '<ul>'.DOKU_LF;
                 $ret .= '<li>'.DOKU_LF;
             }
             //add image tag
             //$ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
-            $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
+            if ($_SESSION['export_html']){
+                $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
+            }else{
+                $ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
+            }
 /*            if ($width && $height){
                 $ret .= ' width="'.$width.'" height="'.$height.'"';
             }*/
@@ -1253,7 +1260,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $ret .= ' />';
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
-            }elseif(!$this->table){
+            }elseif(!$this->table && $_SESSION['export_html']){
                 $ret .= '</li>';
                 if ($title) {
                     $title = preg_replace('/\/[+-]?\d+$/', '', $title);

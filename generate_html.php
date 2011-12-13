@@ -47,6 +47,7 @@ $toexport = explode(',',preg_replace('/:index(,|$)/',',',$_POST['toexport']));
 $output_filename = str_replace(':','_',$id);
 if ($_POST['mode'] !== 'zip') return FALSE;
 session_start();
+$_SESSION['export_html'] = TRUE;
 $tmp_dir = rand();
 $_SESSION['tmp_dir'] = $tmp_dir;
 $_SESSION['latex_images'] = array();
@@ -233,6 +234,7 @@ if ($res === TRUE) {
 }else{
     $result = 'No es pot iniciar l\'arxiu zip';
 }
+$_SESSION['export_html'] = FALSE;
 session_destroy();
 
 removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
