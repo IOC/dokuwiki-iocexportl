@@ -258,7 +258,7 @@ define (["render"],function(render){
 				case 63:$("#help").toggleClass("hidden");
 			 		 break;
 				//b
-				case 98:$(window).scrollTop($("footer").offset().top);
+				case 98:$(window).scrollTop($(window).scrollTop()+$("footer").offset().top);
 					 break;
 				//g
 				case 103:setmenu($("#menu li[name='toc']"));
@@ -959,9 +959,11 @@ define (["render"],function(render){
 	});
 	
 	var setArticleMinHeight = (function(){
-		var top = $(".pnpage").offset().top;
-		if (top < $(window).height()){
-			$("article").css("height",$(".pnpage").offset().top+30);
+		if (!ispageIndex()){
+			var top = $("footer").offset().top;
+			if (top > 0 && top < $(window).height()){
+				$("article").css("height",top+30);
+			}
 		}
 	});
 	

@@ -456,7 +456,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $max_menu;
         global $def_section_href;
         $types = array('activitats','annexos','exercicis');
-
+        $name = trim($name);
         if (strlen($name) > $max_menu){
             $name = substr($name, 0, $max_menu) . '...';
         }
