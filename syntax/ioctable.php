@@ -226,7 +226,8 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '<span>Taula</span>';
                         $renderer->doc .= '</a>';
                         if (isset($params['title'])){
-                            $renderer->doc .= ' '.$params['title'];
+                            $instructions = get_latex_instructions($params['title']);
+                            $renderer->doc .= preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
                         }
                         $renderer->doc .= '</div>';
                         break;

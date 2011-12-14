@@ -1217,7 +1217,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }
             if ($_SESSION['figure']){
                 $ret .= '<figure>'.DOKU_LF;
-                $figtitle = '<span>Figura</span>'.$_SESSION['fig_title'];
+                $figtitle = '<span class="figuretitle">Figura</span>'.$_SESSION['fig_title'];
                 $ret .= '<figcaption>'.$figtitle.'</figcaption>';
             }elseif(!$this->table && $_SESSION['export_html']){
                 $ret .= '<div class="iocfigurec">'.DOKU_LF;

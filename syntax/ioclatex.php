@@ -96,6 +96,10 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
             return TRUE;
         }elseif ($mode === 'iocxhtml'){
             if(!$this->reservedWords($data)){
+                $lpath = '../';
+                if($_SESSION['iocintro']){
+                    $lpath = '';
+                }
                 $block = preg_match('/^\${2}/', $data);
                 $class = ($block)?'blocklatex':'inlinelatex';
                 $render = new Doku_Renderer_xhtml();
@@ -106,7 +110,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                     $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
                 }
                 array_push($_SESSION['latex_images'],$path);
-                $renderer->doc .= '<span class="'.$class.'"><img src="../media/'.basename($match[1]).'" /></span>';
+                $renderer->doc .= '<span class="'.$class.'"><img src="'.$lpath.'media/'.basename($match[1]).'" /></span>';
             }
             return TRUE;
         }

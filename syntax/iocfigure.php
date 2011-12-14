@@ -179,7 +179,8 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
                         break;
                     case DOKU_LEXER_UNMATCHED :
                         if (isset($params['title'])){
-                            $_SESSION['fig_title'] = $params['title'];
+                            $instructions = get_latex_instructions($params['title']);
+                            $_SESSION['fig_title'] = preg_replace('/(<p>)(.*?)(<\/p>)/s','$2',p_latex_render($mode, $instructions, $info));
                         }
                         $this->footer = (isset($params['footer']))?$params['footer']:'';
                         $_SESSION['figure'] = TRUE;

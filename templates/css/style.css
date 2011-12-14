@@ -1837,11 +1837,11 @@ figcaption{
  text-align: left;
 }
 
-figcaption span{
+figcaption .figuretitle{
  font-weight:bold;
 }
 
-figcaption span:after{
+figcaption .figuretitle:after{
  content:" " counter(counth1) "." counter(cfigure) ". ";
 }
 

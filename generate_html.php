@@ -124,6 +124,7 @@ if ($res === TRUE) {
         //var to attach all url media files
         $files = array();
         //Intro
+        $_SESSION['iocintro'] = TRUE;
         foreach ($data[0]['intro'] as $i=>$page){
            $text = io_readFile(wikiFN($page[1]));
            list($header, $text) = extractHeader($text);
@@ -141,16 +142,24 @@ if ($res === TRUE) {
            $html = createrefstopages($html, $data[0]['intro'], '', $i, '', '');
            $zip->addFromString(basename(wikiFN($page[1]),'.txt').'.html', $html);
          }
+         $_SESSION['iocintro'] = FALSE;
          unset($data[0]['intro']);
          //Attach media files
          foreach($files as $sf){
              foreach($sf as $f){
                  resolve_mediaid(getNS($f),&$f,&$exists);
                  if ($exists){
-                     $zip->addFile(mediaFN($f), '/media/'.basename(mediaFN($f)));
+                     $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
                  }
              }
          }
+         //Attach latex files
+         foreach($_SESSION['latex_images'] as $l){
+             if (file_exists($l)){
+                 $zip->addFile($l, 'media/'.basename($l));
+             }
+         }
+         $_SESSION['latex_images'] = array();
     }
      //Content468
      foreach ($data[0] as $ku => $unit){
