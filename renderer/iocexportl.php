@@ -1093,7 +1093,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         //$url = $this->_xmlEntities($url);
         //Escape # only inside iocelem
         if ($_SESSION['iocelem']){
-            $url = preg_replace('/#/','\\\\#', $url);
+            $url = preg_replace('/(#|%)/','\\\\$1', $url);
         }
         if (!$title){
             $this->doc .= '\url{'.$url.'}';
