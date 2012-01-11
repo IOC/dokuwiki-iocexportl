@@ -139,7 +139,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         $offset = (isset($params['offset']))?'['.$params['offset'].'mm]':'';
                         $renderer->doc .= '\iocreference'.$offset.'{';
                     }
-                    $_SESSION['iocelem'] = ($type === 'example' || $type === 'ioctextl' || $type === 'quote')?'textl':TRUE;
+                    $_SESSION['iocelem'] = ($type === 'example' || $type === 'ioctextl' || $type === 'quote' || $type === 'important')?'textl':TRUE;
                     break;
                 case DOKU_LEXER_UNMATCHED :
                         $renderer->doc .= $this->_parse($data, $mode);
