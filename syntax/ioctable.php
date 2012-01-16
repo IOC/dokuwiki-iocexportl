@@ -124,7 +124,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_title'] = (isset($params['title']))?$params['title']:'';
                     //Transform quotes
                     $_SESSION['table_title'] = preg_replace('/(")([^"]+)(")/', '``$2\'\'', $_SESSION['table_title']);
-                    $_SESSION['table_footer'] = (isset($params['footer']) && !isset($params['large']))?trim($renderer->_xmlEntities($params['footer'])):'';
+                    $_SESSION['table_footer'] = (isset($params['footer']))?trim($renderer->_xmlEntities($params['footer'])):'';
                     if (!empty($_SESSION['table_footer'])){
                         $_SESSION['onemoreparsing'] = TRUE;
                     }
@@ -154,8 +154,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     }
                     if ($_SESSION['table_footer'] && $_SESSION['table_large']) {
                         $hspace = '[\textwidth+\marginparwidth+10mm]';
-                        $vspace = '\vspace{4mm}';
-                        $renderer->doc .=  $vspace.'\tablefooterlarge'.$hspace.'{'.$_SESSION['table_footer'].'}';
+                        $renderer->doc .=  '\tablefooterlarge'.$hspace.'{'.$_SESSION['table_footer'].'}';
                     }
                     if ($_SESSION['table_large']){
                         $renderer->doc .= '}'.DOKU_LF;
@@ -164,7 +163,10 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     }elseif ($_SESSION['table_small']){
                         $renderer->doc .= '\end{SCtable}'.DOKU_LF;
                     }
-                    $renderer->doc .= '\vspace{-2ex}\par'.DOKU_LF;
+                    if (!$_SESSION['table_large']){
+                        $renderer->doc .= '\vspace{-2ex}';
+                    }
+                    $renderer->doc .= '\par'.DOKU_LF;
                     $_SESSION['table_id'] = '';
                     $_SESSION['table_title'] = '';
                     $_SESSION['table_footer'] = '';
