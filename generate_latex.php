@@ -26,8 +26,9 @@ $img_src = array('familyicon_administracio.png','familyicon_electronica.png', 'f
 $ioclanguage = array('CA' => 'catalan', 'DE' => 'german', 'EN' => 'english','ES' => 'catalan','FR' => 'frenchb','IT' => 'italian');
 $ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
 //Due listings problems whith header it's necessary to replace extended characters
-$ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç');
-$end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}');
+$ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç','\\\\');
+$end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\linebreak\vspace{-0.8em}\linebreak ');
+$meta_dcicle = 'dcicle';
 
 if (!checkPerms()) return FALSE;
 $exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
@@ -176,7 +177,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $end_characters;
 
         if ($unitzero){
+            $filename = 'backgroundu0';
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
+            if ($_SESSION['double_cicle']){
+                $filename .= 'dc';
+                $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '20', $latex, 1);
+            }else{
+                $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '10', $latex, 1);
+            }
+            $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
             $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', $data[1]['familia'], $latex);
             if (preg_match('/administraci/i', $data[1]['familia'])){
                 $family = 0;
@@ -192,9 +201,19 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
-            $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $data[1]['ciclenom'], $latex);
+            $header_ciclenom = str_replace($ini_characters, $end_characters, $data[1]['ciclenom']);
+            $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $header_ciclenom, $latex);
+
         }else{
+            $filename = 'background';
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx');
+            if ($_SESSION['double_cicle']){
+                $filename .= 'dc';
+                $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '20', $latex, 1);
+            }else{
+                $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '10', $latex, 1);
+            }
+            $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
             $header_nomcomplert = str_replace($ini_characters, $end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
@@ -512,6 +531,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         global $id;
         global $unitzero;
         global $meta_params;
+        global $meta_dcicle;
 
         $data = array();
         $data[0] = array();
@@ -529,6 +549,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 preg_match_all('/ {2,4}\* (\*\*(.*?)\*\*:)(.*)/m', $text, $info, PREG_SET_ORDER);
                 foreach ($info as $i){
                     $key = trim($i[2]);
+                    if ($key === $meta_dcicle){
+                        $_SESSION['double_cicle'] = TRUE;
+                        continue;
+                    }
                     if (in_array($key, $meta_params)){
                         $data[1][$key] = trim($i[3]);
                     }else{

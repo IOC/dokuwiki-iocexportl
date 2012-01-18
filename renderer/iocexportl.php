@@ -76,11 +76,18 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
         }
         if ($_SESSION['u0']){
-            copy(DOKU_PLUGIN.'iocexportl/templates/backgroundu0.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/backgroundu0.pdf');
+            //copy(DOKU_PLUGIN.'iocexportl/templates/backgroundu0.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/backgroundu0.pdf');
+            $filename = 'backgroundu0';
         }else{
-            copy(DOKU_PLUGIN.'iocexportl/templates/background.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/background.pdf');
+            //copy(DOKU_PLUGIN.'iocexportl/templates/background.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/background.pdf');
+            $filename = 'background';
         }
-
+        if ($_SESSION['double_cicle']){
+            $filename .= 'dc';
+        }
+        if(!file_exists(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$filename.'.pdf')){
+            copy(DOKU_PLUGIN.'iocexportl/templates/'.$filename.'.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$filename.'.pdf');
+        }
         //Global variables
         $this->_initialize_globals();
     }
@@ -98,7 +105,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 
 
 	/**
-     * NOVA
+     * Initialization session variables
      */
     function _initialize_globals(){
         if (!isset($_SESSION['accounting'])){
@@ -115,6 +122,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         if (!isset($_SESSION['createbook'])){
             $_SESSION['createbook'] = FALSE;
+        }
+        if (!isset($_SESSION['double_cicle'])){
+            $_SESSION['double_cicle'] = FALSE;
         }
         if (!isset($_SESSION['draft'])){
             $_SESSION['draft'] = FALSE;
