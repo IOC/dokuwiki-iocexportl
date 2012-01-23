@@ -20,6 +20,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
 
     static $vimeo = 'http://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
     static $youtube = 'http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1';
+    static $dailymotion = 'http://www.dailymotion.com/embed/video/@VIDEO@';
 
    /**
     * Get an associative array with plugin info.
@@ -51,7 +52,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('\{\{\s?(?:vimeo|youtube).*?>[^}]+\}\}', $mode, 'plugin_iocexportl_iocmedia');
+        $this->Lexer->addSpecialPattern('\{\{\s?(?:vimeo|youtube|dailymotion).*?>[^}]+\}\}', $mode, 'plugin_iocexportl_iocmedia');
     }
 
     /**
@@ -99,9 +100,15 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
         if ($mode === 'iocexportl'){
             list($site, $url, $title) = $data;
-            if($site === 'vimeo' || $site === 'youtube'){
+            if($site === 'dailymotion' || $site === 'vimeo' || $site === 'youtube'){
                 $_SESSION['qrcode'] = TRUE;
-                $type = ($site === 'vimeo')?self::$vimeo:self::$youtube;
+                if ($site === 'dailymotion'){
+                    $type = self::$dailymotion;
+                }elseif($site === 'vimeo'){
+                    $type = self::$vimeo;
+                }else{
+                    $type = self::$youtube;
+                }
                 $url = preg_replace('/@VIDEO@/', $url, $type);
                 qrcode_media_url($renderer, $url, $title, $site);
             }
@@ -110,16 +117,26 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= $title;
         }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
             list($site, $url, $title, $width, $height) = $data;
-            if($site === 'vimeo' || $site === 'youtube'){
-                $type = ($site === 'vimeo')?self::$vimeo:self::$youtube;
+            if($site === 'dailymotion' || $site === 'vimeo' || $site === 'youtube'){
+                if ($site === 'dailymotion'){
+                    $type = self::$dailymotion;
+                }elseif($site === 'vimeo'){
+                    $type = self::$vimeo;
+                }else{
+                    $type = self::$youtube;
+                }
                 $url = preg_replace('/@VIDEO@/', $url, $type);
             }
             $renderer->doc .= '<div class="mediavideo">';
-            $renderer->doc .= html_flashobject(
-                            $url,
-                            $width,
-                            $height,
-                            array('wmode' => 'opaque'));
+            if ($site === 'dailymotion'){
+                 $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
+            }else{
+                $renderer->doc .= html_flashobject(
+                                $url,
+                                $width,
+                                $height,
+                                array('wmode' => 'opaque'));
+            }
             $renderer->doc .= '</div>';
         }
         return FALSE;
