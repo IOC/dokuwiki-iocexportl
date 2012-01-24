@@ -1231,14 +1231,15 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }else{
                 $ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
             }
+            if($this->table && $width){
+                $ret .= ' width="'.$width.'"';
+            }
 /*            if ($width && $height){
                 $ret .= ' width="'.$width.'" height="'.$height.'"';
             }*/
 
-            if (!$_SESSION['figure']){
+            if (!$_SESSION['figure'] && !$this->table){
                 $ret .= ' class="imgB"';
-            }else{
-                $ret .= ' class="media'.$align.'"';
             }
 
             // make left/right alignment for no-CSS view work (feeds)

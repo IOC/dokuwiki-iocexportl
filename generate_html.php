@@ -35,6 +35,8 @@ if (!checkPerms()) return FALSE;
 $exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
 if (!$exportallowed && !auth_isadmin()) return FALSE;
 
+@set_time_limit(240);
+
 $time_start = microtime(TRUE);
 
 //get seccions to export

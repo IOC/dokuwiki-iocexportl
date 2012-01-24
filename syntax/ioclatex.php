@@ -104,13 +104,21 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                 $class = ($block)?'blocklatex':'inlinelatex';
                 $render = new Doku_Renderer_xhtml();
                 $xhtml = $render->render($data);
-                if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
-                    $path = mediaFN($match[2]);
-                } else {
-                    $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                //Inside quiz and xhtml wiki required
+                if ($_SESSION['xhtml_latex_quiz']){
+                    $renderer->doc .= $xhtml;
+                }else{
+                    if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {
+                        $path = mediaFN($match[2]);
+                    } else {
+                        $path = DOKU_INC . "lib/plugins/latex/images/renderfail.png";
+                    }
+                    if (!isset($_SESSION['latex_images'])){
+                        $_SESSION['latex_images'] = array();
+                    }
+                    array_push($_SESSION['latex_images'],$path);
+                    $renderer->doc .= '<span class="'.$class.'"><img src="'.$lpath.'media/'.basename($match[1]).'" /></span>';
                 }
-                array_push($_SESSION['latex_images'],$path);
-                $renderer->doc .= '<span class="'.$class.'"><img src="'.$lpath.'media/'.basename($match[1]).'" /></span>';
             }
             return TRUE;
         }

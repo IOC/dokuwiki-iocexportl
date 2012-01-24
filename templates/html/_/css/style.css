@@ -1508,6 +1508,7 @@ figcaption .figuretitle:after{
  display:block;
  padding: 1em 0;
  font-size: 90%;
+ overflow:auto;
 }
 .ioctable .titletable{
  margin: 0 auto 0.4em;

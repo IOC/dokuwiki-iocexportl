@@ -180,6 +180,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!isset($_SESSION['video_url'])){
             $_SESSION['video_url'] = FALSE;
         }
+        if (!isset($_SESSION['xhtml_latex_quiz'])){
+            $_SESSION['xhtml_latex_quiz'] = FALSE;
+        }
     }
 
     /**
