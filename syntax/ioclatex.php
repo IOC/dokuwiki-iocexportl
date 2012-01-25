@@ -127,7 +127,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
 
     /**
      *
-     * Function returns whether latex command is a reseved word
+     * Function returns whether latex command is a reserved word
      * @param string $text
      * @return boolean
      */
