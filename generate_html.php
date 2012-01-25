@@ -875,6 +875,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     while($cont < count($data) && !is_array($data[$sect])){
                         next($data);
                         $sect = key($data);
+                        $cont++;
                     }
                     if (is_array($data[$sect])){
                         $phref = $href.'WebContent/'.$unit.'/'.$sect.'/'.$def_section_href.'.html';
@@ -925,6 +926,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         while($cont < count($data) && is_array($data[$sect])){
                             prev($data);
                             $sect = key($data);
+                            $cont++;
                         }
                         if (!is_array($data[$sect])){//Look whether intro exists when we're at first section
                             $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $sect)).'.html';
