@@ -129,8 +129,8 @@ if ($res === TRUE) {
         $_SESSION['iocintro'] = TRUE;
         foreach ($data[0]['intro'] as $i=>$page){
            $text = io_readFile(wikiFN($page[1]));
-           list($header, $text) = extractHeader($text);
            $navmenu = createNavigation('',array($page[0]), array(''));
+           list($header, $text) = extractHeader($text);
            preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
            array_push($files, $matches[1]);
            $instructions = get_latex_instructions($text);
@@ -363,7 +363,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     if(!isset($data['intro'])){
                         $data['intro'] = array();
                     }
-                    array_push($data['intro'], array($match[2],$ns));
+                    $text = io_readFile($conf['datadir'].'/'.preg_replace('/:/', '/', $ns).'.txt');
+                    $header = getHeader($text);
+                    array_push($data['intro'], array($header, $ns));
                 }else{
                     $ns = preg_replace('/:/' ,'/', $ns);
                     $content = io_readFile($conf['datadir'].'/'.$ns.'/index.txt');
@@ -530,8 +532,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             //Intro
             $menu_html .= '@IOCSTARTINTRO@';
             foreach ($elements['intro'] as $kp => $page){
+                $text = io_readFile(wikiFN($page[1]));
                 $href = '@IOCPATH@'.basename(wikiFN($page[1]),'.txt').'.html';
-                //$menu_html .= setMenu('root', $page[0], $href, 'c'.$kp);
                 $menu_html .= setMenu('root', $page[0], $href, basename(str_replace(':','/',$page[1])));
                 array_push($files, '"'.str_replace('@IOCPATH@', '', $href).'"');
             }
@@ -555,8 +557,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 if (!is_array($section)){
                     $text = io_readFile(wikiFN($section));
                     $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html';
-                    preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
-                    $act_name = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
+                    $act_name = getHeader($text);
                     $tree_names[$ku][$ks]=$act_name;
                     $menu_html .= setMenu('intro', $act_name, $act_href, $ku.$ks);
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
@@ -582,8 +583,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $text = io_readFile(wikiFN($act));
                     $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html';
                     if ($ka !== 'continguts'){
-                        preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
-                        $act_name = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
+                        $act_name = getHeader($text);
                         $tree_names[$ku][$ks][$ka]=$act_name;
                         $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
                     }else{//File continguts has a short name
@@ -782,6 +782,16 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             return array($header, $text);
         }
         return array('',$text);
+    }
+
+    /**
+    *
+    * Get main header from text
+    */
+    function getHeader($text){
+        preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
+        $pagename = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
+        return $pagename;
     }
 
      /**
