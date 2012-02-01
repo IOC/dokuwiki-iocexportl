@@ -2345,6 +2345,12 @@ article figure img{
  color: #000000;
  overflow-x: auto;
 }
+
+.code ol li{
+ list-style:none outside none;
+ margin: 0;
+}
+
 .code a:hover{
  text-decoration:underline;
  color:#000;
@@ -2614,4 +2620,8 @@ article figure img{
  display:inline-block;
  height:100%;
  vertical-align:middle;
+}
+
+iframe{
+ max-width:100%;
 }

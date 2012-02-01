@@ -29,6 +29,8 @@ $menu_html = '';
 static $meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
 $tree_names = array();
 static $web_folder = 'WebContent';
+static $meta_dcicle = 'dcicle';
+$double_cicle = FALSE;
 
 
 if (!checkPerms()) return FALSE;
@@ -53,6 +55,7 @@ $_SESSION['export_html'] = TRUE;
 $tmp_dir = rand();
 $_SESSION['tmp_dir'] = $tmp_dir;
 $_SESSION['latex_images'] = array();
+$_SESSION['graphviz_images'] = array();
 if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
     mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
 }
@@ -162,6 +165,13 @@ if ($res === TRUE) {
              }
          }
          $_SESSION['latex_images'] = array();
+         //Attach graphviz files
+         foreach($_SESSION['graphviz_images'] as $l){
+             if (file_exists($l)){
+                 $zip->addFile($l, 'media/'.basename($l));
+             }
+         }
+         $_SESSION['graphviz_images'] = array();
     }
      //Content468
      foreach ($data[0] as $ku => $unit){
@@ -239,6 +249,14 @@ if ($res === TRUE) {
                 $zip->addFile($l, $web_folder.'/'.$ku.'/media/'.basename($l));
             }
         }
+        $_SESSION['latex_images'] = array();
+        //Attach graphviz files
+        foreach($_SESSION['graphviz_images'] as $l){
+            if (file_exists($l)){
+                $zip->addFile($l, $web_folder.'/'.$ku.'/media/'.basename($l));
+            }
+        }
+        $_SESSION['graphviz_images'] = array();
     }
     $zip->close();
     returnData(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, $output_filename.'.zip');
@@ -430,6 +448,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     function getData(){
         global $id;
         global $meta_params;
+        global $meta_dcicle;
+        global $double_cicle;
 
         $data = array();
         $data[0] = array();
@@ -447,6 +467,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 preg_match_all('/ {2,4}\* (\*\*(.*?)\*\*:)(.*)/m', $text, $info, PREG_SET_ORDER);
                 foreach ($info as $i){
                     $key = trim($i[2]);
+                    if ($key === $meta_dcicle){
+                        $double_cicle = TRUE;
+                        continue;
+                    }
                     if (in_array($key, $meta_params)){
                         $data[1][$key] = trim($i[3]);
                     }else{
@@ -711,11 +735,20 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     * Create Meta data located at the bottom centered
     */
     function createMetaBC($data){
+        global $double_cicle;
 
         $meta .= '<ul>';
         $meta .= '<li>'.(isset($data['familia'])?$data['familia']:'').'</li>';
         $meta .= '<li><strong>'.(isset($data['creditcodi'])?$data['creditcodi']:'').'</strong></li>';
-        $meta .= '<li><strong>'.(isset($data['ciclenom'])?$data['ciclenom']:'').'</strong></li>';
+        if ($double_cicle){
+            $cicles = array();
+            $cc = (isset($data['ciclenom'])?$data['ciclenom']:'');
+            $cicles = preg_split('/\\\\/', $cc);
+            $meta .= '<li><strong>'.trim($cicles[0]).'</strong></li>';
+            $meta .= '<li><strong>'.trim($cicles[2]).'</strong></li>';
+        }else{
+            $meta .= '<li><strong>'.(isset($data['ciclenom'])?$data['ciclenom']:'').'</strong></li>';
+        }
         return $meta;
     }
 

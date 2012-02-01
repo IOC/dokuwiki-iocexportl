@@ -310,13 +310,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
         }
         if (file_exists($img_aux)){
-            /*if (!$_SESSION['figure'] && $_SESSION['iocelem'] === 'textl'){
-                $this->doc .=  '\begin{center}'.DOKU_LF;
-                if ($width > (.8 * self::$p_width)){
-                    $this->doc .= '\resizebox{.8\linewidth}{!}{';
-                }
-            //Image colB
-            }else*/if (!$this->table && !$_SESSION['figure'] && !$_SESSION['iocelem'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
+            if (!$this->table && !$_SESSION['figure'] && !$_SESSION['iocelem'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
                 $offset = '';
                 //Extract offset
                 if ($title){
@@ -340,7 +334,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 }
                 $this->doc .= '\begin{figure}[H]'.DOKU_LF;
             }
-            if ($linking !== 'details'){
+            if (!is_null($linking) && $linking !== 'details'){
                 $this->doc .= '\href{'.$linking.'}{';
             }
             if ($_SESSION['figure']){
@@ -372,20 +366,15 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if ($_SESSION['figure'] && $img_width){
                 $this->doc .= '\end{center}'.DOKU_LF;
             }
-            /*if($_SESSION['iocelem'] && !$_SESSION['figure']){
-                if ($width > (.8 * self::$p_width)){
-                    $this->doc .= '}' . DOKU_LF;
-                }
-                $this->doc .= '\end{center}' . DOKU_LF;
-            }else*/if ($this->table && $width > self::$img_max_table){
+            if ($this->table && $width > self::$img_max_table){
                 $this->doc .= '}';
 
             }
 			//Close href
-            if ($linking !== 'details'){
+            if (!is_null($linking) && $linking !== 'details'){
                 $this->doc .= '}';
                 if (!$_SESSION['video_url']){
-                    $this->doc .= 'DOKU_LF';
+                    $this->doc .= DOKU_LF;
                 }
             }
             if (!$_SESSION['video_url'] && !empty($footer)){
