@@ -8,7 +8,7 @@ if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../')
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 
 
-if (!file_exists(DOKU_PLUGIN.'graphviz/syntax.php')) return;
+if (!class_exists('syntax_plugin_graphviz')) return;
 
 class syntax_plugin_iocexportl_iocgraphviz extends syntax_plugin_graphviz {
 

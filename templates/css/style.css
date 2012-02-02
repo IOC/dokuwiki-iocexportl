@@ -278,7 +278,9 @@ mark {
  font-size:12pt;
 }
  
-#aside, #sidebar-hide, #navmenu, .search, footer div, .pnpage, .head, .search, #HyphenatorToggleBox{
+#aside, #sidebar-hide, #navmenu, .search, footer div, 
+  .pnpage, .head, .search, #HyphenatorToggleBox, .upbutton,
+  .btn_solution, .btn_solution2, .btn_solution3{
   display:none!important;
 }
 
@@ -295,7 +297,17 @@ article{
 }
 
 .header-shadow{
- box-shadow:none;
+ box-shadow:none!important;
+}
+ 
+.solution{
+ display:block!important;
+}
+ 
+.quiz select{
+ background: none repeat scroll 0 0 transparent;
+ border: 0 none;
+ text-align: center;
 }
 }
 
