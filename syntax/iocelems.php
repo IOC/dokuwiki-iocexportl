@@ -171,8 +171,10 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         }
                         break;
                     case DOKU_LEXER_UNMATCHED :
+                        $_SESSION['iocelem'] = TRUE;
                         $instructions = p_get_instructions($data);
                         $renderer->doc .= p_render($mode, $instructions, $info);
+                        $_SESSION['iocelem'] = FALSE;
                         break;
                     case DOKU_LEXER_EXIT :
                         $renderer->doc .= '</div>';
@@ -184,7 +186,7 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
             list($state, $data, $params) = $indata;
             switch ($state) {
                     case DOKU_LEXER_ENTER :
-            $matches = array();
+                        $matches = array();
                         preg_match('/::([^:]*):/', $data, $matches);
                         $type = (isset($matches[1]))?$matches[1]:'';
                         //TEXT LARGE
@@ -199,8 +201,10 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
                         }
                         break;
                     case DOKU_LEXER_UNMATCHED :
+                        $_SESSION['iocelem'] = TRUE;
                         $instructions = get_latex_instructions($data);
                         $renderer->doc .= p_latex_render($mode, $instructions, $info);
+                        $_SESSION['iocelem'] = FALSE;
                         break;
                     case DOKU_LEXER_EXIT :
                         $renderer->doc .= '</div>';

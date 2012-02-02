@@ -273,7 +273,12 @@ mark {
 /* Print styles!
 -------------------------------------------------------------------------------*/
 @media print {
-  #aside, #sidebar-hide, #navmenu, .search, footer div{
+#content{
+ font-family:serif;
+ font-size:12pt;
+}
+ 
+#aside, #sidebar-hide, #navmenu, .search, footer div, .pnpage, .head, .search, #HyphenatorToggleBox{
   display:none!important;
 }
 
@@ -287,6 +292,10 @@ article{
 .headdocument{
  text-shadow: none!important;
  letter-spacing: 0.1em!important;
+}
+
+.header-shadow{
+ box-shadow:none;
 }
 }
 
@@ -1455,6 +1464,10 @@ div.solution{
  margin: 0.4em auto;
  padding: 0.4em 1em;
  width:80%;
+}
+
+.imgelem{
+ text-align:center;
 }
 
 .quiz_result {

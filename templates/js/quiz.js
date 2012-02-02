@@ -141,6 +141,7 @@ define (["functions","render"],function(func,render){
 		}else{
 			jQuery(form).children(".solution").slideDown("slow");
 			jQuery(target).attr('value','Oculta');
+			jQuery('article').css('height','auto');
 			render.infoTable();
 			render.infoFigure();
 		}

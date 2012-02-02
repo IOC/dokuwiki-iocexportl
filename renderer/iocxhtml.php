@@ -1219,6 +1219,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 $ret .= '<figure>'.DOKU_LF;
                 $figtitle = '<span class="figuretitle">Figura</span>'.$_SESSION['fig_title'];
                 $ret .= '<figcaption>'.$figtitle.'</figcaption>';
+            }elseif($_SESSION['iocelem']){
+                $ret .= '<div class="imgelem">'.DOKU_LF;
             }elseif(!$this->table && $_SESSION['export_html']){
                 $ret .= '<div class="iocfigurec">'.DOKU_LF;
                 $ret .= '<ul>'.DOKU_LF;
@@ -1238,7 +1240,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 $ret .= ' width="'.$width.'" height="'.$height.'"';
             }*/
 
-            if (!$_SESSION['figure'] && !$this->table){
+            if (!$_SESSION['figure'] && !$_SESSION['iocelem'] && !$this->table){
                 $ret .= ' class="imgB"';
             }
 
@@ -1261,6 +1263,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             $ret .= ' />';
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
+            }elseif($_SESSION['iocelem']){
+                $ret .= '</div>'.DOKU_LF;
             }elseif(!$this->table && $_SESSION['export_html']){
                 $ret .= '</li>';
                 if ($title) {

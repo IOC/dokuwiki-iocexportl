@@ -10,9 +10,6 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 
 if (!file_exists(DOKU_PLUGIN.'graphviz/syntax.php')) return;
 
-//require_once(DOKU_PLUGIN.'graphviz/syntax.php');
-
-
 class syntax_plugin_iocexportl_iocgraphviz extends syntax_plugin_graphviz {
 
     /**
