@@ -275,12 +275,12 @@ mark {
 @media print {
 #content{
  font-family:serif;
- font-size:12pt;
+ font-size:11pt;
 }
  
-#aside, #sidebar-hide, #navmenu, .search, footer div, 
+#aside, #sidebar-hide, #favcounter, #navmenu, .search, footer div, 
   .pnpage, .head, .search, #HyphenatorToggleBox, .upbutton,
-  .btn_solution, .btn_solution2, .btn_solution3{
+  .btn_solution, .btn_solution2, .btn_solution3, .quiz_result{
   display:none!important;
 }
 
@@ -290,7 +290,7 @@ article{
  -moz-box-shadow: none!important;
  -webkit-box-shadow: none!important;
 }
-
+ 
 .headdocument{
  text-shadow: none!important;
  letter-spacing: 0.1em!important;
@@ -305,7 +305,7 @@ article{
 }
  
 .quiz select{
- background: none repeat scroll 0 0 transparent;
+ background: none repeat scroll 0 0 #fff;
  border: 0 none;
  text-align: center;
 }

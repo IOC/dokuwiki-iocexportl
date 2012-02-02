@@ -963,6 +963,8 @@ define (["render"],function(render){
 			var top = $("footer").offset().top;
 			if (top > 0 && top < $(window).height()){
 				$("article").css("height",top-80);
+			}else{
+				$("article").css("height","auto");
 			}
 		}
 	});
