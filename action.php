@@ -57,6 +57,7 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/numbering.js');
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/quiz.js');
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/render.js');
+            $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/jquery.imagesloaded.js');
         }
 
     }

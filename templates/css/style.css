@@ -278,7 +278,7 @@ mark {
  font-size:11pt;
 }
  
-#aside, #sidebar-hide, #favcounter, #navmenu, .search, footer div, 
+#aside, #sidebar-hide, #favcounter, #navmenu, #help, .search, footer div, 
   .pnpage, .head, .search, #HyphenatorToggleBox, .upbutton,
   .btn_solution, .btn_solution2, .btn_solution3, .quiz_result{
   display:none!important;
