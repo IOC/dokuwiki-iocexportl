@@ -36,35 +36,74 @@ class syntax_plugin_iocexportl_iocgraphviz extends syntax_plugin_graphviz {
                 $_SESSION['graphviz_images'] = array();
             }
             array_push($_SESSION['graphviz_images'], $img);
-            $_SESSION['figure'] = TRUE;
-            $_SESSION['figlabel'] = '';
-            $_SESSION['figtitle'] = '';
-            $_SESSION['figlarge'] = FALSE;
-            $_SESSION['figfooter'] = '';
             $R->doc .= '<div class="iocfigure">';
             $R->doc .= $R->_media($img);
             $R->doc .= '</div>';
-            $_SESSION['figure'] = FALSE;
-            $_SESSION['figlabel'] = '';
-            $_SESSION['figtitle'] = '';
-            $_SESSION['figlarge'] = FALSE;
-            $_SESSION['figfooter'] = '';
             return true;
         }elseif($format == 'iocexportl'){
-            $_SESSION['figure'] = TRUE;
-            $_SESSION['figlabel'] = '';
-            $_SESSION['figtitle'] = '';
-            $_SESSION['figfooter'] = '';
-            $src  = parent::_imgfile($data);
+            $src  = $this->_imgfile($data);
             $width = ($data['width'])?$data['width']:NULL;
             $height = ($data['height'])?$data['height']:NULL;
             $R->_latexAddImage($src, $width, $height);
-            $_SESSION['figure'] = FALSE;
-            $_SESSION['figlabel'] = '';
-            $_SESSION['figtitle'] = '';
-            $_SESSION['figfooter'] = '';
             return true;
         }
         return false;
     }
+
+    /**
+     * Return path to the rendered image on our local system
+     */
+    function _imgfile($data){
+        $cache  = parent::_cachename($data,'png');
+
+        // create the file if needed
+        if(!file_exists($cache)){
+            $in = parent::_cachename($data,'txt');
+            $ok = $this->_run($data,$in,$cache);
+            if(!$ok) return false;
+            clearstatcache();
+        }
+
+        // resized version
+        if($data['width']){
+            $cache = media_resize_image($cache,'png',$data['width'],$data['height']);
+        }
+
+        // something went wrong, we're missing the file
+        if(!file_exists($cache)) return false;
+
+        return $cache;
+    }
+
+    /**
+     * Run the graphviz program
+     */
+    function _run($data,$in,$out) {
+        global $conf;
+
+        if(!file_exists($in)){
+            if($conf['debug']){
+                dbglog($in,'no such graphviz input file');
+            }
+            return false;
+        }
+
+        $cmd  = '/usr/bin/dot';
+        $cmd .= ' -Tpng';
+        $cmd .= ' -Gdpi=300';
+        $cmd .= ' -K'.$data['layout'];
+        $cmd .= ' -o'.escapeshellarg($out); //output
+        $cmd .= ' '.escapeshellarg($in); //input
+
+        exec($cmd, $output, $error);
+
+        if ($error != 0){
+            if($conf['debug']){
+                dbglog(join("\n",$output),'graphviz command failed: '.$cmd);
+            }
+            return false;
+        }
+        return true;
+    }
+
 }
