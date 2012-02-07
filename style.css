@@ -127,11 +127,6 @@ div.dokuwiki #toc__inside ul{
 	width:98%;
 }
 
-.iocfigure{
-  /*margin:0 auto;
-	width:100% !important;*/
-}
-
 .iocfigure .iocinfo{
 	margin:2em auto 0;
 }
@@ -147,6 +142,7 @@ div.dokuwiki #toc__inside ul{
 .iocfigure img{
 	display:block;
 	margin:0 auto 2em auto;
+	max-width:100%;
 }
 
 
