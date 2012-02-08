@@ -384,7 +384,10 @@ define (["render"],function(render){
 
 	var setpnpage = (function (){
 		var width = parseInt($("article").outerWidth(true)) + 20;
-		$(".pnpage").css({width:width,
+		if (isIE() || isNaN(width)){
+			width = parseInt($("article").css('width')) + 80;
+		}
+		$(".pnpage").css({"width":width,
 						  "margin-left":-(width/2),
 						});
 	});
@@ -660,6 +663,10 @@ define (["render"],function(render){
 	
 	var islocalChrome = (function (){
 		return (/Chrome/.test(navigator.userAgent) && /file/.test(document.location.protocol));
+	});
+	
+	var isIE = (function (){
+		return (/MSIE/.test(navigator.userAgent));
 	});
 	
 	var postohashword = (function (){
