@@ -462,14 +462,14 @@ border-right:none;
  z-index: 1;
 }
 
-footer div:before{
+.footer div:before{
  content:"";
  height:100%;
  display:inline-block;
  vertical-align:middle;
 }
 
-footer div{
+.footer div{
  height:100%;
  width:50%;
  min-width:770px;
@@ -478,13 +478,13 @@ footer div{
  margin:0;
 }
 
-footer small{
+.footer small{
  display:inline-block;
  vertical-align: middle;
  font-size:60%;
 }
 
-footer {
+.footer {
  position: relative;
  width: 100%;
  background: #F5F1E8;

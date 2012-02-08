@@ -258,7 +258,13 @@ define (["render"],function(render){
 				case 63:$("#help").toggleClass("hidden");
 			 		 break;
 				//b
-				case 98:$(window).scrollTop($(window).scrollTop()+$("footer").offset().top);
+				case 98:var top;
+						if (!isIE()){
+							top = $(".footer").offset().top;
+						}else{
+							top = $(".footer").scrollTop();
+						}
+						$(window).scrollTop($(window).scrollTop()+top);
 					 break;
 				//g
 				case 103:setmenu($("#menu li[name='toc']"));
@@ -967,7 +973,12 @@ define (["render"],function(render){
 	
 	var setArticleMinHeight = (function(){
 		if (!ispageIndex() && !ispageSearch()){
-			var top = $("footer").offset().top;
+			var top;
+			if (!isIE()){
+				top = $(".footer").offset().top;
+			}else{
+				top = $(".footer").scrollTop();
+			}
 			if (top > 0 && top < $(window).height()){
 				$("article").css("height",top-80);
 			}else{

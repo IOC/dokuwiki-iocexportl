@@ -158,15 +158,15 @@ define (["functions","render"],function(func,render){
 		}
 		return false;
 	}
-	$('.btn_solution').on("click",function (){
+	jQuery('.btn_solution').on("click",function (){
 		checkquiz(this,func);
 	});
 	
-	$('.btn_solution2').click(function (){
+	jQuery('.btn_solution2').on("click",function (){
 		checkquiz2(this);
 	});
 	
-	$('.btn_solution3').click(function (){
+	jQuery('.btn_solution3').on("click",function (){
 		showsol(this,render);
 	});
 	

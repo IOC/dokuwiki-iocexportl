@@ -497,7 +497,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         $types = array('activitats','annexos','exercicis');
         $name = trim($name);
         if (strlen($name) > $max_menu){
-            $name = substr($name, 0, $max_menu) . '...';
+            $name = mb_substr($name, 0, $max_menu) . '...';
         }
         if ($type === 'root'){
             $class = ($index)?'indexnode':'rootnode';
@@ -839,7 +839,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             foreach ($options as $k => $op){
                 if ($op != 'Contingut'){
                     if ((strlen($op) > $max_navmenu) && $k < (count($options)-1)){
-                        $op = substr($op, 0, $max_navmenu) . '...';
+                        $op = mb_substr($op, 0, $max_navmenu) . '...';
                     }
                     $navigation .= '<li>';
                     if (!empty($refs[$k]) && (isset($options[$k+1]) && $options[$k+1] != 'Contingut')){
