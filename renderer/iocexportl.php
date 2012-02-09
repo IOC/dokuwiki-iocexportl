@@ -501,16 +501,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function hr() {
-        if (!$this->code){
-            $this->doc .= '\parbox[c]{\linewidth}{'.DOKU_LF;
-            $this->doc .= '\centering'.DOKU_LF;
-        }
-        $this->doc .= '\line(1,0){'.self::$hr_width.'}'.DOKU_LF;
-        if (!$this->code){
-            $this->doc .= '}'.DOKU_LF;
-        } else {
-            $this->code = FALSE;
-        }
+        $this->doc .= '\newpage'.DOKU_LF;
     }
 
     function linebreak() {

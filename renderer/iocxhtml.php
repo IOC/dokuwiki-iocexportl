@@ -434,7 +434,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     }
 
     function hr() {
-        $this->doc .= '<hr />'.DOKU_LF;
     }
 
     function linebreak() {
