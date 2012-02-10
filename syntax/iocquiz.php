@@ -59,7 +59,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
         $opt = array();
         switch ($state) {
             case DOKU_LEXER_ENTER :
-                $class = trim(substr($match,5,-1));
+                $class = trim(mb_substr($match,5,-1));
                 return array($state, $class);
 
             case DOKU_LEXER_UNMATCHED :
@@ -308,7 +308,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
                         $opt = str_replace(array('<p>','</p>'), '', $opt);
                         if (strlen($opt) > $max_option_length){
                             $title = ' title="'.$opt.'"';
-                            $opt = substr($opt, 0, $max_option_length) . '...';
+                            $opt = mb_substr($opt, 0, $max_option_length) . '...';
                         }
                         if (strlen($opt) > $max_length){
                             $max_length = strlen($opt);
