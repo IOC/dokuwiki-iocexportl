@@ -37,7 +37,7 @@ if (!$exportallowed && !auth_isadmin()) return FALSE;
 $time_start = microtime(TRUE);
 
 //get seccions to export
-$toexport = explode(',',$_POST['toexport']);
+$toexport = array_filter(explode(',',$_POST['toexport']));
 
 $output_filename = str_replace(':','_',$id);
 if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return FALSE;

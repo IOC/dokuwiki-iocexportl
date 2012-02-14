@@ -1932,6 +1932,11 @@ table .rightalign{
 
 
 /***************** ACCOUNTING ************************/
+.iocaccounting{
+ overflow-x: auto;
+ padding: 0.5em 0;
+}
+
 .iocaccounting .titletable{
  margin: 0 auto 0.4em;
 }

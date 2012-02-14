@@ -16,258 +16,301 @@ require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 require_once DOKU_INC.'inc/parser/xhtml.php';
 
-global $conf;
-
-//static $def_unit_href = 'introduccio.html';
-static $def_section_href = 'continguts';
-$exportallowed = FALSE;
-$id = getID();
-static $max_menu = 100;
-static $max_navmenu = 70;
-static $media_path = 'lib/exe/fetch.php?media=';
-$menu_html = '';
-static $meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
-$tree_names = array();
-static $web_folder = 'WebContent';
-static $meta_dcicle = 'dcicle';
-$double_cicle = FALSE;
-
-
-if (!checkPerms()) return FALSE;
-$exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-if (!$exportallowed && !auth_isadmin()) return FALSE;
-
-@set_time_limit(240);
-
-$time_start = microtime(TRUE);
-
-//get seccions to export
-if (empty($_POST['toexport'])){
-  echo json_encode('Empty exportation!');
-  return FALSE;
+//Initialize params
+$params = array();
+$params['id'] = getID();
+$params['mode'] = $_POST['mode'];
+if ($params['id'] === $_POST['id']){
+    $params['toexport'] = $_POST['toexport'];
+    $generate = new generate_html($params);
+    $generate->init();
 }
-$toexport = explode(',',preg_replace('/:index(,|$)/',',',$_POST['toexport']));
 
-$output_filename = str_replace(':','_',$id);
-if ($_POST['mode'] !== 'zip') return FALSE;
-session_start();
-$_SESSION['export_html'] = TRUE;
-$tmp_dir = rand();
-$_SESSION['tmp_dir'] = $tmp_dir;
-$_SESSION['latex_images'] = array();
-$_SESSION['graphviz_images'] = array();
-if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
-    mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
-}
-//get all pages and activitites
-$data = getData();
+class generate_html{
 
-$zip = new ZipArchive;
-$res = $zip->open(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
-if ($res === TRUE) {
-    list($menu_html, $files_name) = createMenu($data[0]);
-    //Get build.js and add which filenames will be used to search
-    $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
-    preg_match('/^([^.]*\.)*([^\.]*\.[^\/]*)\/.*?$/',$data[1]['creditcodi'],$matches);
-    $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
-    $cookiename = '';
-    if (isset($matches[2])){
-        $cookiename = str_replace(".", "_", $matches[2]);
+    //static $def_unit_href = 'introduccio.html';
+    private $def_section_href;
+    private $double_cicle;
+    private $exportallowed;
+    private $export_ok;
+    private $id;
+    private $log;
+    private $max_menu;
+    private $max_navmenu;
+    private $media_path;
+    private $menu_html;
+    private $meta_dcicle;
+    private $meta_params;
+    private $time_start;
+    private $toexport;
+    private $tree_names;
+    private $web_folder;
+
+   /**
+    * Default Constructor
+    *
+    * Initialize variables
+    *
+    * @param array $params Array of parameters to pass to the constructor
+    */
+    function __construct($params){
+        $this->def_section_href = 'continguts';
+        $this->exportallowed = FALSE;
+        $this->export_ok = ($params['mode'] === 'zip' && !empty($params['toexport']));
+        $this->id = $params['id'];
+        $this->max_menu = 100;
+        $this->max_navmenu = 70;
+        $this->media_path = 'lib/exe/fetch.php?media=';
+        $this->menu_html = '';
+        $this->meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
+        $this->tree_names = array();
+        $this->web_folder = 'WebContent';
+        $this->meta_dcicle = 'dcicle';
+        $this->double_cicle = FALSE;
+        $this->toexport = explode(',', preg_replace('/:index(,|$)/',',',$params['toexport']));
+        $this->log = isset($params['log']);
     }
-    $build = preg_replace('/@IOCCOOKIENAME@/', $cookiename, $build);
-    $zip->addFromString('_/js/build.js', $build);
-    getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
-    //Get index source
-    $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
-    $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 3);
-    $text_index = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_index, 1);
-    $text_index = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_index, 1);
-    //Get search source
-    $text_search = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'search.html');
-    $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 3);
-    $text_search = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_search, 1);
-    $text_search = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_search, 1);
-    //Get template source
-    $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
-    $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 3);
-    $text_template = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_template, 1);
-    $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
-    $text_template = preg_replace('/@IOCCOPYTEXT@/', $data[1]['copytext'], $text_template, 1);
-    //Create index page
-    $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $menu_html);
-    $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
-    $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/', '', $menu_html_index);
-    $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
-    $menu_html_index = preg_replace('/@IOCACTIVITYICONSTART@|@IOCACTIVITYICONEND@/', '', $menu_html_index);
-    $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
-    $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
-    $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
-    $html = preg_replace('/@IOCMETA@/',createMeta($data[1]), $html, 1);
-    $html = preg_replace('/@IOCMETABC@/',createMetaBC($data[1]), $html, 1);
-    $html = preg_replace('/@IOCMETABR@/',createMetaBR($data[1]), $html, 1);
-    addMetaMedia($data[1],$zip);
-    $html = preg_replace('/@IOCPATH@/', '', $html);
-    $zip->addFromString('index.html', $html);
-    //Create search page
-    $navmenu = createNavigation('');
-    $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_search, 1);
-    $html = preg_replace('/@IOCTITLE@/', 'Cerca', $html, 1);
-    $html = preg_replace('/@IOCTOC@/', '', $html, 1);
-    $html = preg_replace('/@IOCPATH@/', '', $html);
-    $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
-    $zip->addFromString('search.html', $html);
-    //Remove menu index ,expander and icon/name tags
-    $menu_html = preg_replace('/@IOCSTARTINDEX@|@IOCENDINDEX@/', '', $menu_html);
-    $menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $menu_html);
-    $menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/', '', $menu_html);
-    $menu_html = preg_replace('/@IOCACTIVITYNAMESTART@|@IOCACTIVITYNAMEEND@/', '', $menu_html);
-    if (isset($data[0]['intro'])){
-        if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $menu_html, $matches)){
-            $menu_html_intro = $matches[1];
-            $menu_html = preg_replace('/@IOCSTARTINTRO@.*?@IOCENDINTRO@/', '', $menu_html, 1);
-        }
-        //var to attach all url media files
-        $files = array();
-        //Intro
-        $_SESSION['iocintro'] = TRUE;
-        foreach ($data[0]['intro'] as $i=>$page){
-           $text = io_readFile(wikiFN($page[1]));
-           $navmenu = createNavigation('',array($page[0]), array(''));
-           list($header, $text) = extractHeader($text);
-           preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
-           array_push($files, $matches[1]);
-           $instructions = get_latex_instructions($text);
-           $html = p_latex_render('iocxhtml', $instructions, $info);
-           $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-           $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_intro, $html, 1);
-           $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
-           $html = preg_replace('/@IOCTOC@/', '', $html, 1);
-           $html = preg_replace('/@IOCPATH@/', '', $html);
-           $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
-           $html = createrefstopages($html, $data[0]['intro'], '', $i, '', '');
-           $zip->addFromString(basename(wikiFN($page[1]),'.txt').'.html', $html);
-         }
-         $_SESSION['iocintro'] = FALSE;
-         unset($data[0]['intro']);
-         //Attach media files
-         foreach($files as $sf){
-             foreach($sf as $f){
-                 resolve_mediaid(getNS($f),&$f,&$exists);
-                 if ($exists){
-                     $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
-                 }
-             }
-         }
-         //Attach latex files
-         foreach($_SESSION['latex_images'] as $l){
-             if (file_exists($l)){
-                 $zip->addFile($l, 'media/'.basename($l));
-             }
-         }
-         $_SESSION['latex_images'] = array();
-         //Attach graphviz files
-         foreach($_SESSION['graphviz_images'] as $l){
-             if (file_exists($l)){
-                 $zip->addFile($l, 'media/'.basename($l));
-             }
-         }
-         $_SESSION['graphviz_images'] = array();
-    }
-     //Content468
-     foreach ($data[0] as $ku => $unit){
-        //Section
-        //var to attach all url media files
-        $files = array();
-        $latex = array();
-        $unitname = $unit['iocname'];
-        unset($unit['iocname']);
-        if(preg_match('/@IOCSTARTUNIT@(.*?)@IOCENDUNIT@/', $menu_html, $matches)){
-            $menu_html_unit = $matches[1];
-            $menu_html = preg_replace('/@IOCSTARTUNIT@.*?@IOCENDUNIT@/', '', $menu_html, 1);
-        }
-        $def_unit_href = $unit['def_unit_href'];
-        unset($unit['def_unit_href']);
-        foreach ($unit as $ks => $section){
-            if (is_array($section)){
-                //Activities
-                $_SESSION['activities'] = TRUE;
-                foreach ($section as $ka => $act){
-                    $text = io_readFile(wikiFN($act));
-                    if (basename(wikiFN($act),'.txt') === 'activitats'){
-                        $_SESSION['activity'] = TRUE;
-                    }
-                    list($header, $text) = extractHeader($text);
-                    $navmenu = createNavigation('../../../',array($unitname,$tree_names[$ku][$ks]['sectionname'],$tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$def_section_href.'.html',''));
-                    preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
-                    array_push($files, $matches[1]);
-                    $instructions = get_latex_instructions($text);
-                    $html = p_latex_render('iocxhtml', $instructions, $info);
-                    $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-                    $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
-                    //preg_match_all('/(<span class="(blocklatex|inlinelatex)">.*?<\/span>)/', $html, $matches);
-                    $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
-                    $html = preg_replace('/@IOCTOC@/', $toc, $html, 1);
-                    $html = preg_replace('/@IOCPATH@/', '../../../', $html);
-                    $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
-                    $html = createrefstopages($html, $unit, $ku, $ks, $ka, '../../../');
-                    $zip->addFromString($web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html', $html);
-                    if (basename(wikiFN($act),'.txt') === 'activitats'){
-                        $_SESSION['activity'] = FALSE;
-                    }
-                }
-                $_SESSION['activities'] = FALSE;
-            }else{
-                $text = io_readFile(wikiFN($section));
-                list($header, $text) = extractHeader($text);
-                $navmenu = createNavigation('../../',array($unitname,$tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
-                preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
-                array_push($files, $matches[1]);
-                $instructions = get_latex_instructions($text);
-                $html = p_latex_render('iocxhtml', $instructions, $info);
-                $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
-                $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
-                $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
-                $html = preg_replace('/@IOCTOC@/', '', $html, 1);
-                $html = preg_replace('/@IOCPATH@/', '../../', $html);
-                $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
-                $html = createrefstopages($html, $unit, $ku, '', $ks, '../../');
-                $zip->addFromString($web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html', $html);
-            }
-        }
-        //Attach media files
-        foreach($files as $sf){
-            foreach($sf as $f){
-                resolve_mediaid(getNS($f),&$f,&$exists);
-                if ($exists){
-                    $zip->addFile(mediaFN($f), $web_folder.'/'.$ku.'/media/'.basename(mediaFN($f)));
-                }
-            }
-        }
-        //Attach latex files
-        foreach($_SESSION['latex_images'] as $l){
-            if (file_exists($l)){
-                $zip->addFile($l, $web_folder.'/'.$ku.'/media/'.basename($l));
-            }
-        }
+
+    /**
+     *
+     * Exportation to html
+     */
+    public function init(){
+        global $conf;
+
+        if (!$this->export_ok) return FALSE;
+        if (!$this->checkPerms()) return FALSE;
+        $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
+        if (!$this->exportallowed && !auth_isadmin()) return FALSE;
+
+        @set_time_limit(240);
+
+        $this->time_start = microtime(TRUE);
+
+        $output_filename = str_replace(':','_',$this->id);
+
+        session_start();
+        $_SESSION['export_html'] = TRUE;
+        $tmp_dir = rand();
+        $_SESSION['tmp_dir'] = $tmp_dir;
         $_SESSION['latex_images'] = array();
-        //Attach graphviz files
-        foreach($_SESSION['graphviz_images'] as $l){
-            if (file_exists($l)){
-                $zip->addFile($l, $web_folder.'/'.$ku.'/media/'.basename($l));
-            }
-        }
         $_SESSION['graphviz_images'] = array();
+        if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
+            mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
+        }
+        //get all pages and activitites
+        $data = $this->getData();
+
+        $zip = new ZipArchive;
+        $res = $zip->open(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/'.$output_filename.'.zip', ZipArchive::CREATE);
+        if ($res === TRUE) {
+            list($this->menu_html, $files_name) = $this->createMenu($data[0]);
+            //Get build.js and add which filenames will be used to search
+            $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
+            preg_match('/^([^.]*\.)*([^\.]*\.[^\/]*)\/.*?$/',$data[1]['creditcodi'],$matches);
+            $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
+            $cookiename = '';
+            if (isset($matches[2])){
+                $cookiename = str_replace(".", "_", $matches[2]);
+            }
+            $build = preg_replace('/@IOCCOOKIENAME@/', $cookiename, $build);
+            $zip->addFromString('_/js/build.js', $build);
+            $this->getFiles(DOKU_PLUGIN_TEMPLATES_HTML,$zip);
+            //Get index source
+            $text_index = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'index.html');
+            $text_index = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_index, 3);
+            $text_index = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_index, 1);
+            $text_index = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_index, 1);
+            //Get search source
+            $text_search = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'search.html');
+            $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 3);
+            $text_search = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_search, 1);
+            $text_search = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_search, 1);
+            //Get template source
+            $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
+            $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 3);
+            $text_template = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_template, 1);
+            $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
+            $text_template = preg_replace('/@IOCCOPYTEXT@/', $data[1]['copytext'], $text_template, 1);
+            //Create index page
+            $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $this->menu_html);
+            $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTINDEX@(.*?)@IOCENDINDEX@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCACTIVITYICONSTART@|@IOCACTIVITYICONEND@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
+            $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
+            $html = preg_replace('/@IOCMETA@/',$this->createMeta($data[1]), $html, 1);
+            $html = preg_replace('/@IOCMETABC@/',$this->createMetaBC($data[1]), $html, 1);
+            $html = preg_replace('/@IOCMETABR@/',$this->createMetaBR($data[1]), $html, 1);
+            $this->addMetaMedia($data[1],$zip);
+            $html = preg_replace('/@IOCPATH@/', '', $html);
+            $zip->addFromString('index.html', $html);
+            //Create search page
+            $navmenu = $this->createNavigation('');
+            $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_search, 1);
+            $html = preg_replace('/@IOCTITLE@/', 'Cerca', $html, 1);
+            $html = preg_replace('/@IOCTOC@/', '', $html, 1);
+            $html = preg_replace('/@IOCPATH@/', '', $html);
+            $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+            $zip->addFromString('search.html', $html);
+            //Remove menu index ,expander and icon/name tags
+            $this->menu_html = preg_replace('/@IOCSTARTINDEX@|@IOCENDINDEX@/', '', $this->menu_html);
+            $this->menu_html = preg_replace('/@IOCSTARTEXPANDER@|@IOCENDEXPANDER@/', '', $this->menu_html);
+            $this->menu_html = preg_replace('/@IOCACTIVITYICONSTART@(.*?)@IOCACTIVITYICONEND@/', '', $this->menu_html);
+            $this->menu_html = preg_replace('/@IOCACTIVITYNAMESTART@|@IOCACTIVITYNAMEEND@/', '', $this->menu_html);
+            if (isset($data[0]['intro'])){
+                if(preg_match('/@IOCSTARTINTRO@(.*?)@IOCENDINTRO@/', $this->menu_html, $matches)){
+                    $menu_html_intro = $matches[1];
+                    $this->menu_html = preg_replace('/@IOCSTARTINTRO@.*?@IOCENDINTRO@/', '', $this->menu_html, 1);
+                }
+                //var to attach all url media files
+                $files = array();
+                //Intro
+                $_SESSION['iocintro'] = TRUE;
+                foreach ($data[0]['intro'] as $i=>$page){
+                   $text = io_readFile(wikiFN($page[1]));
+                   $navmenu = $this->createNavigation('',array($page[0]), array(''));
+                   list($header, $text) =$this->extractHeader($text);
+                   preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
+                   array_push($files, $matches[1]);
+                   $instructions = get_latex_instructions($text);
+                   $html = p_latex_render('iocxhtml', $instructions, $info);
+                   $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
+                   $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_intro, $html, 1);
+                   $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
+                   $html = preg_replace('/@IOCTOC@/', '', $html, 1);
+                   $html = preg_replace('/@IOCPATH@/', '', $html);
+                   $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+                   $html = $this->createrefstopages($html, $data[0]['intro'], '', $i, '', '');
+                   $zip->addFromString(basename(wikiFN($page[1]),'.txt').'.html', $html);
+                 }
+                 $_SESSION['iocintro'] = FALSE;
+                 unset($data[0]['intro']);
+                 //Attach media files
+                 foreach($files as $sf){
+                     foreach($sf as $f){
+                         resolve_mediaid(getNS($f),&$f,&$exists);
+                         if ($exists){
+                             $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
+                         }
+                     }
+                 }
+                 //Attach latex files
+                 foreach($_SESSION['latex_images'] as $l){
+                     if (file_exists($l)){
+                         $zip->addFile($l, 'media/'.basename($l));
+                     }
+                 }
+                 $_SESSION['latex_images'] = array();
+                 //Attach graphviz files
+                 foreach($_SESSION['graphviz_images'] as $l){
+                     if (file_exists($l)){
+                         $zip->addFile($l, 'media/'.basename($l));
+                     }
+                 }
+                 $_SESSION['graphviz_images'] = array();
+            }
+             //Content468
+             foreach ($data[0] as $ku => $unit){
+                //Section
+                //var to attach all url media files
+                $files = array();
+                $latex = array();
+                $unitname = $unit['iocname'];
+                unset($unit['iocname']);
+                if(preg_match('/@IOCSTARTUNIT@(.*?)@IOCENDUNIT@/', $this->menu_html, $matches)){
+                    $menu_html_unit = $matches[1];
+                    $this->menu_html = preg_replace('/@IOCSTARTUNIT@.*?@IOCENDUNIT@/', '', $this->menu_html, 1);
+                }
+                $def_unit_href = $unit['def_unit_href'];
+                unset($unit['def_unit_href']);
+                foreach ($unit as $ks => $section){
+                    if (is_array($section)){
+                        //Activities
+                        $_SESSION['activities'] = TRUE;
+                        foreach ($section as $ka => $act){
+                            $text = io_readFile(wikiFN($act));
+                            if (basename(wikiFN($act),'.txt') === 'activitats'){
+                                $_SESSION['activity'] = TRUE;
+                            }
+                            list($header, $text) = $this->extractHeader($text);
+                            $navmenu = $this->createNavigation('../../../',array($unitname,$this->tree_names[$ku][$ks]['sectionname'],$this->tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$this->def_section_href.'.html',''));
+                            preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
+                            array_push($files, $matches[1]);
+                            $instructions = get_latex_instructions($text);
+                            $html = p_latex_render('iocxhtml', $instructions, $info);
+                            $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
+                            $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
+                            //preg_match_all('/(<span class="(blocklatex|inlinelatex)">.*?<\/span>)/', $html, $matches);
+                            $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
+                            $html = preg_replace('/@IOCTOC@/', $toc, $html, 1);
+                            $html = preg_replace('/@IOCPATH@/', '../../../', $html);
+                            $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+                            $html = $this->createrefstopages($html, $unit, $ku, $ks, $ka, '../../../');
+                            $zip->addFromString($this->web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html', $html);
+                            if (basename(wikiFN($act),'.txt') === 'activitats'){
+                                $_SESSION['activity'] = FALSE;
+                            }
+                        }
+                        $_SESSION['activities'] = FALSE;
+                    }else{
+                        $text = io_readFile(wikiFN($section));
+                        list($header, $text) = $this->extractHeader($text);
+                        $navmenu = $this->createNavigation('../../',array($unitname,$this->tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
+                        preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
+                        array_push($files, $matches[1]);
+                        $instructions = get_latex_instructions($text);
+                        $html = p_latex_render('iocxhtml', $instructions, $info);
+                        $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
+                        $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
+                        $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
+                        $html = preg_replace('/@IOCTOC@/', '', $html, 1);
+                        $html = preg_replace('/@IOCPATH@/', '../../', $html);
+                        $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
+                        $html = $this->createrefstopages($html, $unit, $ku, '', $ks, '../../');
+                        $zip->addFromString($this->web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html', $html);
+                    }
+                }
+                //Attach media files
+                foreach($files as $sf){
+                    foreach($sf as $f){
+                        resolve_mediaid(getNS($f),&$f,&$exists);
+                        if ($exists){
+                            $zip->addFile(mediaFN($f), $this->web_folder.'/'.$ku.'/media/'.basename(mediaFN($f)));
+                        }
+                    }
+                }
+                //Attach latex files
+                foreach($_SESSION['latex_images'] as $l){
+                    if (file_exists($l)){
+                        $zip->addFile($l, $this->web_folder.'/'.$ku.'/media/'.basename($l));
+                    }
+                }
+                $_SESSION['latex_images'] = array();
+                //Attach graphviz files
+                foreach($_SESSION['graphviz_images'] as $l){
+                    if (file_exists($l)){
+                        $zip->addFile($l, $this->web_folder.'/'.$ku.'/media/'.basename($l));
+                    }
+                }
+                $_SESSION['graphviz_images'] = array();
+            }
+            $zip->close();
+            $result = array();
+            $this->returnData(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, $output_filename.'.zip', $result);
+        }else{
+            $result = 'No es pot iniciar l\'arxiu zip';
+        }
+        $_SESSION['export_html'] = FALSE;
+        session_destroy();
+
+        $this->removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
+        if($this->log){
+            return $result;
+        }
     }
-    $zip->close();
-    returnData(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, $output_filename.'.zip');
-}else{
-    $result = 'No es pot iniciar l\'arxiu zip';
-}
-$_SESSION['export_html'] = FALSE;
-session_destroy();
-
-removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
-
 
     /**
      *
@@ -275,17 +318,15 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $path
      * @param string $filename
      */
-    function returnData($path, $filename){
-        global $id;
-        global $media_path;
+    private function returnData($path, $filename, &$result){
         global $conf;
-        global $time_start;
+
         if (file_exists($path.'/'.$filename)){
             $error = '';
             $filesize = filesize($path . "/" . $filename);
             $filesize = filesize_h($filesize);
 
-            $dest = preg_replace('/:/', '/', $id);
+            $dest = preg_replace('/:/', '/', $this->id);
             $dest = dirname($dest);
             if (!file_exists($conf['mediadir'].'/'.$dest)){
                 mkdir($conf['mediadir'].'/'.$dest, 0755, TRUE);
@@ -293,12 +334,21 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename);
             $dest = preg_replace('/\//', ':', $dest);
             $time_end = microtime(TRUE);
-            $time = round($time_end - $time_start, 2);
-            $result = array('zip', $media_path.$dest.':'.$filename.'&time='.gettimeofday(TRUE), $filename, $filesize, $time, $error);
+            $time = round($time_end - $this->time_start, 2);
+            if($this->log){
+                setlocale(LC_TIME, 'ca_ES.utf8');
+                $result = array('time' => strftime("%e %B %Y %T", filemtime($path.'/'.$filename)), 'path' => $dest.':'.$filename, 'size' => $filesize);
+            }else{
+                $data = array('zip', $this->media_path.$dest.':'.$filename.'&time='.gettimeofday(TRUE), $filename, $filesize, $time, $error);
+            }
         }else{
             $result = 'Error en la creació del arxiu: ' . $filename;
         }
-        echo json_encode($result);
+        if (!$this->log){
+            echo json_encode($data);
+        }else{
+            return $result;
+        }
     }
 
 	/**
@@ -306,7 +356,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * Remove specified dir
      * @param string $directory
      */
-    function removeDir($directory) {
+    private function removeDir($directory) {
         if(!file_exists($directory) || !is_dir($directory)) {
             return FALSE;
         } elseif(!is_readable($directory)) {
@@ -319,7 +369,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $path = $directory . "/" . $contents;
 
                     if(is_dir($path)) {
-                        removeDir($path);
+                        $this->removeDir($path);
                     } else {
                         unlink($path);
                     }
@@ -340,7 +390,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Check whether user has right acces level
      */
-    function checkPerms() {
+    private function checkPerms() {
         global $ID;
         global $USERINFO;
         $ID = getID();
@@ -357,13 +407,10 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param array $data
      * @param boolean $struct
      */
-    function getPageNames(&$data){
-        global $id;
+    private function getPageNames(&$data){
         global $conf;
-        global $toexport;
-        global $def_section_href;
 
-        $file = wikiFN($id);
+        $file = wikiFN($this->id);
         if (@file_exists($file)) {
             $matches = array();
             $txt =  io_readFile($file);
@@ -373,8 +420,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             preg_match_all('/\[\[([^|\]]+)\|?(.*?)\]\] */', $pages, $matches, PREG_SET_ORDER);
             foreach ($matches as $match){
                 $sort = FALSE;
-                $ns = resolve_id(getNS($id),$match[1]);
-                if (!in_array($ns, $toexport)){
+                $ns = resolve_id(getNS($this->id),$match[1]);
+                if (!in_array($ns, $this->toexport)){
                     continue;
                 }
                 if (page_exists($ns)){
@@ -382,7 +429,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         $data['intro'] = array();
                     }
                     $text = io_readFile($conf['datadir'].'/'.preg_replace('/:/', '/', $ns).'.txt');
-                    $header = getHeader($text);
+                    $header = $this->getHeader($text);
                     array_push($data['intro'], array($header, $ns));
                 }else{
                     $ns = preg_replace('/:/' ,'/', $ns);
@@ -426,7 +473,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                             preg_match('/([^:]*:)+([^\.]*)$/', $pagename, $name);
                             if (!empty($section[1])){
                                 //Put default section at first place
-                                if ($name[2] === $def_section_href){
+                                if ($name[2] === $this->def_section_href){
                                     $data[$unit[1]][$section[1]] = array_merge(array($name[2] => $pagename),$data[$unit[1]][$section[1]]);
                                 }else{
                                     $data[$unit[1]][$section[1]][$name[2]] = $pagename;
@@ -445,16 +492,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Get and return uri wiki pages
      */
-    function getData(){
-        global $id;
-        global $meta_params;
-        global $meta_dcicle;
-        global $double_cicle;
+    private function getData(){
 
         $data = array();
         $data[0] = array();
         $data[1] = array();
-        $file = wikiFN($id);
+        $file = wikiFN($this->id);
         $inf = NULL;
         if (@file_exists($file)) {
             $info = io_grep($file, '/(?<=\={6} )[^\=]*/', 0, TRUE);
@@ -467,11 +510,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 preg_match_all('/ {2,4}\* (\*\*(.*?)\*\*:)(.*)/m', $text, $info, PREG_SET_ORDER);
                 foreach ($info as $i){
                     $key = trim($i[2]);
-                    if ($key === $meta_dcicle){
-                        $double_cicle = TRUE;
+                    if ($key === $this->meta_dcicle){
+                        $this->double_cicle = TRUE;
                         continue;
                     }
-                    if (in_array($key, $meta_params)){
+                    if (in_array($key, $this->meta_params)){
                         $data[1][$key] = trim($i[3]);
                     }else{
                         $instructions = get_latex_instructions(trim($i[1].$i[3]));
@@ -481,7 +524,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 }
             }
             //get page names
-            getPageNames($data[0]);
+            $this->getPageNames($data[0]);
             return $data;
         }
         return FALSE;
@@ -491,13 +534,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Create side menu elements
      */
-    function setMenu($type='', $name='', $href='', $id='',$index=FALSE){
-        global $max_menu;
-        global $def_section_href;
+    private function setMenu($type='', $name='', $href='', $id='',$index=FALSE){
+
         $types = array('activitats','annexos','exercicis');
         $name = trim($name);
-        if (strlen($name) > $max_menu){
-            $name = mb_substr($name, 0, $max_menu) . '...';
+        if (strlen($name) > $this->max_menu){
+            $name = mb_substr($name, 0, $this->max_menu) . '...';
         }
         if ($type === 'root'){
             $class = ($index)?'indexnode':'rootnode';
@@ -510,7 +552,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
-            $menu_html .= '<p id="'.$id.$def_section_href.'"><a href="'.$href.'">'.$name.'</a>';
+            $menu_html .= '<p id="'.$id.$this->def_section_href.'"><a href="'.$href.'">'.$name.'</a>';
             $menu_html .= '@IOCSTARTEXPANDER@<span class="buttonexp"></span>@IOCENDEXPANDER@';
             $menu_html .= '</p>';
             $menu_html .= '<ul>';
@@ -545,10 +587,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Create side menu elements and return path to filenames
      */
-    function createMenu($elements){
-        global $web_folder;
-        global $tree_names;
-        global $def_section_href;
+    private function createMenu($elements){
 
         $files = array();
         $menu_html = '';
@@ -558,39 +597,39 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             foreach ($elements['intro'] as $kp => $page){
                 $text = io_readFile(wikiFN($page[1]));
                 $href = '@IOCPATH@'.basename(wikiFN($page[1]),'.txt').'.html';
-                $menu_html .= setMenu('root', $page[0], $href, basename(str_replace(':','/',$page[1])));
+                $menu_html .= $this->setMenu('root', $page[0], $href, basename(str_replace(':','/',$page[1])));
                 array_push($files, '"'.str_replace('@IOCPATH@', '', $href).'"');
             }
             //Link to index
             $menu_html .= '@IOCSTARTINDEX@';
             $href = '@IOCPATH@index.html';
-            $menu_html .= setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
+            $menu_html .= $this->setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
             $menu_html .= '@IOCENDINDEX@';
             $menu_html .= '@IOCENDINTRO@';
             unset($elements['intro']);
         }
         foreach ($elements as $ku => $unit){
             $menu_html .= '@IOCSTARTUNIT@';
-            $tree_names[$ku] = array();
+            $this->tree_names[$ku] = array();
             //Section
-            $menu_html .= setMenu('unit',$unit['iocname'], '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$unit['def_unit_href'].'.html', $ku);
+            $menu_html .= $this->setMenu('unit',$unit['iocname'], '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.$unit['def_unit_href'].'.html', $ku);
             unset($unit['iocname']);
             //First main pages
             unset($unit['def_unit_href']);
             foreach ($unit as $ks => $section){
                 if (!is_array($section)){
                     $text = io_readFile(wikiFN($section));
-                    $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html';
-                    $act_name = getHeader($text);
-                    $tree_names[$ku][$ks]=$act_name;
-                    $menu_html .= setMenu('intro', $act_name, $act_href, $ku.$ks);
+                    $act_href = '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.basename(wikiFN($section),'.txt').'.html';
+                    $act_name = $this->getHeader($text);
+                    $this->tree_names[$ku][$ks]=$act_name;
+                    $menu_html .= $this->setMenu('intro', $act_name, $act_href, $ku.$ks);
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                     unset($unit[$ks]);
                 }
             }
             //Only sections with content
             foreach ($unit as $ks => $section){
-                $tree_names[$ku][$ks] = array();
+                $this->tree_names[$ku][$ks] = array();
                 //Activities
                 $text = io_readFile(wikiFN($section['continguts']));
                 preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
@@ -599,31 +638,31 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 }else{
                      $section_name = $ks;
                 }
-                $tree_names[$ku][$ks]['sectionname']=$section_name;
+                $this->tree_names[$ku][$ks]['sectionname']=$section_name;
                 //Comprovar si existeix continguts.html $def_section_href i enllaçar la secció
-                $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$ks.'/'.$def_section_href.'.html';
-                $menu_html .= setMenu('section', $section_name, $act_href, $ku.$ks);
+                $act_href = '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.$ks.'/'.$this->def_section_href.'.html';
+                $menu_html .= $this->setMenu('section', $section_name, $act_href, $ku.$ks);
                 foreach ($section as $ka => $act){
                     $text = io_readFile(wikiFN($act));
-                    $act_href = '@IOCPATH@'.$web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html';
+                    $act_href = '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.$ks.'/'.basename(wikiFN($act),'.txt').'.html';
                     if ($ka !== 'continguts'){
-                        $act_name = getHeader($text);
-                        $tree_names[$ku][$ks][$ka]=$act_name;
-                        $menu_html .= setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
+                        $act_name = $this->getHeader($text);
+                        $this->tree_names[$ku][$ks][$ka]=$act_name;
+                        $menu_html .= $this->setMenu('activity', $act_name, $act_href, $ku.$ks.$ka);
                     }else{//File continguts has a short name
                         $act_name = 'Contingut';
-                        $tree_names[$ku][$ks]['continguts']=$act_name;
+                        $this->tree_names[$ku][$ks]['continguts']=$act_name;
                     }
                     array_push($files, '"'.str_replace('@IOCPATH@', '', $act_href).'"');
                 }
                 //Close menu activities
-                $menu_html .= setMenu();
+                $menu_html .= $this->setMenu();
             }
-            $menu_html .= setMenu();
+            $menu_html .= $this->setMenu();
             //Link to index
             $menu_html .= '@IOCSTARTINDEX@';
             $href = '@IOCPATH@index.html';
-            $menu_html .= setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
+            $menu_html .= $this->setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
             $menu_html .= '@IOCENDINDEX@';
             $menu_html .= '@IOCENDUNIT@';
         }
@@ -637,7 +676,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     * @param string $directory
     * @param string $zip
     */
-    function getFiles($directory, &$zip){
+    private function getFiles($directory, &$zip){
         if(!file_exists($directory) || !is_dir($directory)) {
             return FALSE;
         } elseif(!is_readable($directory)) {
@@ -651,7 +690,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     if(is_dir($path)) {
                         $dirname = str_replace(DOKU_PLUGIN_TEMPLATES_HTML,'',$path);
                         $zip->addEmptyDir($dirname);
-                        getFiles($path, $zip);
+                        $this->getFiles($path, $zip);
                     }else{
                         if (!in_array($contents, $ignore)){
                             $dirname = str_replace(DOKU_PLUGIN_TEMPLATES_HTML,'',$directory);
@@ -669,7 +708,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Get Table Of Contents
      */
-    function getTOC($text){
+    private function getTOC($text){
         $matches = array();
         $headers = array();
         $toc = '<div class="toc">';
@@ -688,7 +727,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Create Meta data
      */
-    function createMeta($data){
+    private function createMeta($data){
 
         $meta .= '<h1 class="headmainindex">'.(isset($data['creditnom'])?$data['creditnom']:'').'</h1>';
         $meta .= '<div class="metainfo">';
@@ -734,13 +773,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     *
     * Create Meta data located at the bottom centered
     */
-    function createMetaBC($data){
-        global $double_cicle;
+    private function createMetaBC($data){
 
         $meta .= '<ul>';
         $meta .= '<li>'.(isset($data['familia'])?$data['familia']:'').'</li>';
         $meta .= '<li><strong>'.(isset($data['creditcodi'])?$data['creditcodi']:'').'</strong></li>';
-        if ($double_cicle){
+        if ($this->double_cicle){
             $cicles = array();
             $cc = (isset($data['ciclenom'])?$data['ciclenom']:'');
             $cicles = preg_split('/\\\\/', $cc);
@@ -756,7 +794,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     *
     * Create Meta data located at the bottom right aligned
     */
-    function createMetaBR($data){
+    private function createMetaBR($data){
 
         $meta .= 'Primera edició: <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
         $meta .= ' &copy; Departament d&#39;Ensenyament';
@@ -769,7 +807,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param Array $data
      * @param ZIP $zip
      */
-    function addMetaMedia($data, &$zip){
+    private function addMetaMedia($data, &$zip){
         if (isset($data['familypic'])){
             preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['familypic'],$matches);
             resolve_mediaid(getNS($matches[1]),&$matches[1],&$exists);
@@ -806,7 +844,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Extract main header from text
      */
-    function extractHeader($text){
+    private function extractHeader($text){
         $check = array();
         if (preg_match('/\={6}([^=]+)\={6}/', $text, $matches)){
             $text = preg_replace('/\={6}[^=]+\={6}/', '', $text);
@@ -821,7 +859,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     *
     * Get main header from text
     */
-    function getHeader($text){
+    private function getHeader($text){
         preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
         $pagename = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
         return $pagename;
@@ -831,15 +869,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Create menu navigation
      */
-    function createNavigation($index_path, $options=NULL,$refs=NULL){
-        global $max_navmenu;
+    private function createNavigation($index_path, $options=NULL,$refs=NULL){
 
         $navigation = '<ul class="webnav"><li><a href="'.$index_path.'index.html" title="Tornar a l&#39;&iacute;ndex general">Inici</a></li>';
         if (!is_null($options)){
             foreach ($options as $k => $op){
                 if ($op != 'Contingut'){
-                    if ((strlen($op) > $max_navmenu) && $k < (count($options)-1)){
-                        $op = mb_substr($op, 0, $max_navmenu) . '...';
+                    if ((strlen($op) > $this->max_navmenu) && $k < (count($options)-1)){
+                        $op = mb_substr($op, 0, $this->max_navmenu) . '...';
                     }
                     $navigation .= '<li>';
                     if (!empty($refs[$k]) && (isset($options[$k+1]) && $options[$k+1] != 'Contingut')){
@@ -857,9 +894,18 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         return $navigation;
     }
 
-    function createrefstopages($html, $data, $unit, $section, $activity, $href){
-        global $tree_names;
-        global $def_section_href;
+    /**
+     *
+     * Create previous and next reference for each page
+     * @param string $html
+     * @param array $data
+     * @param string $unit
+     * @param string $section
+     * @param string $activity
+     * @param string $href
+     */
+    private function createrefstopages($html, $data, $unit, $section, $activity, $href){
+
         $textprev = 'Anar a la p&agrave;gina anterior:<br />';
         $textnext = 'Anar a la p&agrave;gina seg&uuml;ent:<br />';
         //Intro
@@ -891,7 +937,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $prev = $cont-1;
                 $next = $cont+1;
                 if ($prev >= 0){
-                    list($prev_key,$prev_item) = goAssocArrayNumeric($data,$prev);
+                    list($prev_key,$prev_item) = $this->goAssocArrayNumeric($data,$prev);
                     if (is_array($data[$prev_key])){//First intro element
                         $prev_key = FALSE;
                     }
@@ -899,18 +945,18 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $prev_key = FALSE;
                 }
                 if ($next < count($data)){
-                    list($next_key,$next_item) = goAssocArrayNumeric($data,$next);
+                    list($next_key,$next_item) = $this->goAssocArrayNumeric($data,$next);
                 }else{
                     $next_key = FALSE;
                 }
                 if ($prev_key){
                     $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $prev_item)).'.html';
-                    $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$tree_names[$unit][$prev_key].'</a></div>';
+                    $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$this->tree_names[$unit][$prev_key].'</a></div>';
                 }
                 $html = preg_replace('/@IOCPREVPAGE@/',$content, $html);
                 if ($next_key && !is_array($data[$next_key])){
                     $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $next_item)).'.html';
-                    $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$next_key].'</a></div>';
+                    $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$this->tree_names[$unit][$next_key].'</a></div>';
                 }else{
                     reset($data);
                     $sect = key($data);
@@ -921,8 +967,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         $cont++;
                     }
                     if (is_array($data[$sect])){
-                        $phref = $href.'WebContent/'.$unit.'/'.$sect.'/'.$def_section_href.'.html';
-                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$sect]['sectionname'].'</a></div>';
+                        $phref = $href.'WebContent/'.$unit.'/'.$sect.'/'.$this->def_section_href.'.html';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$this->tree_names[$unit][$sect]['sectionname'].'</a></div>';
                     }else{
                         $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
                     }
@@ -940,28 +986,28 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $prev = $cont-1;
                 $next = $cont+1;
                 if ($prev >= 0){
-                    list($prev_key,$prev_item) = goAssocArrayNumeric($data[$section],$prev);
+                    list($prev_key,$prev_item) = $this->goAssocArrayNumeric($data[$section],$prev);
                 }else{
                     $prev_key = FALSE;
                 }
                 if ($next < count($data[$section])){
-                    list($next_key,$next_item) = goAssocArrayNumeric($data[$section],$next);
+                    list($next_key,$next_item) = $this->goAssocArrayNumeric($data[$section],$next);
                 }else{
                     $next_key = FALSE;
                 }
                 if ($prev_key){
                     $phref = $href.'WebContent/'.$unit.'/'.$section.'/'.basename(str_replace(':', '/', $prev_item)).'.html';
-                    if (basename(str_replace(':', '/', $prev_item)) === $def_section_href){
-                        $name = $tree_names[$unit][$section]['sectionname'];
+                    if (basename(str_replace(':', '/', $prev_item)) === $this->def_section_href){
+                        $name = $this->tree_names[$unit][$section]['sectionname'];
                     }else{
-                        $name = $tree_names[$unit][$section][$prev_key];
+                        $name = $this->tree_names[$unit][$section][$prev_key];
                     }
                     $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$name.'</a></div>';
                 }else{
                     if (isset($data['a'.intval($num_section-1)])){
                         end($data['a'.intval($num_section-1)]);
                         $phref = $href.'WebContent/'.$unit.'/'.'a'.intval($num_section-1).'/'.basename(str_replace(':', '/', key($data['a'.intval($num_section-1)]))).'.html';
-                        $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.end($tree_names[$unit]['a'.intval($num_section-1)]).'</a></div>';
+                        $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.end($this->tree_names[$unit]['a'.intval($num_section-1)]).'</a></div>';
                     }else{
                         end($data);
                         $sect = key($data);
@@ -973,7 +1019,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                         }
                         if (!is_array($data[$sect])){//Look whether intro exists when we're at first section
                             $phref = $href.'WebContent/'.$unit.'/'.basename(str_replace(':', '/', $sect)).'.html';
-                            $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$tree_names[$unit][$sect].'</a></div>';
+                            $content = '<div id="prevpage">'.$textprev.'<a href="'.$phref.'">'.$this->tree_names[$unit][$sect].'</a></div>';
                         }else{
                             $content = '';
                         }
@@ -982,12 +1028,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $html = preg_replace('/@IOCPREVPAGE@/',$content, $html);
                 if ($next_key){
                     $phref = $href.'WebContent/'.$unit.'/'.$section.'/'.basename(str_replace(':', '/', $next_item)).'.html';
-                    $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$tree_names[$unit][$section][$next_key].'</a></div>';
+                    $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$this->tree_names[$unit][$section][$next_key].'</a></div>';
                 }else{
                     if (isset($data['a'.intval($num_section+1)])){
                         reset($data['a'.intval($num_section+1)]);
                         $phref = $href.'WebContent/'.$unit.'/'.'a'.intval($num_section+1).'/'.basename(str_replace(':', '/', key($data['a'.intval($num_section+1)]))).'.html';
-                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.reset($tree_names[$unit]['a'.intval($num_section+1)]).'</a></div>';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.reset($this->tree_names[$unit]['a'.intval($num_section+1)]).'</a></div>';
                     }else{
                         $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
                     }
@@ -999,7 +1045,13 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
     }
 
 
-    function goAssocArrayNumeric($arrAssoc, $key=-1)
+    /**
+     *
+     * Returns a certain value from an associative array
+     * @param array $arrAssoc
+     * @param int $key
+     */
+    private function goAssocArrayNumeric($arrAssoc, $key=-1)
     {
         $i = -1;
         foreach ($arrAssoc as $k => $v)
@@ -1012,3 +1064,4 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         }
         return FALSE;
     }
+}

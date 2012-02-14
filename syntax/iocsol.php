@@ -29,7 +29,7 @@ class syntax_plugin_iocexportl_iocsol extends DokuWiki_Syntax_Plugin {
     }
 
     function getType(){
-        return 'container';
+        return 'protected';
     }
 
     function getPType(){

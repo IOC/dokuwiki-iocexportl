@@ -92,6 +92,7 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             switch ($state) {
               case DOKU_LEXER_ENTER :
                   $this->class = $text;
+                  unset($_SESSION['quizsol']);
                   break;
               case DOKU_LEXER_UNMATCHED :
                   //convert unnumered lists to numbered
@@ -212,7 +213,14 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
           foreach ($sol as $key => $s){
               $text .= '\mbox{';
               $text .= '\item ';
-              $text .= $s .'}';
+              if (strlen($s) > 75){
+                  $text .= '\parbox[t]{.85\linewidth}{\begin{spacing}{.6}\quizoptions ';
+              }
+              $text .= $s;
+              if (strlen($s) > 75){
+                  $text .= '\end{spacing}\hspace{10mm}}';
+              }
+              $text .= '}';
               if ($key < $count-1){
               	$text .= '\hspace{5mm}';
               }

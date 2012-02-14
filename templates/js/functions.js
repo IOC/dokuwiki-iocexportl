@@ -11,9 +11,10 @@ define (["render"],function(render){
 	var defaultbookquizzes = '{"quiz":[{"urls":"0"}]}';
 	var showtooltips = false;
 	var cookiesufix = '@IOCCOOKIENAME@';
-	var cookiegeneral = 'ioc_settings';//Always the same settings for all materials
+	var cookiegeneral = 'ioc_settings';//Always same settings for all materials
 	var cookiefavorites = 'ioc_'+cookiesufix+'_bookmarks';
 	var cookiequizzes = 'ioc_'+cookiesufix+'_quizzes';
+
 	
 	$('#menu li').click(function(e) {
 		setmenu(this);
@@ -890,7 +891,7 @@ define (["render"],function(render){
 	});
 	
 	var setNumTabRef = (function (){
-		$("article .ioctable .titletable > a").each(function(i){
+		$("article .ioctable .titletable > a, article .iocaccounting .titletable > a").each(function(i){
 			$(".tabref > a[href=\"#"+$(this).attr("name")+"\"]").append("."+(i+1));
 		});
 	});
@@ -1008,7 +1009,6 @@ define (["render"],function(render){
 			indexToc($(".indextoc").css('display') !== 'none');
 		}else{
 			if(!ispageSearch()){
-				setArticleMinHeight();
 				calpostooltips();
 				setpnpage();
 			}
