@@ -929,26 +929,27 @@ define (["render"],function(render){
 			//Get and apply stored options
 			var object = $.parseJSON(info);
 			settings(object);
-			sidemenu(object);
-			if(ispageIndex()){
-				indexToc(object.toc[0]['tvisible']==1);
+			if(!ispageSearch()){
+				sidemenu(object);
+				if(ispageIndex()){
+					indexToc(object.toc[0]['tvisible']==1);
+				}
+				info = getcookie(cookiefavorites);
+				if (info!=null && info!=""){
+					object = $.parseJSON(info);
+					setFavButton(object);
+					setFavHeaders(object);
+				}else{
+					setcookie(cookiefavorites,defaultbookmarks);
+				}
+				info = getcookie(cookiequizzes);
+				if (info!=null && info!=""){
+					object = $.parseJSON(info);
+					setCheckExercises(object);
+				}else{
+					setcookie(cookiequizzes,defaultbookquizzes);
+				}
 			}
-			info = getcookie(cookiefavorites);
-			if (info!=null && info!=""){
-				object = $.parseJSON(info);
-				setFavButton(object);
-				setFavHeaders(object);
-			}else{
-				setcookie(cookiefavorites,defaultbookmarks);
-			}
-			info = getcookie(cookiequizzes);
-			if (info!=null && info!=""){
-				object = $.parseJSON(info);
-				setCheckExercises(object);
-			}else{
-				setcookie(cookiequizzes,defaultbookquizzes);
-			}
-
 		}else{
 			if(ispageIndex()){
 				indexToc(!cookiesOK());

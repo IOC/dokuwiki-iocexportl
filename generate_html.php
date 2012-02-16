@@ -79,9 +79,9 @@ class generate_html{
         global $conf;
 
         if (!$this->export_ok) return FALSE;
-        if (!$this->checkPerms()) return FALSE;
+        if (!$this->log && !$this->checkPerms()) return FALSE;
         $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->exportallowed && !auth_isadmin()) return FALSE;
+        if (!$this->log && !$this->exportallowed && !auth_isadmin()) return FALSE;
 
         @set_time_limit(240);
 
@@ -346,8 +346,6 @@ class generate_html{
         }
         if (!$this->log){
             echo json_encode($data);
-        }else{
-            return $result;
         }
     }
 
@@ -433,53 +431,55 @@ class generate_html{
                     array_push($data['intro'], array($header, $ns));
                 }else{
                     $ns = preg_replace('/:/' ,'/', $ns);
-                    $content = io_readFile($conf['datadir'].'/'.$ns.'/index.txt');
-                    $result = array();
-                    $def_unit_href='';
-                    $unit_act = '';
-                    if (preg_match('/^[I|i]ndex/', $content)){
-                        $result = explode(DOKU_LF,$content);
-                        $result = array_filter($result);
-                        @array_shift($result);
-                        $ns = str_replace('/', ':', $ns);
-                        $sort = TRUE;
-                    }else{
-                        search($result,$conf['datadir'], 'search_allpages', null, $ns);
-                    }
-                    foreach ($result as $pagename){
-                        if ($sort){
-                            $pagename = $ns.':'.$pagename;
+                    if (file_exists($conf['datadir'].'/'.$ns.'/index.txt')){
+                        $content = io_readFile($conf['datadir'].'/'.$ns.'/index.txt');
+                        $result = array();
+                        $def_unit_href='';
+                        $unit_act = '';
+                        if (preg_match('/^[I|i]ndex/', $content)){
+                            $result = explode(DOKU_LF,$content);
+                            $result = array_filter($result);
+                            @array_shift($result);
+                            $ns = str_replace('/', ':', $ns);
+                            $sort = TRUE;
                         }else{
-                            $pagename = $pagename['id'];
+                            search($result,$conf['datadir'], 'search_allpages', null, $ns);
                         }
-                        if (!preg_match('/:(pdfindex|imatges|index)$/', $pagename)){
-                            preg_match('/:(u\d+):/', $pagename, $unit);
-                            preg_match('/:(a\d+):/', $pagename, $section);
-                            if (empty($section) && empty($def_unit_href)){
-                                $def_unit_href = preg_replace('/([^:]*:)+/','',$pagename);
+                        foreach ($result as $pagename){
+                            if ($sort){
+                                $pagename = $ns.':'.$pagename;
+                            }else{
+                                $pagename = $pagename['id'];
                             }
-                            if (!empty($unit[1]) && !isset($data[$unit[1]])){
-                                $data[$unit[1]] = array();
-                                $unit_act = $unit[1];
-                            }
-                            if (isset($data[$unit_act]) && empty($data[$unit_act]['def_unit_href'])){
-                                $data[$unit_act]['def_unit_href'] = $def_unit_href;
-                            }
-                            if (!empty($section[1]) && !isset($data[$unit[1]][$section[1]])){
-                                $data[$unit[1]][$section[1]] = array();
-                            }
-                            //Save unit name
-                            $data[$unit[1]]['iocname'] = $match[2];
-                            preg_match('/([^:]*:)+([^\.]*)$/', $pagename, $name);
-                            if (!empty($section[1])){
-                                //Put default section at first place
-                                if ($name[2] === $this->def_section_href){
-                                    $data[$unit[1]][$section[1]] = array_merge(array($name[2] => $pagename),$data[$unit[1]][$section[1]]);
-                                }else{
-                                    $data[$unit[1]][$section[1]][$name[2]] = $pagename;
+                            if (!preg_match('/:(pdfindex|imatges|index)$/', $pagename)){
+                                preg_match('/:(u\d+):/', $pagename, $unit);
+                                preg_match('/:(a\d+):/', $pagename, $section);
+                                if (empty($section) && empty($def_unit_href)){
+                                    $def_unit_href = preg_replace('/([^:]*:)+/','',$pagename);
                                 }
-                             }else{
-                                $data[$unit[1]][$name[2]] = $pagename;
+                                if (!empty($unit[1]) && !isset($data[$unit[1]])){
+                                    $data[$unit[1]] = array();
+                                    $unit_act = $unit[1];
+                                }
+                                if (isset($data[$unit_act]) && empty($data[$unit_act]['def_unit_href'])){
+                                    $data[$unit_act]['def_unit_href'] = $def_unit_href;
+                                }
+                                if (!empty($section[1]) && !isset($data[$unit[1]][$section[1]])){
+                                    $data[$unit[1]][$section[1]] = array();
+                                }
+                                //Save unit name
+                                $data[$unit[1]]['iocname'] = $match[2];
+                                preg_match('/([^:]*:)+([^\.]*)$/', $pagename, $name);
+                                if (!empty($section[1])){
+                                    //Put default section at first place
+                                    if ($name[2] === $this->def_section_href){
+                                        $data[$unit[1]][$section[1]] = array_merge(array($name[2] => $pagename),$data[$unit[1]][$section[1]]);
+                                    }else{
+                                        $data[$unit[1]][$section[1]][$name[2]] = $pagename;
+                                    }
+                                 }else{
+                                    $data[$unit[1]][$name[2]] = $pagename;
+                                }
                             }
                         }
                     }

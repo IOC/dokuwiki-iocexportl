@@ -14,154 +14,209 @@ if (!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGI
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
-global $conf;
 
-$id = getID();
-$unitzero = FALSE;
-$tmp_dir = '';
-$media_path = 'lib/exe/fetch.php?media=';
-$exportallowed = FALSE;
-$meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia');
-$img_src = array('familyicon_administracio.png','familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
-$ioclanguage = array('CA' => 'catalan', 'DE' => 'german', 'EN' => 'english','ES' => 'catalan','FR' => 'frenchb','IT' => 'italian');
-$ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
-//Due listings problems whith header it's necessary to replace extended characters
-$ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç','\\\\');
-$end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\linebreak\vspace{-0.8em}\linebreak ');
-$meta_dcicle = 'dcicle';
+//Initialize params
+$params = array();
+$params['id'] = getID();
+$params['mode'] = $_POST['mode'];
+if ($params['id'] === $_POST['id']){
+    $params['toexport'] = $_POST['toexport'];
+    $params['ioclanguage'] = $_POST['ioclanguage'];
+    $generate = new generate_latex($params);
+    $generate->init();
+}
 
-if (!checkPerms()) return FALSE;
-$exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-if (!$exportallowed && !auth_isadmin()) return FALSE;
 
-$time_start = microtime(TRUE);
+class generate_latex{
 
-//get seccions to export
-$toexport = array_filter(explode(',',$_POST['toexport']));
+    private $end_characters;
+    private $exportallowed;
+    private $img_src;
+    private $ini_characters;
+    private $ioclang;
+    private $ioclanguages;
+    private $ioclangcontinue;
+    private $log;
+    private $media_path;
+    private $meta_dcicle;
+    private $meta_params;
+    private $time_start;
+    private $toexport;
+    private $tmp_dir;
+    private $unitzero;
 
-$output_filename = str_replace(':','_',$id);
-if ($_POST['mode'] !== 'zip' && $_POST['mode'] !== 'pdf') return FALSE;
-if (!auth_isadmin() && $_POST['mode'] === 'zip') return FALSE;
-if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
-    //read header
-    $latex = io_readFile(DOKU_PLUGIN_TEMPLATES.'header.ltx');
-    session_start();
-    $tmp_dir = rand();
-    $_SESSION['tmp_dir'] = $tmp_dir;
-    if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
-        mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
-        mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media', 0775, TRUE);
+
+/**
+    * Default Constructor
+    *
+    * Initialize variables
+    *
+    * @param array $params Array of parameters to pass to the constructor
+    */
+    function __construct($params){
+
+        //Due listings problems whith header it's necessary to replace extended characters
+        $this->end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\linebreak\vspace{-0.8em}\linebreak ');
+        $this->exportallowed = FALSE;
+        $this->export_ok = ($params['mode'] === 'pdf' || $params['mode'] === 'zip' );
+        $this->id = $params['id'];
+        $this->img_src = array('familyicon_administracio.png', 'familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
+        //Due listings problems whith header it's necessary to replace extended characters
+        $this->ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç','\\\\');
+        $this->ioclang = (!isset($params['ioclanguage']))?'CA':strtoupper($params['ioclanguage']);
+        $this->ioclanguages = array('CA' => 'catalan', 'DE' => 'german', 'EN' => 'english','ES' => 'catalan','FR' => 'frenchb','IT' => 'italian');
+        $this->ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
+        $this->log = isset($params['log']);
+        $this->media_path = 'lib/exe/fetch.php?media=';
+        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia');
+        $this->meta_dcicle = 'dcicle';
+        $this->mode = $params['mode'];
+        $this->tmp_dir = '';
+        $this->toexport = explode(',', preg_replace('/:index(,|$)/',',',$params['toexport']));
+        $this->unitzero = FALSE;
     }
-    if (!auth_isadmin()){
-        $latex .= '\draft{Provisional}' . DOKU_LF;
-        $_SESSION['draft'] = TRUE;
-    }
-    if (!file_exists(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx')){
-        session_destroy();
-        return FALSE;
-    }
-    //get all pages and activitites
-    $data = getData();
 
-    //FrontPage
-    renderFrontpage($latex, $data);
-    $latex .= '\frontpageparskip'.DOKU_LF;
-    $_SESSION['createbook'] = TRUE;
-    //Sets default language
-    $lang = preg_replace('/\n/', '', $_POST['ioclanguage']);
-    $language = empty($_POST['ioclanguage'])?$ioclanguage['CA']:$ioclanguage[$lang];
-    $latex = preg_replace('/@IOCLANGUAGE@/', $language, $latex, 1);
-    $latex = preg_replace('/@IOCLANGCONTINUE@/', $ioclangcontinue[$lang], $latex, 1);
-    //Render a non unit zero
-    if (!$unitzero){
-        $_SESSION['chapter'] = 1;
-        //Intro
-        foreach ($data[0]['intro'] as $page){
-            $text = io_readFile(wikiFN($page));
-            $instructions = get_latex_instructions($text);
-            $latex .= p_latex_render('iocexportl', $instructions, $info);
-        }
-        //Content
-        foreach ($data[0]['pageid'] as $page){
-            //Check whether this page has to be exported
-            if (!in_array($page, $toexport)){
-                continue;
+    /**
+     *
+     * Exportation to pdf or zip
+     */
+    public function init(){
+        global $conf;
+
+        if (!$this->export_ok) return FALSE;
+        if (!$this->log && !$this->checkPerms()) return FALSE;
+        $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
+        if (!$this->log && !$this->exportallowed && !auth_isadmin()) return FALSE;
+        if (!$this->log && !auth_isadmin() && $params['mode'] === 'zip') return FALSE;
+
+        $this->time_start = microtime(TRUE);
+
+        $output_filename = str_replace(':','_',$this->id);
+        if (file_exists(DOKU_PLUGIN_TEMPLATES.'header.ltx')){
+            //read header
+            $latex = io_readFile(DOKU_PLUGIN_TEMPLATES.'header.ltx');
+            session_start();
+            $this->tmp_dir = rand();
+            $_SESSION['tmp_dir'] = $this->tmp_dir;
+            if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir)){
+                mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
+                mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
             }
-            $text = io_readFile(wikiFN($page));
-            $instructions = get_latex_instructions($text);
-            $latex .= p_latex_render('iocexportl', $instructions, $info);
-            //render activities
-            if (array_key_exists($page, $data[0]['activities'])){
-                $_SESSION['activities'] = TRUE;
-                foreach ($data[0]['activities'][$page] as $act){
-                    //Check whether this page has to be exported
-                    if (!in_array($act, $toexport)){
-                        continue;
-                    }
-                    $text = io_readFile(wikiFN($act));
+            if (!$this->log && !auth_isadmin()){
+                $latex .= '\draft{Provisional}' . DOKU_LF;
+                $_SESSION['draft'] = TRUE;
+            }
+            if (!file_exists(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx')){
+                session_destroy();
+                return FALSE;
+            }
+            //get all pages and activitites
+            $data = $this->getData();
+
+            //FrontPage
+            $this->renderFrontpage($latex, $data);
+            $latex .= '\frontpageparskip'.DOKU_LF;
+            $_SESSION['createbook'] = TRUE;
+            //Sets default language
+            $this->ioclang = preg_replace('/\n/', '', $this->ioclang);
+            $language = $this->ioclanguages[$this->ioclang];
+            $latex = preg_replace('/@IOCLANGUAGE@/', $language, $latex, 1);
+            $latex = preg_replace('/@IOCLANGCONTINUE@/', $this->ioclangcontinue[$lang], $latex, 1);
+            //Render a non unit zero
+            if (!$this->unitzero){
+                $_SESSION['chapter'] = 1;
+                //Intro
+                foreach ($data[0]['intro'] as $page){
+                    $text = io_readFile(wikiFN($page));
                     $instructions = get_latex_instructions($text);
                     $latex .= p_latex_render('iocexportl', $instructions, $info);
                 }
-                $_SESSION['activities'] = FALSE;
-            }
-        }
-    }else{//Render unit zero
-        $_SESSION['u0'] = TRUE;
-        $text = io_readFile(wikiFN($id));
-        $text = preg_replace('/(\={6} ?.*? ?\={6}\n{2,}\={5} [M|m]eta \={5}\n{2,}( {2,4}\* \*\*[^\*]+\*\*:.*\n?)+)/', '', $text);
-        preg_match('/(?<=\={5} [C|c]redits \={5})\n+(.*?\n?)+(?=\={5} [C|c]opyright \={5})/', $text, $matches);
-        if (isset($matches[0])){
-            $latex .= '\creditspacingline\creditspacingpar\scriptsize' . DOKU_LF;
-            $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
-            $matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
-            $instructions = get_latex_instructions($matches[0]);
-            $latex .= p_latex_render('iocexportl', $instructions, $info);
-            $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
-            $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
-            preg_match('/(?<=\={5} [C|c]opyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
-            if (isset($matches[0])){
-				$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
-                $latex .= '\vfill'.DOKU_LF;
-                $instructions = get_latex_instructions($matches[0]);
-                $latex .= p_latex_render('iocexportl', $instructions, $info);
-				$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
-                $text = preg_replace('/\={5} [C|c]opyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
-                preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
+                //Content
+                foreach ($data[0]['pageid'] as $page){
+                    //Check whether this page has to be exported
+                    if (!in_array($page, $this->toexport)){
+                        continue;
+                    }
+                    $text = io_readFile(wikiFN($page));
+                    $instructions = get_latex_instructions($text);
+                    $latex .= p_latex_render('iocexportl', $instructions, $info);
+                    //render activities
+                    if (array_key_exists($page, $data[0]['activities'])){
+                        $_SESSION['activities'] = TRUE;
+                        foreach ($data[0]['activities'][$page] as $act){
+                            //Check whether this page has to be exported
+                            if (!in_array($act, $this->toexport)){
+                                continue;
+                            }
+                            $text = io_readFile(wikiFN($act));
+                            $instructions = get_latex_instructions($text);
+                            $latex .= p_latex_render('iocexportl', $instructions, $info);
+                        }
+                        $_SESSION['activities'] = FALSE;
+                    }
+                }
+            }else{//Render unit zero
+                $_SESSION['u0'] = TRUE;
+                $text = io_readFile(wikiFN($this->id));
+                $text = preg_replace('/(\={6} ?.*? ?\={6}\n{2,}\={5} [M|m]eta \={5}\n{2,}( {2,4}\* \*\*[^\*]+\*\*:.*\n?)+)/', '', $text);
+                preg_match('/(?<=\={5} [C|c]redits \={5})\n+(.*?\n?)+(?=\={5} [C|c]opyright \={5})/', $text, $matches);
                 if (isset($matches[0])){
-                    $latex .= '\creditspacingline\creditspacingpar\tiny\par\vspace{2ex}'.DOKU_LF.DOKU_LF;
-                    $matches[0] = preg_replace('/(http.*)/', DOKU_LF.DOKU_LF.'$1', $matches[0]);
-					$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
+                    $latex .= '\creditspacingline\creditspacingpar\scriptsize' . DOKU_LF;
+                    $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
+                    $matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
                     $instructions = get_latex_instructions($matches[0]);
                     $latex .= p_latex_render('iocexportl', $instructions, $info);
-					$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
-                    $text = preg_replace('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', '', $text);
+                    $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
+                    $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
+                    preg_match('/(?<=\={5} [C|c]opyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
+                    if (isset($matches[0])){
+        				$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
+                        $latex .= '\vfill'.DOKU_LF;
+                        $instructions = get_latex_instructions($matches[0]);
+                        $latex .= p_latex_render('iocexportl', $instructions, $info);
+        				$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
+                        $text = preg_replace('/\={5} [C|c]opyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
+                        preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
+                        if (isset($matches[0])){
+                            $latex .= '\creditspacingline\creditspacingpar\tiny\par\vspace{2ex}'.DOKU_LF.DOKU_LF;
+                            $matches[0] = preg_replace('/(http.*)/', DOKU_LF.DOKU_LF.'$1', $matches[0]);
+        					$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
+                            $instructions = get_latex_instructions($matches[0]);
+                            $latex .= p_latex_render('iocexportl', $instructions, $info);
+        					$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
+                            $text = preg_replace('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', '', $text);
+                        }
+                    }
                 }
+                $latex .= '\restoregeometry' . DOKU_LF;
+                $latex .= '\defaultspacingpar\defaultspacingline' . DOKU_LF;
+                $latex .= '\normalfont\normalsize' . DOKU_LF;
+                $instructions = get_latex_instructions($text);
+                $latex .= p_latex_render('iocexportl', $instructions, $info);
+            }
+            //replace IOCQRCODE
+            $qrcode = '';
+            if ($_SESSION['qrcode']){
+                $qrcode = '\usepackage{pst-barcode,auto-pst-pdf}';
+            }
+            $latex = preg_replace('/@IOCQRCODE@/', $qrcode, $latex, 1);
+            session_destroy();
+            //Footer
+            if (file_exists(DOKU_PLUGIN_TEMPLATES.'footer.ltx')){
+                $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'footer.ltx');
             }
         }
-        $latex .= '\restoregeometry' . DOKU_LF;
-        $latex .= '\defaultspacingpar\defaultspacingline' . DOKU_LF;
-        $latex .= '\normalfont\normalsize' . DOKU_LF;
-        $instructions = get_latex_instructions($text);
-        $latex .= p_latex_render('iocexportl', $instructions, $info);
+        if ($this->mode === 'zip'){
+            $this->createZip($output_filename,DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir,$latex);
+        }else{
+            $result = array();
+            $this->createLatex($output_filename, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, $latex, $result);
+        }
+        $this->removeDir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir);
+        if($this->log){
+            return $result;
+        }
     }
-    //replace IOCQRCODE
-    $qrcode = '';
-    if ($_SESSION['qrcode']){
-        $qrcode = '\usepackage{pst-barcode,auto-pst-pdf}';
-    }
-    $latex = preg_replace('/@IOCQRCODE@/', $qrcode, $latex, 1);
-    session_destroy();
-    //Footer
-    if (file_exists(DOKU_PLUGIN_TEMPLATES.'footer.ltx')){
-        $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'footer.ltx');
-    }
-}
-if ($_POST['mode'] === 'zip'){
-    createZip($output_filename,DOKU_PLUGIN_LATEX_TMP.$tmp_dir,$latex);
-}else{
-    createLatex($output_filename,DOKU_PLUGIN_LATEX_TMP.$tmp_dir,$latex);
-}
-removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
 
     /**
      *
@@ -169,14 +224,9 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $latex
      * @param array $data
      */
-    function renderFrontpage(&$latex, $data){
-        global $tmp_dir;
-        global $unitzero;
-        global $img_src;
-        global $ini_characters;
-        global $end_characters;
+    private function renderFrontpage(&$latex, $data){
 
-        if ($unitzero){
+        if ($this->unitzero){
             $filename = 'backgroundu0';
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
             if ($_SESSION['double_cicle']){
@@ -191,17 +241,17 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 $family = 0;
             }elseif (preg_match('/electricitat/i', $data[1]['familia'])){
                 $family = 1;
-            }elseif (preg_match('/socioculturals/', $data[1]['familia'])){
+            }elseif (preg_match('/socioculturals/i', $data[1]['familia'])){
                 $family = 2;
             }else{
                 $family = 3;
             }
-            copy(DOKU_PLUGIN.'iocexportl/templates/'.$img_src[$family], DOKU_PLUGIN_LATEX_TMP.$tmp_dir.'/media/'.$img_src[$family]);
-            $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$img_src[$family], $latex);
+            copy(DOKU_PLUGIN.'iocexportl/templates/'.$this->img_src[$family], DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$this->img_src[$family]);
+            $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$this->img_src[$family], $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
-            $header_ciclenom = str_replace($ini_characters, $end_characters, $data[1]['ciclenom']);
+            $header_ciclenom = str_replace($this->ini_characters, $this->end_characters, $data[1]['ciclenom']);
             $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $header_ciclenom, $latex);
 
         }else{
@@ -215,14 +265,14 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
             $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
-            $header_nomcomplert = str_replace($ini_characters, $end_characters, $data[1]['nomcomplert']);
+            $header_nomcomplert = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', $data[1]['autoria'], $latex, 1);
             if (!isset($data[1]['extra'])){
                 $data[1]['extra'] = '';
             }
             $latex = preg_replace('/@IOC_EXPORT_EXTRA@/', $data[1]['extra'], $latex, 1);
-            $header_creditnom = str_replace($ini_characters, $end_characters, $data[1]['creditnom']);
+            $header_creditnom = str_replace($this->ini_characters, $this->end_characters, $data[1]['creditnom']);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $header_creditnom, $latex);
         }
     }
@@ -234,7 +284,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $path
      * @param string $text
      */
-    function createLatex($filename, $path, &$text){
+    private function createLatex($filename, $path, &$text, &$result){
         //Replace media relative URI's for absolute URI's
         $text = preg_replace('/\{media\//', '{'.$path.'/media/', $text);
         io_saveFile($path.'/'.$filename.'.tex', $text);
@@ -242,19 +292,19 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
         if ($_SESSION['qrcode']){
             $shell_escape = '-shell-escape';
         }
-        @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
-        if ($result === 0){
+        @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
+        if ($return === 0){
             //One more to calculate correctly size tables
-            @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
             if ($_SESSION['onemoreparsing']){
-                @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+                @exec('cd '.$path.' && pdflatex -draftmode '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
             }
-            @exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $result);
+            @exec('cd '.$path.' && pdflatex '.$shell_escape.' -halt-on-error ' .$filename.'.tex' , $sortida, $return);
         }
-        if ($result !== 0){
-            getLogError($path, $filename);
+        if ($return !== 0){
+            $this->getLogError($path, $filename, $result);
         }else{
-            returnData($path, $filename.'.pdf', 'pdf');
+            $this->returnData($path, $filename.'.pdf', 'pdf', $result);
         }
     }
 
@@ -265,11 +315,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $filename
      * @param string $type
      */
-    function returnData($path, $filename, $type){
-        global $id;
-        global $media_path;
+    private function returnData($path, $filename, $type, &$result=NULL){
         global $conf;
-        global $time_start;
 
         if (file_exists($path.'/'.$filename)){
             $error = '';
@@ -279,12 +326,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
             $filesize = filesize($path . "/" . $filename);
             $filesize = filesize_h($filesize);
-            $dest = preg_replace('/:/', '/', $id);
+            $dest = preg_replace('/:/', '/', $this->id);
             $dest = dirname($dest);
             if (!file_exists($conf['mediadir'].'/'.$dest)){
                 mkdir($conf['mediadir'].'/'.$dest, 0755, TRUE);
             }
-            $filename_dest = (auth_isadmin())?$filename:basename($filename, '.'.$type).'_draft.'.$type;
+            $filename_dest = ($this->log || auth_isadmin())?$filename:basename($filename, '.'.$type).'_draft.'.$type;
             //Replace log extension to txt, and show where error is
             if ($type === 'log'){
                 $filename_dest = preg_replace('/\.log$/', '.txt', $filename_dest, 1);
@@ -296,16 +343,26 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             copy($path.'/'.$filename, $conf['mediadir'].'/'.$dest .'/'.$filename_dest);
             $dest = preg_replace('/\//', ':', $dest);
             $time_end = microtime(TRUE);
-            $time = round($time_end - $time_start, 2);
-            if ($type === 'pdf'){
-                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time);
+            $time = round($time_end - $this->time_start, 2);
+            if($this->log){
+                if($type === 'log'){
+                    $num_pages = 'E';
+                }
+                setlocale(LC_TIME, 'ca_ES.utf8');
+                $result = array('time' => strftime("%e %B %Y %T", filemtime($path.'/'.$filename)), 'path' => $dest.':'.$filename_dest, 'pages' => $num_pages, 'size' => $filesize);
             }else{
-                $result = array($type, $media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time, $error);
+                if ($type === 'pdf'){
+                    $data = array($type, $this->media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $num_pages, $time);
+                }else{
+                    $data = array($type, $this->media_path.$dest.':'.$filename_dest.'&time='.gettimeofday(TRUE), $filename_dest, $filesize, $time, $error);
+                }
             }
         }else{
             $result = 'Error en la creació del arixu: ' . $filename;
         }
-        echo json_encode($result);
+        if (!$this->log){
+            echo json_encode($data);
+        }
     }
 
     /**
@@ -315,21 +372,22 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $path
      * @param string $text
      */
-    function createZip($filename, $path, &$text){
+    private function createZip($filename, $path, &$text){
+
         $zip = new ZipArchive;
         $res = $zip->open($path.'/'.$filename.'.zip', ZipArchive::CREATE);
         if ($res === TRUE) {
             $zip->addFromString($filename.'.tex', $text);
             $zip->addEmptyDir('media');
             $files = array();
-            getFiles($path.'/media', $files);
+            $this->getFiles($path.'/media', $files);
             foreach($files as $f){
                 $zip->addFile($f, 'media/'.basename($f));
             }
             $zip->close();
-            returnData($path, $filename.'.zip', 'zip');
+            $this->returnData($path, $filename.'.zip', 'zip');
         }else{
-            getLogError($filename);
+            $this->getLogError($filename);
         }
     }
 
@@ -339,17 +397,16 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $path
      * @param string $filename
      */
-    function getLogError($path, $filename){
-        global $tmp_dir;
-        global $conf;
+    private function getLogError($path, $filename, &$return=NULL){
+
         $output = array();
 
-        if(auth_isadmin()){
-            returnData($path, $filename.'.log', 'log');
+        if($this->log || auth_isadmin()){
+            $this->returnData($path, $filename.'.log', 'log', $return);
         }else{
             @exec('tail -n 20 '.$path.'/'.$filename.'.log;', $output);
             io_saveFile($path.'/'.filename.'.log', implode(DOKU_LF, $output));
-            returnData($path, $filename.'.log', 'log');
+            $this->returnData($path, $filename.'.log', 'log');
         }
     }
 
@@ -359,7 +416,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param string $directory
      * @param string $files
      */
-    function getFiles($directory, &$files){
+    private function getFiles($directory, &$files){
+
         if(!file_exists($directory) || !is_dir($directory)) {
                 return FALSE;
         } elseif(!is_readable($directory)) {
@@ -368,6 +426,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             $directoryHandle = opendir($directory);
             while ($contents = readdir($directoryHandle)) {
                 if($contents != '.' && $contents != '..') {
+                    //Extensions allowed
                     if (preg_match('/.*?\.pdf|.*?\.png|.*?\.jpg/', $contents)){
                         $path = $directory . "/" . $contents;
                         if(!is_dir($path)) {
@@ -386,7 +445,8 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * Remove specified dir
      * @param string $directory
      */
-    function removeDir($directory) {
+    private function removeDir($directory) {
+
         if(!file_exists($directory) || !is_dir($directory)) {
             return FALSE;
         } elseif(!is_readable($directory)) {
@@ -399,7 +459,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                     $path = $directory . "/" . $contents;
 
                     if(is_dir($path)) {
-                        removeDir($path);
+                        $this->removeDir($path);
                     } else {
                         unlink($path);
                     }
@@ -420,7 +480,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Check whether user has right acces level
      */
-    function checkPerms() {
+   private  function checkPerms() {
         global $ID;
         global $USERINFO;
         $ID = getID();
@@ -437,26 +497,25 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param array $data
      * @param boolean $struct
      */
-    function getPageNames(&$data, $struct = FALSE){
-        global $id;
+    private function getPageNames(&$data, $struct = FALSE){
         global $conf;
 
         $data['intro'] = array();
         $data['pageid'] = array();
         if (!$struct){
             $exists = FALSE;
-            $file = wikiFN($id);
+            $file = wikiFN($this->id);
             if (@file_exists($file)) {
                 $matches = array();
                 $txt =  io_readFile($file);
                 preg_match_all('/(?<=\={5} [T|t]oc \={5})\n+(\s{2,4}\*\s+\[\[[^\]]+\]\] *\n?)+/i', $txt, $matches);
                 $pages = implode('\n', $matches[0]);
                 //get exercises and activities
-                $pages = getActivities($data, $pages);
+                $pages = $this->getActivities($data, $pages);
                 preg_match_all('/\[\[([^|]+).*?\]\] */', $pages, $matches);
                 $counter = 0;
                 foreach ($matches[1] as $page){
-                    resolve_pageid(getNS($id),$page,$exists);
+                    resolve_pageid(getNS($this->id),$page,$exists);
                     if ($exists){
                         if ($counter < 2){
                             array_push($data['intro'], $page);
@@ -469,7 +528,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
         }else{
             $result = array();
-            preg_match('/(\w+:)+pdf:\w+\b/', $id, $result);
+            preg_match('/(\w+:)+pdf:\w+\b/', $this->id, $result);
             $ns = preg_replace('/:/' ,'/', $result[0]);
             search($result,$conf['datadir'],'search_index', null, $ns);
             foreach ($result as $pagename){
@@ -493,8 +552,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      * @param array $data
      * @param string $pages
      */
-    function getActivities(&$data, $pages){
-        global $id;
+    private function getActivities(&$data, $pages){
 
         $matches = array();
         $data['activities'] = array();
@@ -507,7 +565,7 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 continue;
             }else{
                 $masterid = $ret[1];
-                resolve_pageid(getNS($id),$masterid,$exists);
+                resolve_pageid(getNS($this->id),$masterid,$exists);
                 //return all activities for active page
                 preg_match_all('/\s{4}\*\s+\[\[([^|]+).*?\]\]/', $match, $ret);
                 foreach ($ret[1] as $r){
@@ -527,16 +585,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
      *
      * Get and return uri wiki pages
      */
-    function getData(){
-        global $id;
-        global $unitzero;
-        global $meta_params;
-        global $meta_dcicle;
+    private function getData(){
 
         $data = array();
         $data[0] = array();
         $data[1] = array();
-        $file = wikiFN($id);
+        $file = wikiFN($this->id);
         $inf = NULL;
         if (@file_exists($file)) {
             $info = io_grep($file, '/(?<=\={6} )[^\=]*/', 0, TRUE);
@@ -549,11 +603,11 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
                 preg_match_all('/ {2,4}\* (\*\*(.*?)\*\*:)(.*)/m', $text, $info, PREG_SET_ORDER);
                 foreach ($info as $i){
                     $key = trim($i[2]);
-                    if ($key === $meta_dcicle){
+                    if ($key === $this->meta_dcicle){
                         $_SESSION['double_cicle'] = TRUE;
                         continue;
                     }
-                    if (in_array($key, $meta_params)){
+                    if (in_array($key, $this->meta_params)){
                         $data[1][$key] = trim($i[3]);
                     }else{
                         $instructions = get_latex_instructions(trim($i[1].$i[3]));
@@ -564,11 +618,12 @@ removeDir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir);
             }
             //get page names
             if (key_exists('familia', $data[1])){
-                $unitzero = TRUE;
+                $this->unitzero = TRUE;
             }else{
-                getPageNames($data[0]);
+                $this->getPageNames($data[0]);
             }
             return $data;
         }
         return FALSE;
     }
+}
