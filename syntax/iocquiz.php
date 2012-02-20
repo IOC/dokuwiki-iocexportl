@@ -293,9 +293,11 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             $sol = array();
             $aux = array();
             $used = array();
-            foreach ($_SESSION['quizsol'] as $s){
-              array_push($sol,$s);
-              array_push($aux,$s);
+            if (!empty($_SESSION['quizsol'])){
+                foreach ($_SESSION['quizsol'] as $s){
+                  array_push($sol,$s);
+                  array_push($aux,$s);
+                }
             }
             //Remove duplicated values
             $aux = array_unique($aux);
@@ -328,10 +330,12 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             $max_length = max($max_length, 20);
             $options = preg_replace('/@IOCDOTS@/', str_repeat(".", $max_length), $options, 1);
             $cont = 1;
-            foreach ($_SESSION['quizsol'] as $s){
-                $pos = array_search($s, $aux, TRUE);
-                $renderer->doc = preg_replace('/@IOCDROPDOWN'.$cont.'@/', '<select name="sol_'.($pos+1).'">'.$options.'</select>', $renderer->doc, 1);
-                $cont += 1;
+            if (!empty($_SESSION['quizsol'])){
+                foreach ($_SESSION['quizsol'] as $s){
+                    $pos = array_search($s, $aux, TRUE);
+                    $renderer->doc = preg_replace('/@IOCDROPDOWN'.$cont.'@/', '<select name="sol_'.($pos+1).'">'.$options.'</select>', $renderer->doc, 1);
+                    $cont += 1;
+                }
             }
         }
         $renderer->doc .= '</table>';
