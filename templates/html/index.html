@@ -66,9 +66,9 @@
 
 <div class="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
 	<header id="header">
-        <div class="head"><a href="http://ioc.gencat.cat"><img src="img/logo.png" alt="Institut Obert de Catalunya"/></a><a href="@IOCREFLICENSE@"><img src="img/license.png" alt="Llic&egrave;ncia" class="license"/></a></div>
+        <div class="head"><a href="http://ioc.gencat.cat"><img src="img/logo.png" alt="Institut Obert de Catalunya"/></a><a href="@IOCREFLICENSE@"><img src="img/license.png" alt="@IOCLICENSE@" class="license"/></a></div>
 		<div class="headdocument hidden">@IOCHEADDOCUMENT@</div>
-        <div id="button_start" class="button_start">Inici</div>
+        <div id="button_start" class="button_start">@IOCSTART@</div>
         <div id="search" class="search">
          <form id="frmsearch" action="search.html" method="get">
          <input type="text" name="q"/>
@@ -88,14 +88,14 @@
        </div>
 	 </article>
     </div>
-    <div class="headtoc headtocdown"><h1 class="hover headmainindex">Taula de Continguts<img class="up" src="img/down.png"/></h1>
+    <div class="headtoc headtocdown"><h1 class="hover headmainindex">@IOCHEADTOC@<img class="up" src="img/down.png"/></h1>
      <div class="indextoc">
       <div class="indexcontent">
        <ul>@IOCTOC@</ul>
       </div>
      </div>
     </div>
-  <div class="hidden infomessage">Esteu llegint aquest material fent servir <span>Chrome/Chromium</span> en local; degut a les limitacions imposades per aquest navegador no podreu fer servir la cerca ni la resta de funcionalitats associades a l&#39;&uacute;s de les galetes.</div>
+  <div class="hidden infomessage">@IOCCHROME@</div>
 </div>  
 </body>
 </html>

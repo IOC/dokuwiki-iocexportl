@@ -55,21 +55,21 @@ define (["functions","render"],function(func,render){
 	  
 	  if(quiztype !== 'vf'){
 		if (values){
-		  res = '<p class="ok">Correcte</p>';
+		  res = '<p class="ok">@IOCOK@</p>';
 		  ok = true;
 		  func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 		}else{
-		  res = '<p class="ko">Erroni</p>';
+		  res = '<p class="ko">@IOCWRONG@</p>';
 		  ok = false;
 		}
 	  }else{
 		  var resp = values.join(',');
 		  if (solution == resp){
-			res = '<p class="ok">Correcte</p>';
+			res = '<p class="ok">@IOCOK@</p>';
 			ok = true;
 			func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 		  }else{
-			res = '<p class="ko">Erroni</p>';
+			res = '<p class="ko">@IOCWRONG@</p>';
 			ok = false;
 		  }
 	  }
@@ -104,13 +104,13 @@ define (["functions","render"],function(func,render){
 	  var resp = '';
 	  for(i=0, l=solutions.length; i<l; i++){
 		  if (solutions[i] == 'F'){
-			  resp = '<p class="ko">Erroni</p>';
+			  resp = '<p class="ko">@IOCWRONG@</p>';
 			  ok = false;
 			  break;
 		  }
 	  }
 	  if (resp == ''){
-		  resp = '<p class="ok">Correcte</p>';
+		  resp = '<p class="ok">@IOCOK@</p>';
 		  ok = true;
 		  func.editCheckExercise(document.location.pathname,div.prev('h2').children('a').attr('id'));
 	  }
@@ -137,10 +137,10 @@ define (["functions","render"],function(func,render){
 		var form = jQuery(target).parents('form');
 		if (jQuery(form).children(".solution").css('display') == 'block' ){
 			jQuery(form).children(".solution").slideUp("slow");
-			jQuery(target).attr('value','Mostra');
+			jQuery(target).attr('value','@IOCSHOW@');
 		}else{
 			jQuery(form).children(".solution").slideDown("slow");
-			jQuery(target).attr('value','Oculta');
+			jQuery(target).attr('value','@IOCHIDE@');
 			jQuery('article').css('height','auto');
 			render.infoTable();
 			render.infoFigure();

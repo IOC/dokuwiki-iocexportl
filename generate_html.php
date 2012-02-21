@@ -22,6 +22,7 @@ $params['id'] = getID();
 $params['mode'] = $_POST['mode'];
 if ($params['id'] === $_POST['id']){
     $params['toexport'] = $_POST['toexport'];
+    $params['ioclanguage'] = $_POST['ioclanguage'];
     $generate = new generate_html($params);
     $generate->init();
 }
@@ -34,6 +35,7 @@ class generate_html{
     private $exportallowed;
     private $export_ok;
     private $id;
+    private $lang;
     private $log;
     private $max_menu;
     private $max_navmenu;
@@ -58,6 +60,14 @@ class generate_html{
         $this->exportallowed = FALSE;
         $this->export_ok = ($params['mode'] === 'zip' && !empty($params['toexport']));
         $this->id = $params['id'];
+        $lang = (!isset($params['ioclanguage']))?'ca':strtolower($params['ioclanguage']);
+        $lang = preg_replace('/\n/', '', $lang);
+        if (!file_exists(dirname(__FILE__).'/conf/lang/'.$lang.'.conf')){
+            $lang = 'ca';
+        }
+        $this->lang =  confToHash(dirname(__FILE__).'/conf/lang/'.$lang.'.conf');
+        $_SESSION['IOCSHOW'] = $this->lang['show'];
+        $_SESSION['IOCSOLUTION'] = $this->lang['solution'];
         $this->max_menu = 100;
         $this->max_navmenu = 70;
         $this->media_path = 'lib/exe/fetch.php?media=';
@@ -109,6 +119,15 @@ class generate_html{
             $build = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'_/js/build.js');
             preg_match('/^([^.]*\.)*([^\.]*\.[^\/]*)\/.*?$/',$data[1]['creditcodi'],$matches);
             $build = preg_replace('/"@IOCFILENAMES@"/', implode(',', $files_name), $build, 1);
+            $build = preg_replace('/@IOCSEARCHING@/', $this->lang['searching'], $build, 1);
+            $build = preg_replace('/@IOCPREPARINGSEARCH@/', $this->lang['preparingsearch'], $build, 1);
+            $build = preg_replace('/@IOCSEARCHRESULTS@/', $this->lang['searchresults'], $build, 1);
+            $build = preg_replace('/@IOCNOSEARCHRESULTS@/', $this->lang['nosearchresults'], $build, 1);
+            $build = preg_replace('/@IOCSEARCHFINISHED@/', $this->lang['searchfinished'], $build, 1);
+            $build = preg_replace('/@IOCSHOW@/', $this->lang['show'], $build, 1);
+            $build = preg_replace('/@IOCHIDE@/', $this->lang['hide'], $build, 1);
+            $build = preg_replace('/@IOCOK@/', $this->lang['ok'], $build);
+            $build = preg_replace('/@IOCWRONG@/', $this->lang['wrong'], $build);
             $cookiename = '';
             if (isset($matches[2])){
                 $cookiename = str_replace(".", "_", $matches[2]);
@@ -126,12 +145,53 @@ class generate_html{
             $text_search = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_search, 3);
             $text_search = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_search, 1);
             $text_search = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_search, 1);
+            $text_search = preg_replace('/@IOCLICENSE@/',$this->lang['license'], $text_search, 1);
+            $text_search = preg_replace('/@IOCTOPPAGE@/',$this->lang['toppage'], $text_search, 1);
             //Get template source
             $text_template = io_readFile(DOKU_PLUGIN_TEMPLATES_HTML.'template.html');
             $text_template = preg_replace('/@IOCHEADDOCUMENT@/', $data[1]['creditnom'], $text_template, 3);
             $text_template = preg_replace('/@IOCFAMILY@/', $data[1]['familia'], $text_template, 1);
             $text_template = preg_replace('/@IOCREFLICENSE@/', $data[1]['copylink'], $text_template, 1);
             $text_template = preg_replace('/@IOCCOPYTEXT@/', $data[1]['copytext'], $text_template, 1);
+            $text_template = preg_replace('/@IOCLICENSE@/',$this->lang['license'], $text_template, 1);
+            $text_template = preg_replace('/@IOCTOPPAGE@/',$this->lang['toppage'], $text_template, 1);
+            $text_template = preg_replace('/@IOCINDEX@/',$this->lang['index'], $text_template, 1);
+            $text_template = preg_replace('/@IOCSETTINGS@/',$this->lang['settings'], $text_template, 1);
+            $text_template = preg_replace('/@IOCPRINT@/',$this->lang['print'], $text_template, 1);
+            $text_template = preg_replace('/@IOCBOOKMARKS@/',$this->lang['bookmarks'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELP@/',$this->lang['help'], $text_template, 1);
+            $text_template = preg_replace('/@IOCFONTCOLOR@/',$this->lang['fontcolor'], $text_template, 1);
+            $text_template = preg_replace('/@IOCWIDTH@/',$this->lang['width'], $text_template, 1);
+            $text_template = preg_replace('/@IOCFONTSIZE@/',$this->lang['fontsize'], $text_template, 1);
+            $text_template = preg_replace('/@IOCOPTIONS@/',$this->lang['fontsize'], $text_template, 1);
+            $text_template = preg_replace('/@IOCSHOWADITIONAL@/',$this->lang['showaditionals'], $text_template, 1);
+            $text_template = preg_replace('/@IOCSHOWIMAGES@/',$this->lang['showimages'], $text_template, 1);
+            $text_template = preg_replace('/@IOCJUSTIFY@/',$this->lang['justify'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHYPHENATION@/',$this->lang['hyphenation'], $text_template, 1);
+            $text_template = preg_replace('/@IOCSHORTCUTS@/',$this->lang['shorcuts'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGENERAL@/',$this->lang['general'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOTONAVIGATION@/',$this->lang['gonavigation'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOTOSETTINGS@/',$this->lang['gosettings'], $text_template, 1);
+            $text_template = preg_replace('/@IOCBOOKMARK@/',$this->lang['savebookmark'], $text_template, 1);
+            $text_template = preg_replace('/@IOCPRINTPAGE@/',$this->lang['printpage'], $text_template, 1);
+            $text_template = preg_replace('/@IOCSHOWHIDEHELP@/',$this->lang['showhelp'], $text_template, 1);
+            $text_template = preg_replace('/@IOCNAVIGATION@/',$this->lang['navigation'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOMAIN@/',$this->lang['gomainindex'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOTOPPAGE@/',$this->lang['gotoppage'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOBOTTOMPAGE@/',$this->lang['gobottompage'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOFORWARD@/',$this->lang['goforward'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOBACKWARD@/',$this->lang['gobackward'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGOPREVIOUSPAGE@/',$this->lang['gopreviouspage'], $text_template, 1);
+            $text_template = preg_replace('/@IOCGONEXTPAGE@/',$this->lang['gonextpage'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPTOC@/',$this->lang['helptoc'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPSETTINGS@/',$this->lang['helpsettings'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPPRINT@/',$this->lang['helpprint'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPBOOKMARK@/',$this->lang['helpbookmark'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPCOUNTERBOOKMARK@/',$this->lang['helpcounterbookmark'], $text_template, 1);
+            $text_template = preg_replace('/@IOCBUTTONHELP@/',$this->lang['helpbutton'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPSHOWHIDEBAR@/',$this->lang['helpshowhidebar'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPSEARCH@/',$this->lang['helpsearch'], $text_template, 1);
+            $text_template = preg_replace('/@IOCHELPHEADER@/',$this->lang['helpheader'], $text_template, 1);
             //Create index page
             $menu_html_index = preg_replace('/@IOCSTARTUNIT@|@IOCENDUNIT@/', '', $this->menu_html);
             $menu_html_index = preg_replace('/@IOCSTARTINTRO@|@IOCENDINTRO@/', '', $menu_html_index);
@@ -141,6 +201,10 @@ class generate_html{
             $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
             $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
+            $html = preg_replace('/@IOCHEADTOC@/',$this->lang['Toc'], $html, 1);
+            $html = preg_replace('/@IOCCHROME@/',$this->lang['chrome'], $html, 1);
+            $html = preg_replace('/@IOCSTART@/',$this->lang['start'], $html, 1);
+            $html = preg_replace('/@IOCLICENSE@/',$this->lang['license'], $html, 1);
             $html = preg_replace('/@IOCMETA@/',$this->createMeta($data[1]), $html, 1);
             $html = preg_replace('/@IOCMETABC@/',$this->createMetaBC($data[1]), $html, 1);
             $html = preg_replace('/@IOCMETABR@/',$this->createMetaBR($data[1]), $html, 1);
@@ -150,7 +214,7 @@ class generate_html{
             //Create search page
             $navmenu = $this->createNavigation('');
             $html = preg_replace('/@IOCCONTENT@/', '<div id="search-results"></div>', $text_search, 1);
-            $html = preg_replace('/@IOCTITLE@/', 'Cerca', $html, 1);
+            $html = preg_replace('/@IOCTITLE@/', $this->lang['search'], $html, 1);
             $html = preg_replace('/@IOCTOC@/', '', $html, 1);
             $html = preg_replace('/@IOCPATH@/', '', $html);
             $html = preg_replace('/@IOCNAVMENU@/', $navmenu, $html, 1);
@@ -301,7 +365,7 @@ class generate_html{
             $result = array();
             $this->returnData(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, $output_filename.'.zip', $result);
         }else{
-            $result = 'No es pot iniciar l\'arxiu zip';
+            $result = $this->lang['nozipfile'];
         }
         $_SESSION['export_html'] = FALSE;
         session_destroy();
@@ -342,7 +406,7 @@ class generate_html{
                 $data = array('zip', $this->media_path.$dest.':'.$filename.'&time='.gettimeofday(TRUE), $filename, $filesize, $time, $error);
             }
         }else{
-            $result = 'Error en la creació del arxiu: ' . $filename;
+            $result = $this->lang['createfileerror'] . $filename;
         }
         if (!$this->log){
             echo json_encode($data);
@@ -603,7 +667,7 @@ class generate_html{
             //Link to index
             $menu_html .= '@IOCSTARTINDEX@';
             $href = '@IOCPATH@index.html';
-            $menu_html .= $this->setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
+            $menu_html .= $this->setMenu('root', $this->lang['gomainindex'], $href, '', TRUE);
             $menu_html .= '@IOCENDINDEX@';
             $menu_html .= '@IOCENDINTRO@';
             unset($elements['intro']);
@@ -662,7 +726,7 @@ class generate_html{
             //Link to index
             $menu_html .= '@IOCSTARTINDEX@';
             $href = '@IOCPATH@index.html';
-            $menu_html .= $this->setMenu('root', 'Tornar a l&#39;&iacute;ndex general', $href, '', TRUE);
+            $menu_html .= $this->setMenu('root', $this->lang['gomainindex'], $href, '', TRUE);
             $menu_html .= '@IOCENDINDEX@';
             $menu_html .= '@IOCENDUNIT@';
         }
@@ -712,7 +776,7 @@ class generate_html{
         $matches = array();
         $headers = array();
         $toc = '<div class="toc">';
-        $toc .= '<span>Taula de continguts</span><br /><ul>';
+        $toc .= '<span>'.$this->lang['toc'].'</span><br /><ul>';
         preg_match_all('/\={5}([^=]+)\={5}/', $text, $matches, PREG_SET_ORDER);
         foreach ($matches as $m){
             $toc .= '<li>';
@@ -736,7 +800,7 @@ class generate_html{
 
         $coord = (isset($data['coordinacio'])?$data['coordinacio']:'');
         if (!empty($coord)){
-            $meta .= '<li><strong>Coordinaci&oacute;</strong></li>';
+            $meta .= '<li><strong>'.$this->lang['editor'].'</strong></li>';
         }
         $coord = preg_split('/\s?\\\\\s?/', $coord);
         foreach ($coord as $co){
@@ -746,7 +810,7 @@ class generate_html{
         }
         $authors = (isset($data['autoria'])?$data['autoria']:'');
         if (!empty($authors)){
-            $meta .= '<li><strong>Redacci&oacute;</strong></li>';
+            $meta .= '<li><strong>'.$this->lang['author'].'</strong></li>';
         }
         $authors = preg_split('/\s?\\\\\s?/', $authors);
         foreach ($authors as $auth){
@@ -756,7 +820,7 @@ class generate_html{
         }
         $adapt = (isset($data['adaptacio'])?$data['adaptacio']:'');
         if (!empty($adapt)){
-            $meta .= '<li><strong>Adaptaci&oacute;</strong></li>';
+            $meta .= '<li><strong>'.$this->lang['adaptation'].'</strong></li>';
         }
         $adapt = preg_split('/\s?\\\\\s?/', $adapt);
         foreach ($adapt as $ad){
@@ -796,7 +860,7 @@ class generate_html{
     */
     private function createMetaBR($data){
 
-        $meta .= 'Primera edició: <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
+        $meta .= $this->lang['firstediton'].': <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
         $meta .= ' &copy; Departament d&#39;Ensenyament';
         return $meta;
     }
@@ -871,7 +935,7 @@ class generate_html{
      */
     private function createNavigation($index_path, $options=NULL,$refs=NULL){
 
-        $navigation = '<ul class="webnav"><li><a href="'.$index_path.'index.html" title="Tornar a l&#39;&iacute;ndex general">Inici</a></li>';
+        $navigation = '<ul class="webnav"><li><a href="'.$index_path.'index.html" title="'.$this->lang['gomainindex'].'">'.$this->lang['start'].'</a></li>';
         if (!is_null($options)){
             foreach ($options as $k => $op){
                 if ($op != 'Contingut'){
@@ -906,8 +970,8 @@ class generate_html{
      */
     private function createrefstopages($html, $data, $unit, $section, $activity, $href){
 
-        $textprev = 'Anar a la p&agrave;gina anterior:<br />';
-        $textnext = 'Anar a la p&agrave;gina seg&uuml;ent:<br />';
+        $textprev = $this->lang['gopreviouspage'].'<br />';
+        $textnext = $this->lang['gonextpage'].'<br />';
         //Intro
         if (empty($unit)){
             $prev = $section-1;
@@ -923,7 +987,7 @@ class generate_html{
                 $href = $href.basename(str_replace(':', '/', $data[$next][1])).'.html';
                 $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'">'.$data[$next][0].'</a></div>';
             }else{
-                $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
+                $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">'.$this->lang['mainindex'].'</a></div>';
             }
             $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
         }else{
@@ -970,7 +1034,7 @@ class generate_html{
                         $phref = $href.'WebContent/'.$unit.'/'.$sect.'/'.$this->def_section_href.'.html';
                         $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.$this->tree_names[$unit][$sect]['sectionname'].'</a></div>';
                     }else{
-                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">'.$this->lang['mainindex'].'</a></div>';
                     }
                 }
                 $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);
@@ -1035,7 +1099,7 @@ class generate_html{
                         $phref = $href.'WebContent/'.$unit.'/'.'a'.intval($num_section+1).'/'.basename(str_replace(':', '/', key($data['a'.intval($num_section+1)]))).'.html';
                         $content = '<div id="nextpage">'.$textnext.'<a href="'.$phref.'">'.reset($this->tree_names[$unit]['a'.intval($num_section+1)]).'</a></div>';
                     }else{
-                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">&Iacute;ndex general</a></div>';
+                        $content = '<div id="nextpage">'.$textnext.'<a href="'.$href.'index.html">'.$this->lang['mainindex'].'</a></div>';
                     }
                 }
                 $html = preg_replace('/@IOCNEXTPAGE@/',$content, $html);

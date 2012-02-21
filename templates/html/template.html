@@ -76,7 +76,7 @@
 <div class="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
 
 	<header id="header">
-		<div class="head"><a href="http://ioc.gencat.cat"><img src="@IOCPATH@img/logo.png" alt="Institut Obert de Catalunya"/></a><a href="@IOCREFLICENSE@"><img src="@IOCPATH@img/license.png" alt="Llic&egrave;ncia" class="license"/></a></div>
+		<div class="head"><a href="http://ioc.gencat.cat"><img src="@IOCPATH@img/logo.png" alt="Institut Obert de Catalunya"/></a><a href="@IOCREFLICENSE@"><img src="@IOCPATH@img/license.png" alt="@IOCLICENSE@" class="license"/></a></div>
 		<div class="headdocument"><a href="@IOCPATH@index.html">@IOCHEADDOCUMENT@</a></div>
         <div id="search" class="search" name="search">
          <form id="frmsearch" action="@IOCPATH@search.html" method="get">
@@ -84,15 +84,15 @@
         </form>
         </div>
 	</header>
-   <div id="upbutton" class="upbutton" style="display:none;"><img src="@IOCPATH@img/uparrow.png" alt="Pujar a l'inici de p&agrave;gina"/></div>
+   <div id="upbutton" class="upbutton" style="display:none;"><img src="@IOCPATH@img/uparrow.png" alt="@IOCTOPPAGE@"/></div>
    <aside id="aside">
     <div id="menu">
       <ul>
-       <li name="toc"><div><img src="@IOCPATH@img/toc.png" alt="Index"/></div></li>
-       <li name="settings"><div><img src="@IOCPATH@img/settings.png" alt="Ajust"/></div></li>
-       <li name="printer"><div><img src="@IOCPATH@img/printer.png" alt="Imprimir"/></div></li>
-       <li name="favorites"><div><img src="@IOCPATH@img/favorites.png" alt="Favorits"/></div></li>
-       <li name="help_icon" class="help_icon"><div><img src="@IOCPATH@img/help_icon.png" alt="Ajuda"/></div></li>
+       <li name="toc"><div><img src="@IOCPATH@img/toc.png" alt="@IOCINDEX@"/></div></li>
+       <li name="settings"><div><img src="@IOCPATH@img/settings.png" alt="@IOCSETTINGS@"/></div></li>
+       <li name="printer"><div><img src="@IOCPATH@img/printer.png" alt="@IOCPRINT@"/></div></li>
+       <li name="favorites"><div><img src="@IOCPATH@img/favorites.png" alt="@IOCBOOKMARKS@"/></div></li>
+       <li name="help_icon" class="help_icon"><div><img src="@IOCPATH@img/help_icon.png" alt="@IOCHELP@"/></div></li>
       </ul>
      </div>
    </aside>
@@ -111,7 +111,7 @@
     <div class="menucontent">
      <div class="allsettings">
      <div class="settings">
-      <label>Font i color</label>
+      <label>@IOCFONTCOLOR@</label>
 		<div class="setting-option">
 	        <ul class="fontBackground">
 				<li id="style-newspaper" title="Newspaper" class="appearance-style-newspaper"><span>Newspaper</span></li>
@@ -123,26 +123,26 @@
 		</div>
      </div>
 	<div class="settings">
-      <label>Amplada</label>
+      <label>@IOCWIDTH@</label>
 		<div class="setting-option">
 	        <div id="slider-width"></div>
 		</div>
      </div>
      <div class="settings">
-      <label>Mida de la font</label>
+      <label>@IOCFONTSIZE@</label>
 		<div class="setting-option">
 	        <div id="slider-font"></div>
 		</div>
      </div>
      <div class="settings">
-      <label>Opcions</label>
+      <label>@IOCOPTIONS@</label>
 	  <div class="setting-option">
        <form action="" class="sett-options">
 		<ul>
-		    <li><input type="checkbox" id="secondary-content" /><label for="secondary-content">Mostra recursos complementaris</label></li>
-		    <li><input type="checkbox" id="main-images" /><label for="main-images">Mostra imatges</label></li>
-		    <li><input type="checkbox" id="text-alignment" /><label for="text-alignment">Text justificat</label></li>
-			<li><input type="checkbox" id="text-hyphen" /><label for="text-hyphen">Partici&oacute; sil·l&agrave;bica</label></li>
+		    <li><input type="checkbox" id="secondary-content" /><label for="secondary-content">@IOCSHOWADITIONAL@</label></li>
+		    <li><input type="checkbox" id="main-images" /><label for="main-images">@IOCSHOWIMAGES@</label></li>
+		    <li><input type="checkbox" id="text-alignment" /><label for="text-alignment">@IOCJUSTIFY@</label></li>
+			<li><input type="checkbox" id="text-hyphen" /><label for="text-hyphen">@IOCHYPHENATION@</label></li>
 		</ul>
        </form>
 	  </div>
@@ -156,25 +156,25 @@
  </section>   
  <div id="bridge" class="hidden"></div>
  <div id="help" class="hidden">
-  <div class="helptitle">Dreceres del teclat<hr></div>
-  <div class="helpsection"><span>General</span>
+  <div class="helptitle">@IOCSHORTCUTS@<hr></div>
+  <div class="helpsection"><span>@IOCGENERAL@</span>
    <ul>
-    <li><span class="shortcut">g</span>: Anar al men&uacute; de navegaci&oacute;</li>
-    <li><span class="shortcut">o</span>: Anar a opcions</li>
-    <li><span class="shortcut">s</span>: Guardar la p&agrave;gina actual a favorits</li>
-    <li><span class="shortcut">p</span>: Imprimir la p&agrave;gina actual</li>
-    <li><span class="shortcut">?</span>: Mostrar/Ocultar l&#39;ajuda</li>
+    <li><span class="shortcut">g</span>: @IOCGOTONAVIGATION@</li>
+    <li><span class="shortcut">o</span>: @IOCGOTOSETTINGS@</li>
+    <li><span class="shortcut">s</span>: @IOCBOOKMARK@</li>
+    <li><span class="shortcut">p</span>: @IOCPRINTPAGE@</li>
+    <li><span class="shortcut">?</span>: @IOCSHOWHIDEHELP@</li>
    </ul>
   </div>
-  <div class="helpsection"><span>Navegaci&oacute;</span>
+  <div class="helpsection"><span>@IOCNAVIGATION@</span>
    <ul>
-    <li><span class="shortcut">i</span>: Anar a l&#39;&iacute;ndex general</li>
-    <li><span class="shortcut">t</span>: Anar a l&#39;inici de p&agrave;gina</li>
-    <li><span class="shortcut">b</span>: Anar al final de p&agrave;gina</li>
-    <li><span class="shortcut">j</span>: Anar cap endavant dintre la p&agrave;gina</li>
-    <li><span class="shortcut">k</span>: Anar cap enrere dintre la p&agrave;gina</li>
-    <li><span class="shortcut">h</span>: Anar a la p&agrave;gina anterior</li>
-    <li><span class="shortcut">l</span>: Anar a la p&agrave;gina seg&uuml;ent</li>
+    <li><span class="shortcut">i</span>: @IOCGOMAIN@</li>
+    <li><span class="shortcut">t</span>: @IOCGOTOPPAGE@</li>
+    <li><span class="shortcut">b</span>: @IOCGOBOTTOMPAGE@</li>
+    <li><span class="shortcut">j</span>: @IOCGOFORWARD@</li>
+    <li><span class="shortcut">k</span>: @IOCGOBACKWARD@</li>
+    <li><span class="shortcut">h</span>: @IOCGOPREVIOUSPAGE@</li>
+    <li><span class="shortcut">l</span>: @IOCGONEXTPAGE@</li>
    </ul>
    </div>
  </div>
@@ -197,15 +197,15 @@
     </footer>
  </div>
  <div id="help-tooltips">
-  <div id="help-toc" class="hidden tooltip"><span>Taula de continguts:</span> Ofereix una vista general de l&#39;estructura del m&ograve;dul, que us facilitar&agrave; la navegaci&oacute; a trav&eacute;s dels seus continguts.<span class="arrow-left"></span></div> 
-  <div id="help-settings" class="hidden tooltip"><span>Opcions de format:</span> Permet configurar el format de lectura a partir de les vostres prefer&egrave;ncies, modificant la mida de la lletra, el color del fons, l&#39;amplada de la p&agrave;gina o l&#39;ocultaci&oacute; dels continguts complementaris, entre d&#39;altres.<span class="arrow-left"></span></div>
-  <div id="help-printer" class="hidden tooltip"><span>Imprimir:</span>  Envia el contingut seleccionat a la impressora.<span class="arrow-left"></span></div>
-  <div id="help-favorites" class="hidden tooltip"><span>Prefereits:</span> Permet desar aquelles parts del contingut a les que us interessi accedir en un moment posterior; us permetr&agrave; anar creant un repositori personalitzat de les seccions que considereu m&eacute;s rellevants. Un cop l&#39;hageu començat a fer servir se us mostrar&agrave; a sota un comptador que us informar&agrave; del nombre de preferits que s&#39;hagin emmagatzemat fins al moment.<span class="arrow-left"></span></div>
-  <div id="help-favcounter" class="hidden tooltip"><span>Comptador i llistat de preferits:</span> Indica el nombre de preferits que s&#39;han desat fins el moment; clicant damunt seu accedireu al llistat de preferits, i a trav&eacute;s d&#39;aquest podreu accedir directament als continguts que hageu emmagatzemat.<span class="arrow-left"></span></div>
-  <div id="help-help_icon" class="hidden tooltip"><span>Ajuda:</span> Aquesta opci&oacute; activa la informaci&oacute; de les funcionalitats del web tot situant el punter del ratol&iacute; al damunt dels diferents &iacute;tems.<span class="arrow-left"></span></div>
-  <div id="help-sidebar-hide" class="hidden tooltip"><span>Mostrar/Ocultar barra lateral:</span>  Deshabilita la barra d&#39;opcions, permetent la seva recuperaci&oacute; quan es desitgi.<span class="arrow-left"></span></div>
-  <div id="help-search" class="hidden tooltip"><span>Cerca:</span>  Introdu&iuml;u les paraules clau sobre aquells conceptes que desitgeu localitzar en els continguts del m&ograve;dul. Tamb&eacute; podeu excloure un terme de la cerca tot afegint-hi el signe &#8220;-&#8221; al davant.<span class="arrow-top"></span></div>
-  <div id="help-header" class="hidden tooltip"><span>Cap&ccedil;alera:</span>  Indica l&#39;apartat o secci&oacute; que es mostra en pantalla. Tingueu present que les capçaleres de segon, tercer i quart nivell tamb&eacute; es poden desar com a marcadors.<span class="arrow-left"></span></div>
+  <div id="help-toc" class="hidden tooltip">@IOCHELPTOC@<span class="arrow-left"></span></div> 
+  <div id="help-settings" class="hidden tooltip">@IOCHELPSETTINGS@<span class="arrow-left"></span></div>
+  <div id="help-printer" class="hidden tooltip">@IOCHELPPRINT@<span class="arrow-left"></span></div>
+  <div id="help-favorites" class="hidden tooltip">@IOCHELPBOOKMARK@<span class="arrow-left"></span></div>
+  <div id="help-favcounter" class="hidden tooltip">@IOCHELPCOUNTERBOOKMARK@<span class="arrow-left"></span></div>
+  <div id="help-help_icon" class="hidden tooltip">@IOCBUTTONHELP@<span class="arrow-left"></span></div>
+  <div id="help-sidebar-hide" class="hidden tooltip">@IOCHELPSHOWHIDEBAR@<span class="arrow-left"></span></div>
+  <div id="help-search" class="hidden tooltip">@IOCHELPSEARCH@<span class="arrow-top"></span></div>
+  <div id="help-header" class="hidden tooltip">@IOCHELPHEADER@<span class="arrow-left"></span></div>
 </div> 
 </body>
 </html>

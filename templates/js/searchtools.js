@@ -259,12 +259,12 @@ var Search = {
   performSearch : function(query) {
     // create the required interface elements
     this.out = $('#search-results');
-    this.title = $('<h2 class="nocount">' + 'Cercant' + '</h2>').appendTo(this.out);
+    this.title = $('<h2 class="nocount">' + '@IOCSEARCHING@' + '</h2>').appendTo(this.out);
     this.dots = $('<span></span>').appendTo(this.title);
     this.status = $('<p style="display: none"></p>').appendTo(this.out);
     this.output = $('<ul class="search-result"/>').appendTo(this.out);
 
-    $('#search-progress').text('Preparant al cerca...');
+    $('#search-progress').text('@PREPARINGSEARCH@');
     this.startPulse();
     this.query(query);
   },
@@ -355,13 +355,13 @@ var Search = {
 		}
 		if (pos < 1) {
 			Search.stopPulse();
-			Search.title.text('Resultats de la cerca');
+			Search.title.text('@IOCSEARCHRESULTS@');
 
 			var elems = jQuery('.search-result').children().length;
 			if (elems < 1){
-			  Search.status.text('La teva cerca no ha retornat cap resultat.');
+			  Search.status.text('@IOCNOSEARCHRESULTS@');
 			}else{
-				var text = 'Cerca finalitzada, trobada/es %s pàgina/es que concorda/en amb la cerca.';
+				var text = '@IOCSEARCHFINISHED@';
 				if (elems > 1){
 					text = text.replace(/\w\//g,'');
 				}else{

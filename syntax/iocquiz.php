@@ -345,7 +345,8 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= '<input type="hidden" name="qsol" value="'.implode(',', $_SESSION['quizsol']).'"></input>';
         }
         $checkquiz2 = ($this->class === 'complete' || $this->class === 'relations' );
-        $renderer->doc .= '<input class="btn_solution'.(($checkquiz2)?'2':'').'" type="button" value="Solució">';
+        $value = (!empty($_SESSION['IOCSOLUTION']))?$_SESSION['IOCSOLUTION']:'Soluci&oacute;';
+        $renderer->doc .= '<input class="btn_solution'.(($checkquiz2)?'2':'').'" type="button" value="'.$value.'">';
         $renderer->doc .= '</form>';
         $renderer->doc .= '<div class="quiz_result"></div>';
         $renderer->doc .= '</div>';
