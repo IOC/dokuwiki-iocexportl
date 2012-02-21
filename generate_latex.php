@@ -63,7 +63,7 @@ class generate_latex{
         $this->img_src = array('familyicon_administracio.png', 'familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
         //Due listings problems whith header it's necessary to replace extended characters
         $this->ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç','\\\\');
-        $this->ioclang = (!isset($params['ioclanguage']))?'CA':strtoupper($params['ioclanguage']);
+        $this->ioclang = (empty($params['ioclanguage']))?'CA':strtoupper($params['ioclanguage']);
         $this->ioclanguages = array('CA' => 'catalan', 'DE' => 'german', 'EN' => 'english','ES' => 'catalan','FR' => 'frenchb','IT' => 'italian');
         $this->ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
         $this->log = isset($params['log']);
@@ -121,7 +121,7 @@ class generate_latex{
             $this->ioclang = preg_replace('/\n/', '', $this->ioclang);
             $language = $this->ioclanguages[$this->ioclang];
             $latex = preg_replace('/@IOCLANGUAGE@/', $language, $latex, 1);
-            $latex = preg_replace('/@IOCLANGCONTINUE@/', $this->ioclangcontinue[$lang], $latex, 1);
+            $latex = preg_replace('/@IOCLANGCONTINUE@/', $this->ioclangcontinue[$this->ioclang], $latex, 1);
             //Render a non unit zero
             if (!$this->unitzero){
                 $_SESSION['chapter'] = 1;
