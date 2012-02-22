@@ -72,7 +72,7 @@ define (["render"],function(render){
 			}
 		);
 
-	$('#content').click(function(e) {
+	$('#content').on("click", function(e) {
 		setmenu(null);
 		$("#help").addClass("hidden");
 	});
@@ -244,7 +244,7 @@ define (["render"],function(render){
 		//ESC
 		if (event.keyCode === 27){
 			event.preventDefault();
-			$("#help").addClass("hidden");
+			$("#help, #preview").addClass("hidden");
 			setmenu(null);
 		}
 	});
@@ -1192,10 +1192,17 @@ define (["render"],function(render){
 			$(this).siblings("span[name='star']").show();
 		}else{
 			$(this).siblings("span[name='star']").removeClass().addClass("star");
-		}	
+		}
 	});
 
+	$(document).on("click", "article figure img", function(){
+		render.previewImage($(this));
+	});
 
+	$(document).on("click", ".closepreview",function(){
+		$('#preview').addClass('hidden');
+	});
+	
 	//Initialize menu and settings params
 	get_params();
 	setNumberHeader();

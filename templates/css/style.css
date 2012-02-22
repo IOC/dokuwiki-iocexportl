@@ -1848,6 +1848,9 @@ cursor:pointer;
 .iocfigure{
  margin:1em 0;
  font-size: 90%;
+ cursor:pointer;
+ cursor:-moz-zoom-in;
+ cursor:-webkit-zoom-in;
 }
 
 figure{
@@ -2654,4 +2657,33 @@ article figure img{
 
 iframe{
  max-width:100%;
+}
+
+#preview{
+ position:fixed;
+ background-color:#222;
+ color:#fff;
+ width:100%;
+ height:100%;
+ text-align:center;
+ opacity:.97;
+ left:0;
+ top:0;
+ z-index:4;
+}
+
+
+#preview .prevcontent{
+ position:relative;
+ top:50%;
+}
+
+.closepreview{
+  background:url("../../img/close.png") no-repeat scroll 0 0 transparent;
+  position: absolute;
+  margin-top:-16px;
+  right: 50%;
+  width:32px;
+  height:32px;
+  cursor:pointer;
 }

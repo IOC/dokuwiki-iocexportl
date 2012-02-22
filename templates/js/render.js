@@ -35,5 +35,28 @@ define(function() {
 			th.closest("tr").addClass("borderth");
 		});
 	};
-	return {"infoTable":infoTable,"infoFigure":infoFigure,"thTable":thTable};
+	
+	var previewImage = function(img){
+		var src = $(img).attr('src');
+		$('#preview .prevcontent').html('<span class="closepreview"></span><img src="'+ src +'" alt="Image preview" />')
+					 .closest('#preview')
+					 	.removeClass("hidden")
+					 .end()
+					 .imagesLoaded(function(){
+						var $img = $(this).find('img'); 
+						height = $img.height();
+						if (height > $(window).height()){
+							height = $(window).height() - 50;
+							$(this).css('height', height);
+							$img.css('height', height);
+						}
+						$(this).find('.closepreview').css('margin-right',-($img.width()/2)-16);
+						$(this).css('margin-top',-(height/2));
+		});
+	};
+	
+	return {"infoTable":infoTable,
+		    "infoFigure":infoFigure,
+		    "thTable":thTable,
+		    "previewImage":previewImage};
 });
