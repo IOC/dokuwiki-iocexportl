@@ -260,11 +260,7 @@ define (["render"],function(render){
 			 		 break;
 				//b
 				case 98:var top;
-						if (!isIE()){
-							top = $(".footer").offset().top;
-						}else{
-							top = $(".footer").scrollTop();
-						}
+						top = $(".footer").offset().top;
 						$(window).scrollTop($(window).scrollTop()+top);
 					 break;
 				//g
@@ -554,14 +550,20 @@ define (["render"],function(render){
 						.addClass('hidden');
 		});
 		calposfavcountooltip();	
-		item = $("#sidebar-hide").offset();
-		tooltip = $("#help-sidebar-hide");
+		var item = $("#sidebar-hide").offset();
+		var tooltip = $("#help-sidebar-hide");
 		tooltip.css({'visibility':'hidden'}).removeClass('hidden');
 		tooltip.css({top:(item.top-(tooltip.outerHeight(true)/2) + 12),
 					 'visibility':'visible'})
 					.addClass('hidden');
 		item = $("#search input[type='text']");
 		item_pos = item.offset();
+		tooltip = $("#help-search");
+		tooltip.css({'visibility':'hidden'}).removeClass('hidden');
+		tooltip.css({top:item_pos.top + (tooltip.outerHeight(true)/2) + 15,
+				     left:(item_pos.left + (item.outerWidth(true)/2) - (tooltip.outerWidth(true)/2) - 18),
+				     'visibility':'visible'})
+						.addClass('hidden');
 		tooltip = $("#help-search");
 		tooltip.css({'visibility':'hidden'}).removeClass('hidden');
 		tooltip.css({top:item_pos.top + (tooltip.outerHeight(true)/2) + 15,
@@ -975,12 +977,7 @@ define (["render"],function(render){
 	
 	var setArticleMinHeight = (function(){
 		if (!ispageIndex() && !ispageSearch()){
-			var top;
-			if (!isIE()){
-				top = $(".footer").offset().top;
-			}else{
-				top = $(".footer").scrollTop();
-			}
+			var top = $(".footer").offset().top;
 			if (top > 0 && top < $(window).height()){
 				$("article").css("height",top-80);
 			}else{

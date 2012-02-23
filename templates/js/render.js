@@ -38,6 +38,7 @@ define(function() {
 	
 	var previewImage = function(img){
 		var src = $(img).attr('src');
+		$('#preview .prevcontent').empty();
 		$('#preview .prevcontent').html('<span class="closepreview"></span><img src="'+ src +'" alt="Image preview" />')
 					 .closest('#preview')
 					 	.removeClass("hidden")
@@ -45,10 +46,16 @@ define(function() {
 					 .imagesLoaded(function(){
 						var $img = $(this).find('img'); 
 						height = $img.height();
+						width = $img.width();
 						if (height > $(window).height()){
 							height = $(window).height() - 50;
 							$(this).css('height', height);
-							$img.css('height', height);
+							$img.css('max-height', height);
+						}
+						if (width > $(window).width() - 50){
+							width = $(window).width() - 50;
+							$(this).css('width', width);
+							$img.css('max-width', width);
 						}
 						$(this).find('.closepreview').css('margin-right',-($img.width()/2)-16);
 						$(this).css('margin-top',-(height/2));

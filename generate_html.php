@@ -168,7 +168,7 @@ class generate_html{
             $text_template = preg_replace('/@IOCSHOWIMAGES@/',$this->lang['showimages'], $text_template, 1);
             $text_template = preg_replace('/@IOCJUSTIFY@/',$this->lang['justify'], $text_template, 1);
             $text_template = preg_replace('/@IOCHYPHENATION@/',$this->lang['hyphenation'], $text_template, 1);
-            $text_template = preg_replace('/@IOCSHORTCUTS@/',$this->lang['shorcuts'], $text_template, 1);
+            $text_template = preg_replace('/@IOCSHORTCUTS@/',$this->lang['shortcuts'], $text_template, 1);
             $text_template = preg_replace('/@IOCGENERAL@/',$this->lang['general'], $text_template, 1);
             $text_template = preg_replace('/@IOCGOTONAVIGATION@/',$this->lang['gonavigation'], $text_template, 1);
             $text_template = preg_replace('/@IOCGOTOSETTINGS@/',$this->lang['gosettings'], $text_template, 1);
