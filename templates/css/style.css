@@ -2716,9 +2716,9 @@ article figure img {
 }
 
 .pnpage {
-	position: absolute;
+	position: relative;
 	display: inline-block;
-	bottom: 80px;
+	top:-142px;
 	background-color: #000;
 	color: #fff;
 	left: 50%;
