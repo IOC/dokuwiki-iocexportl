@@ -5,9 +5,7 @@ if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 
 require_once DOKU_INC . 'inc/parser/renderer.php';
 
-static $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ','λ','μ','Ξ','Π','π','ρ','Σ','σ','Τ','τ','υ','Φ','φ','χ','Ψ','ψ','Ω','Ω','ω','≠','≤','≥','Ф','∑','∞');
-static $reserved_symbols = array('#', '$', '%', '&', '~', '[', ']', '_');
-static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\_');
+$symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ','λ','μ','Ξ','Π','π','ρ','Σ','σ','Τ','τ','υ','Φ','φ','χ','Ψ','ψ','Ω','Ω','ω','≠','≤','≥','Ф','∑','∞');
 
     /**
      *
@@ -37,8 +35,8 @@ static $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\
      * @param string $text
      */
     function clean_reserved_symbols($text){
-        global $reserved_symbols;
-        global $replacement_symbols;
+        $reserved_symbols = array('#', '$', '%', '&', '~', '[', ']', '_');
+        $replacement_symbols = array('\#', '\$', '\%', '\&', '\~', '\[', '\]', '\_');
         return str_ireplace($reserved_symbols, $replacement_symbols, $text);
     }
 

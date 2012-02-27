@@ -10,6 +10,7 @@ if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 if(!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
 require_once DOKU_INC.'inc/parser/renderer.php';
+require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 /**
  * The Renderer

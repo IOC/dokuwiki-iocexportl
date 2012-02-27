@@ -10,6 +10,7 @@ if(!defined('DOKU_INC')) die();
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 if(!defined('DOKU_PLUGIN_LATEX_TMP')) define('DOKU_PLUGIN_LATEX_TMP',DOKU_PLUGIN.'tmp/latex/');
 require_once DOKU_INC.'inc/parser/renderer.php';
+require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
 /**
  * The Renderer
@@ -939,9 +940,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function preformatted($text) {
-        $this->doc .= '\codeinline ';
+        $this->doc .= '\codeinline{';
         $text = clean_reserved_symbols($text);
         $this->_format_text($text);
+        $this->doc .= '}';
     }
 
     function file($text) {
@@ -958,7 +960,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     function code($text, $language=null, $filename=null) {
         $large = preg_split('/\//', $language, 2);
         $language = preg_replace('/\/.*$/', '', $language);
-        if (preg_match('/html/i', $language)){
+        if (preg_match('/html|css|dtd|rss/i', $language)){
             $language = 'HTML';
         }
         if(!$_SESSION['iocelem']){
