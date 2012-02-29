@@ -149,12 +149,12 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             preg_match_all('/  \*.*?\n/', $text, $matches);
             $count = 1;
             foreach ($matches[0] as $match){
-                if (preg_match('/\(ok\)/',$match)){
+                if (preg_match('/\(ok\)/i',$match)){
                     array_push($_SESSION['quizsol'], $count);
                 }
                 $count += 1;
             }
-            $text = preg_replace('/(  \*.*?)\(ok\)/', '$1', $text);
+            $text = preg_replace('/(  \*.*?)\(ok\)/i', '$1', $text);
         }elseif ($this->class === 'vf'){
             preg_match_all('/  \*.*?\((V|F)\)/', $text, $matches);
             foreach ($matches[1] as $match){
