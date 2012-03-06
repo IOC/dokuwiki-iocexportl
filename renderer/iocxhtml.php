@@ -1299,18 +1299,19 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                                     $this->_xmlEntities($title));
             $ret .= '</div>';
         }elseif($dl){
-            // well at least we have a title to display
-            if (!is_null($title)) {
-                $title  = $this->_xmlEntities($title);
-            }else{
-                $title = 'Arxiu sense t&iacute;tol';
-            }
             resolve_mediaid(getNS($src),&$src,&$exists);
             if ($exists){
                 $filesize = filesize(mediaFN($src));
                 $filesize = ' ( '.filesize_h($filesize) .' )';
             }
-            $src = $path.'media/'.basename(str_replace(':', '/', $src));
+            $filename = basename(str_replace(':', '/', $src));
+            // well at least we have a title to display
+            if (!is_null($title) && !empty($title)) {
+                $title  = $this->_xmlEntities($title);
+            }else{
+                $title = $filename;
+            }
+            $src = $path.'media/'.$filename;
             $ret .= '<div class="mediaf file'.$ext.'">';
             $ret .= '<div class="mediacontent">';
             $ret .= '<a href="'.$path.'media/'.basename(str_replace(':', '/', $src)).'">'.$title.'</a>'.
