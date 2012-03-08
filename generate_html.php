@@ -611,8 +611,14 @@ class generate_html{
             $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
             $menu_html .= '</li>';
         }elseif ($type === 'unit'){
+            $matches = array();
+            $unit = '';
+            preg_match('/\/u(\d)\//', $href, $matches);
+            if (isset($matches[1]) && is_numeric($matches[1])){
+                $unit = $matches[1].'. ';
+            }
             $menu_html = '<li id="'.$id.'" class="parentnode">';
-            $menu_html .= '<p><a href="'.$href.'">'.$name.'</a></p>';
+            $menu_html .= '<p><a href="'.$href.'">'.$unit.$name.'</a></p>';
             $menu_html .= '<ul class="expander">';
         }elseif ($type === 'section'){
             $menu_html = '<li id="'.$id.'" class="tocsection">';
