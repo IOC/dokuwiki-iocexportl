@@ -199,7 +199,8 @@ class generate_html{
             $menu_html_index = preg_replace('/@IOCSTARTEXPANDER@(.*?)@IOCENDEXPANDER@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCACTIVITYICONSTART@|@IOCACTIVITYICONEND@/', '', $menu_html_index);
             $menu_html_index = preg_replace('/@IOCACTIVITYNAMESTART@(.*?)@IOCACTIVITYNAMEEND@/', '', $menu_html_index);
-            $menu_html_index = preg_replace('/(expander|id="\w+")/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/id="\w+"/', '', $menu_html_index);
+            $menu_html_index = preg_replace('/"expander"/', '"indent"', $menu_html_index);
             $html = preg_replace('/@IOCTOC@/', $menu_html_index, $text_index, 1);
             $html = preg_replace('/@IOCHEADTOC@/',$this->lang['Toc'], $html, 1);
             $html = preg_replace('/@IOCCHROME@/',$this->lang['chrome'], $html, 1);

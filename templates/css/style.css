@@ -917,9 +917,7 @@ clear: left;
 }
 
 #toc .expander p {
-	/*background:  url("../../img/tocright.png") no-repeat scroll right 90% transparent;
-	*/
-color: #000;
+    color: #000;
 	font-weight: normal;
 	border-bottom: 1px solid #989898;
 }
@@ -939,9 +937,7 @@ color: #000;
 }
 
 #toc .expander .tocdown {
-	/*background:  url("../../img/tocdown.png") no-repeat scroll right 90% transparent;
-	*/
-background: url("../../img/less.png") no-repeat scroll 0 0 transparent;
+    background: url("../../img/less.png") no-repeat scroll 0 0 transparent;
 }
 
 #toc .parentnode hr {
@@ -1803,6 +1799,10 @@ div.solution {
 
 .indexcontent a {
 	color: #333;
+}
+
+.indexcontent .indent{
+    padding-left:11px;
 }
 
 .indextoc h1 {
