@@ -151,6 +151,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!isset($_SESSION['imgB'])){
             $_SESSION['imgB'] = FALSE;
         }
+        if (!isset($_SESSION['introbook'])){
+            $_SESSION['introbook'] = TRUE;
+        }
         if (!isset($_SESSION['onemoreparsing'])){
             $_SESSION['onemoreparsing'] = FALSE;
         }
@@ -476,7 +479,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if ($_SESSION['u0']){
             $chapternumber = '*';
             $this->doc .= '\headingnonumbers';
-        }elseif ($_SESSION['createbook'] && $level === 1 && $_SESSION['chapter'] < 3){
+        }elseif ($_SESSION['introbook'] && $_SESSION['createbook'] && $level === 1 && $_SESSION['chapter'] < 3){
             $chapternumber = '*';
             $_SESSION['chapter'] += 1;
             $this->doc .= '\cleardoublepage\phantomsection\addcontentsline{toc}{chapter}{' . $text . '}'.DOKU_LF;

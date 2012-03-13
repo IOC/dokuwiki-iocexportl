@@ -39,7 +39,9 @@ class generate_latex{
     private $log;
     private $media_path;
     private $meta_dcicle;
+    private $meta_option;
     private $meta_params;
+    private $nointro;
     private $time_start;
     private $toexport;
     private $tmp_dir;
@@ -69,7 +71,7 @@ class generate_latex{
         $this->log = isset($params['log']);
         $this->media_path = 'lib/exe/fetch.php?media=';
         $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia');
-        $this->meta_dcicle = 'dcicle';
+        $this->meta_option = 'opcions';
         $this->mode = $params['mode'];
         $this->tmp_dir = '';
         $this->toexport = explode(',', preg_replace('/:index(,|$)/',',',$params['toexport']));
@@ -603,8 +605,15 @@ class generate_latex{
                 preg_match_all('/ {2,4}\* (\*\*(.*?)\*\*:)(.*)/m', $text, $info, PREG_SET_ORDER);
                 foreach ($info as $i){
                     $key = trim($i[2]);
-                    if ($key === $this->meta_dcicle){
-                        $_SESSION['double_cicle'] = TRUE;
+                    if (preg_match('/'.$key.'/i', $this->meta_option)){
+                        $options = trim($i[3]);
+                        //Double cicle name
+                        if (preg_match('/dcicle/i', $options)){
+                            $_SESSION['double_cicle'] = TRUE;
+                        //Avoid removing numeration on first two chapters
+                        }elseif(preg_match('/nointro/i', $options)){
+                            $_SESSION['introbook'] = FALSE;
+                        }
                         continue;
                     }
                     if (in_array($key, $this->meta_params)){
