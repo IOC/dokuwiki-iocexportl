@@ -1772,10 +1772,6 @@ div.solution {
 	width: 100%;
 }
 
-.indexcontent ul li p:hover {
-	cursor: pointer;
-}
-
 .indexcontent .tocsection {
 	margin-bottom: 5px;
 }
