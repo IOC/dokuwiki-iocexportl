@@ -2830,19 +2830,31 @@ iframe {
 	max-width: 100%;
 }
 
-#preview {
-	position: fixed;
+#back_preview {
+    position: fixed;
 	background-color: #222;
 	color: #fff;
 	width: 100%;
 	height: 100%;
 	text-align: center;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=97)";
-	filter: alpha(opacity=97);
-	opacity: .97;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
+	filter: alpha(opacity=90);
+	opacity: .90;
 	left: 0;
 	top: 0;
-	z-index: 4;
+	z-index: 4;      
+}
+
+#preview {
+	position: fixed;
+	background-color: transparent;
+	color: #fff;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	left: 0;
+	top: 0;
+	z-index: 5;
 }
 
 #preview .prevcontent {

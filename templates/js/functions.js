@@ -1186,6 +1186,7 @@ define (["render"],function(render){
 	});
 
 	$(document).on("click", ".closepreview",function(){
+		$('#back_preview').addClass('hidden');
 		$('#preview').addClass('hidden');
 	});
 	

@@ -38,6 +38,7 @@ define(function() {
 	
 	var previewImage = function(img){
 		var src = $(img).attr('src');
+		$('#back_preview').removeClass("hidden");
 		$('#preview .prevcontent').empty();
 		$('#preview .prevcontent').html('<span class="closepreview"></span><img src="'+ src +'" alt="Image preview" />')
 					 .closest('#preview')
