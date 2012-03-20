@@ -901,8 +901,10 @@ class generate_html{
                 $urlfamily .= 'gad';
             }elseif (preg_match('/electricitat/i', $data['familia'])){
                 $urlfamily .= 'iea';
-            }elseif (preg_match('/socioculturals/', $data['familia'])){
+            }elseif (preg_match('/socioculturals/i', $data['familia'])){
                 $urlfamily .= 'edi';
+            }elseif (preg_match('/sanitat/i', $data['familia'])){
+                $urlfamily .= 'cai';
             }else{
                 $urlfamily .= 'asix';
             }
