@@ -866,7 +866,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     function externallink($url, $title = NULL) {
         global $conf;
 
-        $name = $this->_getLinkTitle($name, $url, $isImage);
+        $name = $this->_getLinkTitle($title, $url, $isImage);
 
         // url might be an attack vector, only allow registered protocols
         if(is_null($this->schemes)) $this->schemes = getSchemes();
