@@ -2129,8 +2129,12 @@ article ul {
 	margin: 1em 0;
 }
 
-article li {
+article ul li {
 	list-style: disc outside none;
+	margin: 0 0 0.5em 2em;
+}
+
+article ol li {
 	margin: 0 0 0.5em 2em;
 }
 
