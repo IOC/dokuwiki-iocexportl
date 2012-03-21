@@ -1299,7 +1299,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                                     $this->_xmlEntities($title));
             $ret .= '</div>';
         }elseif($dl){
-            resolve_mediaid(getNS($src),&$src,&$exists);
+            resolve_mediaid(getNS($src),$src,$exists);
             if ($exists){
                 $filesize = filesize(mediaFN($src));
                 $filesize = ' ( '.filesize_h($filesize) .' )';

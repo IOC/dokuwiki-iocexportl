@@ -256,7 +256,7 @@ class generate_html{
                  //Attach media files
                  foreach($files as $sf){
                      foreach($sf as $f){
-                         resolve_mediaid(getNS($f),&$f,&$exists);
+                         resolve_mediaid(getNS($f),$f,$exists);
                          if ($exists){
                              $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
                          }
@@ -341,7 +341,7 @@ class generate_html{
                 //Attach media files
                 foreach($files as $sf){
                     foreach($sf as $f){
-                        resolve_mediaid(getNS($f),&$f,&$exists);
+                        resolve_mediaid(getNS($f),$f,$exists);
                         if ($exists){
                             $zip->addFile(mediaFN($f), $this->web_folder.'/'.$ku.'/media/'.basename(mediaFN($f)));
                         }
@@ -881,7 +881,7 @@ class generate_html{
     private function addMetaMedia($data, &$zip){
         if (isset($data['familypic'])){
             preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['familypic'],$matches);
-            resolve_mediaid(getNS($matches[1]),&$matches[1],&$exists);
+            resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
             if ($exists){
                 $zip->addFile(mediaFN($matches[1]), 'img/portada.png');
             }
@@ -889,7 +889,7 @@ class generate_html{
 
         if (isset($data['copylogo'])){
             preg_match('/\{\{([^}|?]+)[^}]*\}\}/',$data['copylogo'],$matches);
-            resolve_mediaid(getNS($matches[1]),&$matches[1],&$exists);
+            resolve_mediaid(getNS($matches[1]),$matches[1],$exists);
             if ($exists){
                 $zip->addFile(mediaFN($matches[1]), 'img/license.png');
             }
