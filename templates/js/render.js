@@ -10,9 +10,11 @@ define(function() {
 			var info = img.parents('figure').children().filter('figcaption');
 			var foot = img.parents('.iocfigure').children().filter('.footfigure');
 			info.css('width',width);
-			info.css('max-width','75%');
+			if (img.closest('.iocexample').length === 0){
+				info.css('max-width','75%');
+				foot.css('max-width','75%');
+			}
 			foot.css('width',width);
-			foot.css('max-width','75%');
 		});
 	};
 
@@ -42,7 +44,8 @@ define(function() {
 		$('#preview .prevcontent').empty();
 		$('#preview .prevcontent').html('<span class="closepreview"></span><img src="'+ src +'" alt="Image preview" />')
 					 .closest('#preview')
-					 	.removeClass("hidden")
+					 	.removeClass()
+					 	.addClass('zoomout')
 					 .end()
 					 .imagesLoaded(function(){
 						var $img = $(this).find('img'); 

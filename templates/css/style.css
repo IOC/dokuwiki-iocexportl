@@ -537,7 +537,7 @@ h2 {
 	font-family: Helvetica Neue,Helvetica-Normal,Helvetica,Corbel,Helmet,Free Sans,Droid Sans,sans-serif;
 	font-size: 130%;
 	font-weight: normal;
-	margin: 2em 0 1em 0;
+	margin: 2em 0 1.5em 0;
 	line-height: 1em;
 }
 
@@ -556,7 +556,7 @@ h3 {
 	font-weight: normal;
 	letter-spacing: -0.05em;
 	line-height: 1.14em;
-	margin: 1.5em 0 0.5em;
+	margin: 2em 0 0.5em;
 }
 
 h3:before {
@@ -1932,7 +1932,7 @@ figure {
 figcaption {
 	display: block;
 	counter-increment: cfigure;
-	margin: 0 auto;
+	margin: 0 auto 0.1em;
 	text-align: left;
 }
 
@@ -1949,7 +1949,7 @@ figcaption .figuretitle:after {
 }
 
 .footfigure {
-	margin: -1em auto 0;
+	margin: -0.7em auto 0;
 	text-align: right;
 }
 
@@ -2841,9 +2841,9 @@ iframe {
 	width: 100%;
 	height: 100%;
 	text-align: center;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
-	filter: alpha(opacity=90);
-	opacity: .90;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=95)";
+	filter: alpha(opacity=95);
+	opacity: .95;
 	left: 0;
 	top: 0;
 	z-index: 4;      
@@ -2864,7 +2864,13 @@ iframe {
 #preview .prevcontent {
 	position: relative;
 	top: 50%;
-	margin:0 auto;
+	margin: 0 auto;
+}
+
+.zoomout{
+	cursor: pointer;
+	cursor: -moz-zoom-out;
+	cursor: -webkit-zoom-out;
 }
 
 .closepreview {

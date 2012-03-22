@@ -252,7 +252,7 @@ define (["render"],function(render){
 		//ESC
 		if (event.keyCode === 27){
 			event.preventDefault();
-			$("#help, #preview").addClass("hidden");
+			$("#help, #back_preview, #preview").addClass("hidden");
 			setmenu(null);
 		}
 	});
@@ -1195,8 +1195,11 @@ define (["render"],function(render){
 	});
 
 	$(document).on("click", ".closepreview",function(){
-		$('#back_preview').addClass('hidden');
-		$('#preview').addClass('hidden');
+		$('#back_preview, #preview').addClass('hidden');
+	});
+	
+	$(document).on("click", "#preview", function(){
+		$('#back_preview, #preview').addClass('hidden');
 	});
 	
 	//Initialize menu and settings params
