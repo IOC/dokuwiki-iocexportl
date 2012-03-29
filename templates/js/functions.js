@@ -395,7 +395,7 @@ define (["render"],function(render){
 
 	var setpnpage = (function (){
 		var width = parseInt($("article").outerWidth(true)) + 20;
-		if (isIE() || isNaN(width)){
+		if (isIE() || isChrome() || isNaN(width)){
 			width = parseInt($("article").css('width')) + 80;
 		}
 		$(".pnpage").css({"width":width,
@@ -680,6 +680,10 @@ define (["render"],function(render){
 	
 	var islocalChrome = (function (){
 		return (/Chrome/.test(navigator.userAgent) && /file/.test(document.location.protocol));
+	});
+	
+	var isChrome = (function (){
+		return (/Chrome/.test(navigator.userAgent));
 	});
 	
 	var isIE = (function (){
