@@ -36,7 +36,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     var $_codeblock = 0; // counts the code and file blocks, used to provide download links
 
 
-	var $id = '';
+    var $id = '';
     var $monospace = FALSE;
     var $table = FALSE;
     var $tmp_dir = 0;//Value of temp dir
@@ -272,13 +272,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if (substr($text, -1) == "\n") {
             $text = substr($text, 0, -1);
         }
-
         if ( is_null($language) ) {
             $this->doc .= '<pre class="'.$type.'">'.$this->_xmlEntities($text).'</pre>'.DOKU_LF;
         } else {
             $class = 'code'; //we always need the code class to make the syntax highlighting apply
             if($type != 'code') $class .= ' '.$type;
-
             $this->doc .= "<pre class=\"$class $language\">".$this->p_iocxhtml_cached_geshi($text, $language, '').'</pre>'.DOKU_LF;
         }
 
@@ -1194,6 +1192,11 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         }
         list($ext,$mime,$dl) = mimetype($src);
         if(substr($mime,0,5) == 'image'){
+            $icon = FALSE;
+            if ($width || $height){
+                $icon = (($width && $width < 49) || ($height && $height < 49));
+            }
+            $imgb = (!$icon && !$this->table && $_SESSION['export_html']);
             // first get the $title
             if (!is_null($title)) {
                 $title  = $this->_xmlEntities($title);
@@ -1221,13 +1224,12 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
                 $ret .= '<figcaption>'.$figtitle.'</figcaption>';
             }elseif($_SESSION['iocelem']){
                 $ret .= '<div class="imgelem">'.DOKU_LF;
-            }elseif(!$this->table && $_SESSION['export_html']){
+            }elseif($imgb){
                 $ret .= '<div class="iocfigurec">'.DOKU_LF;
                 $ret .= '<ul>'.DOKU_LF;
                 $ret .= '<li>'.DOKU_LF;
             }
             //add image tag
-            //$ret .= '<img src="'.ml($src,array('w'=>$width,'h'=>$height,'cache'=>$cache)).'"';
             if ($_SESSION['export_html']){
                 $ret .= '<img src="'.$path.'media/'.basename(str_replace(':', '/', $src)).'"';
             }else{
@@ -1236,11 +1238,8 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             if($this->table && $width){
                 $ret .= ' width="'.$width.'"';
             }
-/*            if ($width && $height){
-                $ret .= ' width="'.$width.'" height="'.$height.'"';
-            }*/
 
-            if (!$_SESSION['figure'] && !$_SESSION['iocelem'] && !$this->table){
+            if (!$icon && !$_SESSION['figure'] && !$_SESSION['iocelem'] && !$this->table){
                 $ret .= ' class="imgB"';
             }
 
@@ -1254,18 +1253,13 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
             }else{
                 $ret .= ' alt=""';
             }
-            /*if ( !is_null($width) )
-                $ret .= ' width="'.$this->_xmlEntities($width).'"';
-
-            if ( !is_null($height) )
-                $ret .= ' height="'.$this->_xmlEntities($height).'"';*/
 
             $ret .= ' />';
             if ($_SESSION['figure']){
                 $ret .= '</figure>'.DOKU_LF;
             }elseif($_SESSION['iocelem']){
                 $ret .= '</div>'.DOKU_LF;
-            }elseif(!$this->table && $_SESSION['export_html']){
+            }elseif($imgb){
                 $ret .= '</li>';
                 if ($title) {
                     $title = preg_replace('/\/[+-]?\d+$/', '', $title);

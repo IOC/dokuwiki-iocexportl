@@ -257,7 +257,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $title = $_SESSION['figtitle'];
             $title = preg_replace('/<verd>|<\/verd>/', '', $title);
         }
+        $figure = FALSE;
         $footer = '';
+        $icon = FALSE;
+        $imgb = FALSE;
         if (!empty($_SESSION['figfooter'])){
             $footer = $_SESSION['figfooter'];
         }
@@ -284,6 +287,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && $_SESSION['iocelem'] !== 'textl'){
             if ($width < 133){
                 $max_width = '[width='.$width.'px]';
+                $icon = ($width < 49 || $height < 49);
             }else{
                 $max_width = '[width=35mm]';
             }
@@ -305,6 +309,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $max_width = '[width='.$width.'px]';
             $img_width = $width;
         }
+
+        $imgb = (!$icon && !$this->table && !$_SESSION['figure'] && !$_SESSION['iocelem'] && !$_SESSION['video_url'] && !$_SESSION['u0']);
+        $figure = (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['u0']);
+
         if (self::$convert || $_SESSION['draft'] || $external){
             $img_aux = $this->_image_convert($src, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media');
         }else{
@@ -314,7 +322,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
         }
         if (file_exists($img_aux)){
-            if (!$this->table && !$_SESSION['figure'] && !$_SESSION['iocelem'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
+            if ($imgb){
                 $offset = '';
                 //Extract offset
                 if ($title){
@@ -331,7 +339,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                     }
                 }
                 $this->doc .= '\imgB'.$offset.'{';
-            }elseif (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['u0']){
+            }elseif ($figure){
                 if ($_SESSION['figlarge']){
                     $this->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{\hspace*{0mm}}{\hspace*{-\marginparwidth}\hspace*{-10mm}}'.DOKU_LF;
                     $this->doc .= '\begin{minipage}[c]{\textwidth+\marginparwidth+\marginparsep}'. DOKU_LF;
@@ -410,12 +418,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $thid->doc .= '}';
 
             }
-            if (!$this->table && $_SESSION['figure'] && !$_SESSION['video_url'] /*&& !$_SESSION['iocelem'] */&& !$_SESSION['u0']){
+            if ($figure){
                 $this->doc .= '\end{figure}';
                 if ($_SESSION['figlarge']){
                     $this->doc .= '\end{minipage}'. DOKU_LF;
                 }
-            }elseif (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && !$_SESSION['iocelem'] && !$_SESSION['u0']){
+            }elseif ($imgb){
                 if (!empty($footer)){
                     $this->doc .= DOKU_LF;
                 }
