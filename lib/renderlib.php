@@ -23,7 +23,7 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
             '\lowercase','\relax','\aftergroup',
             '\afterassignment','\expandafter','\noexpand','\special',
             '\let', '\futurelet','\else','\fi','\chardef','\makeatletter','\afterground',
-            '\noexpand','\line','\mathcode','\item','\section','\mbox','\declarerobustcommand'
+            '\noexpand','\line','\mathcode','\item','\section','\declarerobustcommand'
         );
 
         return  str_ireplace($tex_blacklist, 'forbiddenkeyword', $texexp);
