@@ -287,7 +287,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!$this->table && !$_SESSION['figure'] && !$_SESSION['video_url'] && $_SESSION['iocelem'] !== 'textl'){
             if ($width < 133){
                 $max_width = '[width='.$width.'px]';
-                $icon = ($width < 49 || $height < 49);
+                $icon = ($width < 49 && $height < 49);
             }else{
                 $max_width = '[width=35mm]';
             }
@@ -415,8 +415,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
 					$align = '\iocalignment';
                 }
                 $this->doc .=  '\raisebox{\height}{\parbox[t]{'.$hspace.'}{'.$align.'\footerspacingline\textsf{\tiny'.$vspace.trim($this->_xmlEntities($footer)).'}}}';
-                $thid->doc .= '}';
-
             }
             if ($figure){
                 $this->doc .= '\end{figure}';
