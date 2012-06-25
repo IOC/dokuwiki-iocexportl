@@ -29,7 +29,6 @@ if ($params['id'] === $_POST['id']){
 
 class generate_html{
 
-    //static $def_unit_href = 'introduccio.html';
     private $def_section_href;
     private $double_cicle;
     private $exportallowed;
@@ -72,7 +71,7 @@ class generate_html{
         $this->max_navmenu = 70;
         $this->media_path = 'lib/exe/fetch.php?media=';
         $this->menu_html = '';
-        $this->meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'familia', 'data', 'familypic');
+        $this->meta_params = array('adaptacio', 'autoria', 'ciclenom', 'coordinacio', 'copylink', 'copylogo', 'copytext', 'creditcodi', 'creditnom', 'data', 'familia', 'familypic', 'legal');
         $this->tree_names = array();
         $this->web_folder = 'WebContent';
         $this->meta_dcicle = 'dcicle';
@@ -277,7 +276,7 @@ class generate_html{
                  }
                  $_SESSION['graphviz_images'] = array();
             }
-             //Content468
+             //Content
              foreach ($data[0] as $ku => $unit){
                 //Section
                 //var to attach all url media files
@@ -867,8 +866,11 @@ class generate_html{
     */
     private function createMetaBR($data){
 
+        $meta .= '&copy; Departament d&#39;Ensenyament<br />';
         $meta .= $this->lang['firstediton'].': <strong>'.(isset($data['data'])?$data['data']:'').'</strong>';
-        $meta .= ' &copy; Departament d&#39;Ensenyament';
+        if (isset($data['legal'])){
+            $meta .= '&nbsp;&#47;&nbsp;'.$this->lang['legaldeposit'].': <strong>'.$data['legal'].'</strong>';
+        }
         return $meta;
     }
 

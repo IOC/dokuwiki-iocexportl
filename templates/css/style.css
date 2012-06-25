@@ -1894,6 +1894,8 @@ div.solution {
 	margin-top: 1em;
 	position: absolute;
 	right: 1em;
+	text-align: right;
+	line-height: 1.2em;
 	z-index: 1;
 }
 
