@@ -495,8 +495,8 @@ class generate_html{
                     array_push($data['intro'], array($header, $ns));
                 }else{
                     $ns = preg_replace('/:/' ,'/', $ns);
-                    if (file_exists($conf['datadir'].'/'.$ns.'/index.txt')){
-                        $content = io_readFile($conf['datadir'].'/'.$ns.'/index.txt');
+                    if (file_exists($conf['datadir'].'/'.$ns.'/'.$conf['start'].'.txt')){
+                        $content = io_readFile($conf['datadir'].'/'.$ns.'/'.$conf['start'].'.txt');
                         $result = array();
                         $def_unit_href='';
                         $unit_act = '';
@@ -511,11 +511,14 @@ class generate_html{
                         }
                         foreach ($result as $pagename){
                             if ($sort){
-                                $pagename = $ns.':'.$pagename;
+                                //Absolute path or relative?
+                                if (!@file_exists(wikiFN($pagename))){
+                                    $pagename = $ns.':'.$pagename;
+                                }
                             }else{
                                 $pagename = $pagename['id'];
                             }
-                            if (!preg_match('/:(pdfindex|imatges|index)$/', $pagename)){
+                            if (!preg_match('/:(pdfindex|imatges|'.$conf['start'].')$/', $pagename)){
                                 preg_match('/:(u\d+):/', $pagename, $unit);
                                 preg_match('/:(a\d+):/', $pagename, $section);
                                 if (empty($section) && empty($def_unit_href)){
@@ -550,7 +553,7 @@ class generate_html{
                 }
             }
         }
-     }
+    }
 
     /**
      *

@@ -118,28 +118,11 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
         global $PARSER_MODES;
         $obj = null;
         foreach($pluginlist as $p){
-          require_once DOKU_PLUGIN . 'iocexportl/syntax/'.$p.'.php';
-          $class_name = 'syntax_plugin_iocexportl_'. $p;
-          $p = 'iocexportl_'.$p;
-          if (!empty($DOKU_PLUGINS['syntax'][$p])){
-              if (!$DOKU_PLUGINS['syntax'][$p]->isSingleton()) {
-                  $DOKU_PLUGINS['syntax'][$p] = &class_exists($class_name) ? new $class_name(): null;
-              }
-              $DOKU_PLUGINS['syntax'][$p] = new $class_name();//attempt to load plugin into $obj
-          }else{
-              $DOKU_PLUGINS['syntax'][$p] = new $class_name();
-          }
-          $obj = &$DOKU_PLUGINS['syntax'][$p];
-          $PARSER_MODES[$obj->getType()][] = "plugin_$p"; //register mode type
-          //add to modes
-          $modes[] = array(
-                       'sort' => $obj->getSort(),
-                       'mode' => "plugin_$p",
-                       'obj'  => $obj,
-                     );
-          unset($obj); //remove the reference
+          addSyntaxmode('iocexportl', $p, $modes);
         }
       }
+      // plugin to add wiki pages into another
+      addSyntaxmode('include', 'include', $modes);
 
       // add default modes
       $std_modes = array('listblock','preformatted','notoc','nocache',
@@ -212,13 +195,46 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
 
     /**
      *
+     * Add syntax mode to available syntax modes
+     * @param string $nameplugin
+     * @param string $syntax
+     * @param array $modes
+     */
+    function addSyntaxmode($nameplugin, $syntax, &$modes){
+        global $DOKU_PLUGINS, $PARSER_MODES;
+
+        if(@file_exists(DOKU_PLUGIN . $nameplugin.'/syntax/' . $syntax . '.php')){
+            require_once DOKU_PLUGIN . $nameplugin.'/syntax/' . $syntax . '.php';
+            $class_name = 'syntax_plugin_' . $nameplugin . '_' . $syntax;
+            $syntax = $nameplugin . '_' . $syntax;
+            if (!empty($DOKU_PLUGINS['syntax'][$syntax])){
+                if (!$DOKU_PLUGINS['syntax'][$syntax]->isSingleton()) {
+                    $DOKU_PLUGINS['syntax'][$syntax] = &class_exists($class_name) ? new $class_name(): null;
+                }
+                $DOKU_PLUGINS['syntax'][$syntax] = new $class_name();//attempt to load plugin into $obj
+            }else{
+                $DOKU_PLUGINS['syntax'][$syntax] = new $class_name();
+            }
+            $obj = &$DOKU_PLUGINS['syntax'][$syntax];
+            $PARSER_MODES[$obj->getType()][] = "plugin_$syntax"; //register mode type
+            //add to modes
+            $modes[] = array(
+                    'sort' => $obj->getSort(),
+                    'mode' => "plugin_$syntax",
+                    'obj'  => $obj,
+            );
+            unset($obj); //remove the reference
+        }
+    }
+
+    /**
+     *
      * Renders a list of instruction to the specified output mode
      * @param string $mode
      * @param array $instructions
      * @param array $info
      */
     function p_latex_render($mode,$instructions,&$info){
-        global $DOKU_PLUGINS;
 
         if(is_null($instructions)) return '';
 
@@ -226,9 +242,6 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
 
         $class = "renderer_plugin_".$mode;
 
-        //$DOKU_PLUGINS['renderer'][$mode] = new $class;
-
-        //$Renderer = &$DOKU_PLUGINS['renderer'][$mode];
         $Renderer = new $class;
 
 
