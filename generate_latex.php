@@ -59,7 +59,7 @@ class generate_latex{
     function __construct($params){
 
         //Due listings problems whith header it's necessary to replace extended characters
-        $this->end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\linebreak\vspace{-0.8em}\linebreak ');
+        $this->end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\break ');
         $this->exportallowed = FALSE;
         $this->export_ok = ($params['mode'] === 'pdf' || $params['mode'] === 'zip' );
         $this->id = $params['id'];
@@ -254,7 +254,18 @@ class generate_latex{
             }
             copy(DOKU_PLUGIN.'iocexportl/templates/'.$this->img_pref.$this->img_src[$family], DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$this->img_pref.$this->img_src[$family]);
             $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$this->img_pref.$this->img_src[$family], $latex);
-            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
+            //Two titles
+            if(preg_match('/\\\\/',$data[1]['nomcomplert'])){
+                $twotitles = preg_replace('/\\\\\\\\/', '\\twotitles', $data[1]['nomcomplert']);
+                $twotitles = preg_replace('/\((\w+)\)/', '\\frontpagefamily{$1}', $twotitles);
+                $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', '\\fonttwofamilies'.DOKU_LF. trim($twotitles), $latex);
+            }else{
+                $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
+            }
+            if (isset($twotitles)){
+                $data[1]['nomcomplert'] = preg_replace('/\\\\\\\\/', '\\break', $data[1]['nomcomplert']);
+            }
+            $data[1]['nomcomplert'] = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
             $header_ciclenom = str_replace($this->ini_characters, $this->end_characters, $data[1]['ciclenom']);
@@ -270,6 +281,7 @@ class generate_latex{
                 $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '10', $latex, 1);
             }
             $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
+            $data[1]['nomcomplert'] = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
             $header_nomcomplert = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
@@ -599,7 +611,7 @@ class generate_latex{
         $file = wikiFN($this->id);
         $inf = NULL;
         if (@file_exists($file)) {
-            $info = io_grep($file, '/(?<=\={6} )[^\=]*/', 0, TRUE);
+            $info = io_grep($file, '/(?<=\={6} )[^=]*/', 0, TRUE);
             $data[1]['nomcomplert'] = $info[0][0];
             $text = io_readFile($file);
             $info = array();

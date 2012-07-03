@@ -299,6 +299,14 @@
 	\parbox[t]{#1}{\textsf{\tiny\begin{flushright}\vspace{-3\baselineskip}#2\end{flushright}}}
 }
 
+\newcommand{\twotitles}{
+	\break\par\vspace{-.4\marginparsep}
+}
+
+\newcommand{\frontpagefamily}[1]{
+	\textcolor{colorfrontfamily}{#1}
+}
+
 \newenvironment{mediaurl}[1]
 	{
 		\qrcode{
@@ -355,6 +363,7 @@
 \renewcommand{\LARGE}{\fontsize{14}{16.8}\selectfont}
 \renewcommand{\huge}{\fontsize{17}{20.4}\selectfont}
 \renewcommand{\Huge}{\fontsize{30}{36}\selectfont}
+\newcommand{\fonttwofamilies}{\fontsize{20.4}{24.48}\selectfont}
 \newcommand{\subsub}{\fontsize{10}{11.2}\selectfont}
 \newcommand{\quizoptions}{\fontsize{9}{10.8}\selectfont}
 \normalsize
@@ -403,9 +412,9 @@
 
 %Header fancy pages
 \pagestyle{fancy}
-\lhead{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_CREDIT@}}}
+\lhead{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
 \chead{}%no page number in toc page
-\rhead{\headerspacingline\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT_H@}}}
+\rhead{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
 \lfoot{}
 \cfoot{}
 \rfoot{}
@@ -414,9 +423,9 @@
 %Header plain pages
 \fancypagestyle{plain}{
 	\fancyhf{}
-	\fancyhead[LO]{\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_CREDIT@}}}
+	\fancyhead[LO]{\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_CREDIT@}
 	\fancyhead[CO]{}%no page number in toc page
-	\fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont{\tiny{@IOC_EXPORT_NOMCOMPLERT_H@}}}
+	\fancyhead[RO]{\headerspacingline\fontfamily{phv}\selectfont\tiny @IOC_EXPORT_NOMCOMPLERT_H@}
 	\fancyfoot[RO]{}
 %	\headrulewidth 0.4pt
 }
@@ -428,7 +437,7 @@
 \definecolor{colorimportant}{RGB}{209,209,209}
 \definecolor{colorreference}{RGB}{209,209,209}
 \definecolor{coloraccounting}{RGB}{209,209,209}
-%\definecolor{colorreference}{gray}{0.9}
+\definecolor{colorfrontfamily}{gray}{0.7}
 
 %margins
 \marginparwidth = 35mm
