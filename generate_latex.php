@@ -32,6 +32,7 @@ class generate_latex{
     private $end_characters;
     private $exportallowed;
     private $img_src;
+    private $img_pref;
     private $ini_characters;
     private $ioclang;
     private $ioclanguages;
@@ -62,7 +63,8 @@ class generate_latex{
         $this->exportallowed = FALSE;
         $this->export_ok = ($params['mode'] === 'pdf' || $params['mode'] === 'zip' );
         $this->id = $params['id'];
-        $this->img_src = array('familyicon_administracio.png', 'familyicon_electronica.png', 'familyicon_infantil.png', 'familyicon_informatica.png');
+        $this->img_pref = 'familyicon_';
+        $this->img_src = array('administracio.png', 'electronica.png', 'infantil.png', 'informatica.png', 'transversal.png');
         //Due listings problems whith header it's necessary to replace extended characters
         $this->ini_characters = array('á', 'é', 'í', 'ó', 'ú', 'à', 'è', 'ò', 'ï', 'ü', 'ñ', 'ç','Á', 'É', 'Í', 'Ó', 'Ú', 'À', 'È', 'Ò', 'Ï', 'Ü', 'Ñ', 'Ç','\\\\');
         $this->ioclang = (empty($params['ioclanguage']))?'CA':strtoupper($params['ioclanguage']);
@@ -245,11 +247,13 @@ class generate_latex{
                 $family = 1;
             }elseif (preg_match('/socioculturals/i', $data[1]['familia'])){
                 $family = 2;
-            }else{
+            }elseif (preg_match('/comunicacions/i', $data[1]['familia'])){
                 $family = 3;
+            }else{
+                $family = 4;
             }
-            copy(DOKU_PLUGIN.'iocexportl/templates/'.$this->img_src[$family], DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$this->img_src[$family]);
-            $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$this->img_src[$family], $latex);
+            copy(DOKU_PLUGIN.'iocexportl/templates/'.$this->img_pref.$this->img_src[$family], DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/'.$this->img_pref.$this->img_src[$family]);
+            $latex = preg_replace('/@IOC_EXPORT_IMGFAMILIA@/', 'media/'.$this->img_pref.$this->img_src[$family], $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
