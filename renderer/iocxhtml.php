@@ -93,42 +93,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     function document_end(){
     }
 
-
-    /**
-     * Register a new edit section range
-     *
-     * @param $type  string The section type identifier
-     * @param $title string The section title
-     * @param $start int    The byte position for the edit start
-     * @return string A marker class for the starting HTML element
-     * @author Adrian Lang <lang@cosmocode.de>
-     */
-    public function startSectionEdit($start, $type, $title = null) {
-        static $lastsecid = 0;
-        $this->sectionedits[] = array(++$lastsecid, $start, $type, $title);
-        return 'sectionedit' . $lastsecid;
-    }
-
-    /**
-     * Finish an edit section range
-     *
-     * @param $end int The byte position for the edit end; null for the rest of
-                       the page
-     * @author Adrian Lang <lang@cosmocode.de>
-     */
-    public function finishSectionEdit($end = null) {
-        list($id, $start, $type, $title) = array_pop($this->sectionedits);
-        if (!is_null($end) && $end <= $start) {
-            return;
-        }
-        $this->doc .= "<!-- EDIT$id " . strtoupper($type) . ' ';
-        if (!is_null($title)) {
-            $this->doc .= '"' . str_replace('"', '', $title) . '" ';
-        }
-        $this->doc .= "[$start-" . (is_null($end) ? '' : $end) . '] -->';
-    }
-
-
     /**
      * _getMediaLinkConf is a helperfunction to internalmedia() and externalmedia()
      * which returns a basic link to a media.
@@ -402,31 +366,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if(!$text) return; //skip empty headlines
 
         $hid = $this->_headerToLink($text,true);
-		/*
-        //only add items within configured levels
-        $this->toc_additem($hid, $text, $level);
-
-        // adjust $node to reflect hierarchy of levels
-        $this->node[$level-1]++;
-        if ($level < $this->lastlevel) {
-            for ($i = 0; $i < $this->lastlevel-$level; $i++) {
-                $this->node[$this->lastlevel-$i-1] = 0;
-            }
-        }
-        $this->lastlevel = $level;
-
-        if ($level <= $conf['maxseclevel'] &&
-            count($this->sectionedits) > 0 &&
-            $this->sectionedits[count($this->sectionedits) - 1][2] === 'section') {
-            $this->finishSectionEdit($pos - 1);
-        }*/
 
         // write the header
         $this->doc .= DOKU_LF.'<h'.$level;
-/*        if ($level <= $conf['maxseclevel']) {
-            $this->doc .= ' class="' . $this->startSectionEdit($pos, 'section', $text) . '"';
-        }*/
-        //$this->doc .= '><a name="'.$hid.'" id="'.$hid.'">';
         $this->doc .= '><a id="'.$hid.'" >';
         $this->doc .= $this->_xmlEntities($text);
         $this->doc .= "</a></h$level>".DOKU_LF;
@@ -506,9 +448,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ($_SESSION['activity']){
             $class .= ' tabminheight';
         }
-        /*if ($pos !== null) {
-            $class .= ' ' . $this->startSectionEdit($pos, 'table');
-        }*/
         $this->doc .= '<div class="' . $class . '"><table class="inline">' .
                       DOKU_LF;
         $this->table = TRUE;
@@ -517,9 +456,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
     function table_close(){
         $this->doc .= '</table></div>'.DOKU_LF;
         $this->table = FALSE;
-        /*if ($pos !== null) {
-            $this->finishSectionEdit($pos);
-        }*/
     }
 
     function tablerow_open(){
@@ -781,7 +717,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      * Render an internal Wiki Link
      */
     function internallink($id, $name = NULL) {
-    global $conf;
+        global $conf;
         global $ID;
 
         $params = '';
@@ -806,6 +742,7 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         resolve_pageid(getNS($ID),$id,$exists);
 
         $name = $this->_getLinkTitle($name, $default, $isImage, $id, $linktype);
+
         if ( !$isImage ) {
             if ( $exists ) {
                 $class='wikilink1';
@@ -922,7 +859,6 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
      */
     function interwikilink($match, $name = NULL, $wikiName, $wikiUri) {
         global $conf;
-
         $link = array();
         $link['target'] = $conf['target']['interwiki'];
         $link['pre']    = '';

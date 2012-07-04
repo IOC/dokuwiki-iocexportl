@@ -47,8 +47,12 @@ class syntax_plugin_iocexportl_iocelems extends DokuWiki_Syntax_Plugin {
         return 514;
     }
 
-    function getAllowedTypes() {
-        return array('container');
+    function accepts($mode) {
+        $valid = array('plugin_iocexportl_ioctable', 'plugin_iocexportl_iocfigure', 'plugin_iocexportl_iocmedia');
+        if(in_array($mode, $valid)){
+            return true;
+        }
+        return parent::accepts($mode);
     }
 
     /**

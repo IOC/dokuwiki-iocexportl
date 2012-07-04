@@ -1020,18 +1020,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $_SESSION['qrcode'] = TRUE;
                 $src = $this->_xmlEntities(DOKU_URL.'lib/exe/fetch.php?media='.$src);
                 qrcode_media_url($this, $src, $title, 'pdf');
-                /*
-                $this->doc .= '\begin{mediaurl}{'.$src.'}';
-                $_SESSION['video_url'] = TRUE;
-                $this->doc .= '\parbox[c]{\linewidth}{\raggedright ';
-                $this->_latexAddImage(DOKU_PLUGIN . 'iocexportl/templates/pdf.png','32',null,null,null,$src);
-                $this->doc .= '}';
-                $_SESSION['video_url'] = FALSE;
-                $this->doc .= '& \hspace{-2mm}';
-                $this->doc .= '\parbox[c]{\linewidth}{\raggedright ';
-                $this->externallink($src, $title);
-                $this->doc .= '}';
-                $this->doc .= '\end{mediaurl}';*/
             }
         }else{
             if (!$_SESSION['u0']){
@@ -1180,15 +1168,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function _xmlEntities($value) {
-        /*if (!$this->monospace){
-            //Search mathematical formulas
-            //echo $value.'INICIAL'.DOKU_LF;
-            list($value, $replace) = $this->_latexElements($value);
-            //echo $value.'FINAL';
-            if ($replace){
-                return $value;
-            }
-        }*/
         static $find = array('{','}','\\','_','^','<','>','#','%', '$', '&', '~', '"','−');
         static $replace = array('@IOCKEYSTART@', '@IOCKEYEND@', '\textbackslash ', '@IOCBACKSLASH@_', '@IOCBACKSLASH@^{}',
 								'@IOCBACKSLASH@textless{}','@IOCBACKSLASH@textgreater{}','@IOCBACKSLASH@#','@IOCBACKSLASH@%', '@IOCBACKSLASH@$', '@IOCBACKSLASH@&', '@IOCBACKSLASH@~{}', '@IOCBACKSLASH@textquotedbl{}', '-');
