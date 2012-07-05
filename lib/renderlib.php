@@ -115,7 +115,6 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
       getPlugins($pluginlist);
 
       if(count($pluginlist)){
-        global $PARSER_MODES;
         $obj = null;
         foreach($pluginlist as $p){
           addSyntaxmode('iocexportl', $p, $modes);

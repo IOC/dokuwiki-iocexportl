@@ -316,9 +316,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (self::$convert || $_SESSION['draft'] || $external){
             $img_aux = $this->_image_convert($src, DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media');
         }else{
-            $img_aux = DOKU_PLUGIN_LATEX_TMP . $this->tmp_dir . '/media/' . basename($src);
+            $img_aux = tempnam(DOKU_PLUGIN_LATEX_TMP . $this->tmp_dir . '/media', 'ltx');
+            $ext = pathinfo($src,PATHINFO_EXTENSION);
             if (file_exists($src)){
-                copy($src, $img_aux);
+                copy($src, "$img_aux.$ext");
             }
         }
         if (file_exists($img_aux)){
