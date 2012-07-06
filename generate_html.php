@@ -103,6 +103,7 @@ class generate_html{
         $tmp_dir = rand();
         $_SESSION['tmp_dir'] = $tmp_dir;
         $_SESSION['latex_images'] = array();
+        $_SESSION['media_files'] = array();
         $_SESSION['graphviz_images'] = array();
         if (!file_exists(DOKU_PLUGIN_LATEX_TMP.$tmp_dir)){
             mkdir(DOKU_PLUGIN_LATEX_TMP.$tmp_dir, 0775, TRUE);
@@ -237,8 +238,6 @@ class generate_html{
                    $text = io_readFile(wikiFN($page[1]));
                    $navmenu = $this->createNavigation('',array($page[0]), array(''));
                    list($header, $text) =$this->extractHeader($text);
-                   preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
-                   array_push($files, $matches[1]);
                    $instructions = get_latex_instructions($text);
                    $html = p_latex_render('iocxhtml', $instructions, $info);
                    $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
@@ -253,14 +252,13 @@ class generate_html{
                  $_SESSION['iocintro'] = FALSE;
                  unset($data[0]['intro']);
                  //Attach media files
-                 foreach($files as $sf){
-                     foreach($sf as $f){
-                         resolve_mediaid(getNS($f),$f,$exists);
-                         if ($exists){
-                             $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
-                         }
+                 foreach($_SESSION['media_files'] as $f){
+                     resolve_mediaid(getNS($f),$f,$exists);
+                     if ($exists){
+                         $zip->addFile(mediaFN($f), 'media/'.basename(mediaFN($f)));
                      }
                  }
+                 $_SESSION['media_files'] = array();
                  //Attach latex files
                  foreach($_SESSION['latex_images'] as $l){
                      if (file_exists($l)){
@@ -279,9 +277,6 @@ class generate_html{
              //Content
              foreach ($data[0] as $ku => $unit){
                 //Section
-                //var to attach all url media files
-                $files = array();
-                $latex = array();
                 $unitname = $unit['iocname'];
                 unset($unit['iocname']);
                 if(preg_match('/@IOCSTARTUNIT@(.*?)@IOCENDUNIT@/', $this->menu_html, $matches)){
@@ -301,13 +296,10 @@ class generate_html{
                             }
                             list($header, $text) = $this->extractHeader($text);
                             $navmenu = $this->createNavigation('../../../',array($unitname,$this->tree_names[$ku][$ks]['sectionname'],$this->tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$this->def_section_href.'.html',''));
-                            preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
-                            array_push($files, $matches[1]);
                             $instructions = get_latex_instructions($text);
                             $html = p_latex_render('iocxhtml', $instructions, $info);
                             $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                             $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
-                            //preg_match_all('/(<span class="(blocklatex|inlinelatex)">.*?<\/span>)/', $html, $matches);
                             $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
                             $html = preg_replace('/@IOCTOC@/', $toc, $html, 1);
                             $html = preg_replace('/@IOCPATH@/', '../../../', $html);
@@ -323,8 +315,6 @@ class generate_html{
                         $text = io_readFile(wikiFN($section));
                         list($header, $text) = $this->extractHeader($text);
                         $navmenu = $this->createNavigation('../../',array($unitname,$this->tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
-                        preg_match_all('/\{\{([^}|?]+)[^}]*\}\}/', $text, $matches);
-                        array_push($files, $matches[1]);
                         $instructions = get_latex_instructions($text);
                         $html = p_latex_render('iocxhtml', $instructions, $info);
                         $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
@@ -338,14 +328,13 @@ class generate_html{
                     }
                 }
                 //Attach media files
-                foreach($files as $sf){
-                    foreach($sf as $f){
-                        resolve_mediaid(getNS($f),$f,$exists);
-                        if ($exists){
-                            $zip->addFile(mediaFN($f), $this->web_folder.'/'.$ku.'/media/'.basename(mediaFN($f)));
-                        }
+                foreach($_SESSION['media_files'] as $f){
+                    resolve_mediaid(getNS($f),$f,$exists);
+                    if ($exists){
+                        $zip->addFile(mediaFN($f), $this->web_folder.'/'.$ku.'/media/'.basename(mediaFN($f)));
                     }
                 }
+                $_SESSION['media_files'] = array();
                 //Attach latex files
                 foreach($_SESSION['latex_images'] as $l){
                     if (file_exists($l)){

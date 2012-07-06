@@ -1126,6 +1126,9 @@ class renderer_plugin_iocxhtml extends Doku_Renderer {
         if ($_SESSION['activities']){
             $path = '../';
         }
+        //attach url media file
+        array_push($_SESSION['media_files'], $src);
+
         list($ext,$mime,$dl) = mimetype($src);
         if(substr($mime,0,5) == 'image'){
             $icon = FALSE;
