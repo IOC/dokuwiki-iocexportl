@@ -211,13 +211,20 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
             'list'   => array(
                            array(
                                 'type'   => 'format',
+                                'title'  => $this->getLang('newcontent_btn'),
+                                'icon'   => '../../plugins/iocexportl/img/ico_newcontent.png',
+                                'open'   => '<newcontent>\n',
+                                'close'  => '\n</newcontent>',
+                                ),
+                           array(
+                                'type'   => 'format',
                                 'title'  => $this->getLang('figure_btn'),
                                 'icon'   => '../../plugins/iocexportl/img/ico_figure.png',
                                 'key'    => 'z',
                                 'open'   => '::figure:\n  :title:\n  :footer:\n',
                                 'close'  => '\n:::\n',
                                 ),
-                            array(
+                           array(
                                 'type'   => 'format',
                                 'title'  => $this->getLang('figlink_btn'),
                                 'icon'   => '../../plugins/iocexportl/img/ico_figlink.png',

@@ -11,6 +11,7 @@ $lang['example_btn']  = 'Incloure la sintaxis d\'example';
 $lang['figure_btn'] = 'Sintaxis de figure';
 $lang['figlink_btn'] = 'Sintaxis d\'enllaç a figure';
 $lang['important_btn']  = 'Incloure la sintaxis de\'important';
+$lang['newcontent_btn']  = 'Incloure la sintaxis de contingut nou';
 $lang['note_btn']  = 'Incloure la sintaxis de note';
 $lang['quote_btn']  = 'Incloure la sintaxis de quote';
 $lang['reference_btn']  = 'Incloure la sintaxis de reference';

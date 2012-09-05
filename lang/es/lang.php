@@ -11,6 +11,7 @@ $lang['example_btn']  = 'Sintaxi d\'example';
 $lang['figure_btn'] = 'Sintaxi de figure';
 $lang['figlink_btn'] = 'Sintaxi enlace a figure';
 $lang['important_btn']  = 'Sintaxi de\'important';
+$lang['newtext_btn']  = 'Sintaxi de newcontent';
 $lang['note_btn']  = 'Sintaxi de note';
 $lang['quote_btn']  = 'Sintaxi de quote';
 $lang['reference_btn']  = 'Sintaxi de reference';
