@@ -489,7 +489,7 @@ class generate_html{
                         $result = array();
                         $def_unit_href='';
                         $unit_act = '';
-                        if (preg_match('/^[I|i]ndex/', $content)){
+                        if (preg_match('/^index/i', $content)){
                             $result = explode(DOKU_LF,$content);
                             $result = array_filter($result);
                             @array_shift($result);
@@ -695,11 +695,7 @@ class generate_html{
                 //Activities
                 $text = io_readFile(wikiFN($section['continguts']));
                 preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
-                if (!empty($matches[1])){
-                    $section_name = $matches[1];
-                }else{
-                     $section_name = $ks;
-                }
+                $section_name = $this->getHeader($text);
                 $this->tree_names[$ku][$ks]['sectionname']=$section_name;
                 //Comprovar si existeix continguts.html $def_section_href i enllaçar la secció
                 $act_href = '@IOCPATH@'.$this->web_folder.'/'.$ku.'/'.$ks.'/'.$this->def_section_href.'.html';
@@ -913,6 +909,11 @@ class generate_html{
      */
     private function extractHeader($text){
         $check = array();
+        if(preg_match('/^\{\{page>([^}]*)\}\}/', $text, $matches)){
+            if (!empty($matches[1])){
+                $text = io_readFile(wikiFN($matches[1]));
+            }
+        }
         if (preg_match('/\={6}([^=]+)\={6}/', $text, $matches)){
             $text = preg_replace('/\={6}[^=]+\={6}/', '', $text);
             $id = sectionID($matches[1], $check);
@@ -928,6 +929,13 @@ class generate_html{
     */
     private function getHeader($text){
         preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
+        if (empty($matches[1])){
+            preg_match('/^\{\{page>([^}]*)\}\}/', $text, $matches);
+            if (!empty($matches[1])){
+                $text = io_readFile(wikiFN($matches[1]));
+                preg_match('/\={6}([^=]+)\={6}/', $text, $matches);
+            }
+        }
         $pagename = (!empty($matches[1]))?trim($matches[1]):'HEADER LEVEL 1 NOT FOUND';
         return $pagename;
     }
