@@ -990,7 +990,6 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
                 $this->doc .= '\end{minipage}'.DOKU_LF.DOKU_LF;
             }
         }else{
-            //$this->doc .= '\hspace*{\\fill}\\linebreak\\linebreak'. DOKU_LF;
             $this->doc .= '\hspace*{4mm}'. DOKU_LF;
             $this->doc .= '\begin{minipage}[c]{.85\textwidth}'. DOKU_LF;
             if ( !$language ) {
@@ -1000,7 +999,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }
             $text = preg_replace('/\\\\/', '\\\\\\\\', $text);
             $text = preg_replace('/ /', '\\\\ ', $text);
-            $text = preg_replace('/([%{}])/', '\\$1', $text);
+            $text = preg_replace('/([%{}])/', '\\\\$1', $text);
             $this->doc .=  $this->_format_text($text) . '^^J';
             $this->doc .= '\end{csource}'.DOKU_LF;
             $this->doc .= '\end{minipage}\linebreak'.DOKU_LF;
