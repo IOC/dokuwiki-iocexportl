@@ -1164,7 +1164,7 @@ define (["render"],function(render){
 	$("h2 > a,h3 > a,h4 > a").hover( 
 		function(){
 			if ($(this).siblings("span[name='star']").hasClass("star") && !islocalChrome()){
-				$(this).siblings("span[name='star']").show();
+				$(this).siblings("span[name='star']").css('display', 'inline-block');
 			}
 			if(showtooltips){
 				showhelp($(this),true,true);
