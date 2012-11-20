@@ -237,7 +237,9 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
 
         if(is_null($instructions)) return '';
 
-        require_once DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php';
+        if (@file_exists(DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php')) {
+          require_once DOKU_PLUGIN . 'iocexportl/renderer/'.$mode.'.php';
+        }
 
         $class = "renderer_plugin_".$mode;
 
