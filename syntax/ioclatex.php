@@ -105,7 +105,7 @@ class syntax_plugin_iocexportl_ioclatex extends DokuWiki_Syntax_Plugin {
                 $render = new Doku_Renderer_xhtml();
                 $xhtml = $render->render($data);
                 //Inside quiz and xhtml wiki required
-                if ($_SESSION['xhtml_latex_quiz']){
+                if ($_SESSION['xhtml_latex_quiz']) {
                     $renderer->doc .= $xhtml;
                 }else{
                     if (preg_match('/<img src="(.*?\?media=(.*?))"/', $xhtml, $match)) {

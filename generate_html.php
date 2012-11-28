@@ -240,6 +240,7 @@ class generate_html{
                    list($header, $text) =$this->extractHeader($text);
                    $instructions = get_latex_instructions($text);
                    $html = p_latex_render('iocxhtml', $instructions, $info);
+                   $html = preg_replace('/\$/', '\\\\$', $html);
                    $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                    $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_intro, $html, 1);
                    $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
@@ -298,6 +299,7 @@ class generate_html{
                             $navmenu = $this->createNavigation('../../../',array($unitname,$this->tree_names[$ku][$ks]['sectionname'],$this->tree_names[$ku][$ks][$ka]), array('../'.$def_unit_href.'.html',$this->def_section_href.'.html',''));
                             $instructions = get_latex_instructions($text);
                             $html = p_latex_render('iocxhtml', $instructions, $info);
+                            $html = preg_replace('/\$/', '\\\\$', $html);
                             $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                             $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
                             $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);
@@ -317,6 +319,7 @@ class generate_html{
                         $navmenu = $this->createNavigation('../../',array($unitname,$this->tree_names[$ku][$ks]), array($def_unit_href.'.html',''));
                         $instructions = get_latex_instructions($text);
                         $html = p_latex_render('iocxhtml', $instructions, $info);
+                        $html = preg_replace('/\$/', '\\\\$', $html);
                         $html = preg_replace('/@IOCCONTENT@/', $html, $text_template, 1);
                         $html = preg_replace('/@IOCMENUNAVIGATION@/', $menu_html_unit, $html, 1);
                         $html = preg_replace('/@IOCTITLE@/', $header, $html, 1);

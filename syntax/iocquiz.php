@@ -261,12 +261,14 @@ class syntax_plugin_iocexportl_iocquiz extends DokuWiki_Syntax_Plugin {
             }
             $renderer->doc .= '<tr>';
             $renderer->doc .= '<td>'.($k+1).'</td>';
-
-			$_SESSION['xhtml_latex_quiz'] = TRUE;
+            if ($mode === 'xhtml') {
+			          $_SESSION['xhtml_latex_quiz'] = TRUE;
+            }
             $instructions = get_latex_instructions($m);
             $renderer->doc .=  '<td>'.p_latex_render('iocxhtml', $instructions, $info).'</td>';
-			$_SESSION['xhtml_latex_quiz'] = FALSE;
-
+            if ($mode === 'xhtml') {
+			          $_SESSION['xhtml_latex_quiz'] = FALSE;
+            }
             if ($this->class === 'complete' || $this->class === 'relations'){
                 preg_match_all('/@IOCDROPDOWN@/', $renderer->doc, $match);
                 foreach ($match[0] as $elem){

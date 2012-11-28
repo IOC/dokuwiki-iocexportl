@@ -243,8 +243,9 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
 
         $class = "renderer_plugin_".$mode;
 
-        $Renderer = new $class;
-
+        if (class_exists($class)) {
+          $Renderer = new $class;
+        }
 
         if (is_null($Renderer)) return null;
 
