@@ -47,11 +47,6 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
         return 513;
     }
 
-    function getAllowedTypes(){
-        return array('formatting');
-    }
-
-
     /**
      * Connect pattern to lexer
      */

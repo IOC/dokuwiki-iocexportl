@@ -601,6 +601,8 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
      * Tables
      */
     function table_open($maxcols = NULL, $numrows = NULL){
+        global $conf;
+
         $this->table = TRUE;
         $this->tableheader = TRUE;
         $this->max_cols = $maxcols;
@@ -642,7 +644,12 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         $this->doc .= '}';
         if (!$_SESSION['table_small']){
-            $vspace = '\vspace{-2.5ex}';
+            if (!$_SESSION['table_large']){
+                $vspace = '\vspace{-2.5ex}';
+            } else {
+                $separation = (isset($conf['plugin']['iocexportl']['largetablecaptmargin'])?'-2.9ex':'-2.5ex');
+                $vspace = '\vspace{'.$separation.'}';
+            }
             if (strlen($_SESSION['table_title']) > 86){
                 $vspace = '';
             }

@@ -9,3 +9,4 @@ $meta['jquery_url']   = array('string');
 $meta['allowexport']   = array('onoff');
 $meta['counter']   = array('onoff');
 $meta['toccontents'] = array('onoff');
+$meta['largetablecaptmargin'] = array('onoff');

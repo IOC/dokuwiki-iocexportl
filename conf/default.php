@@ -8,3 +8,4 @@ $conf['jquery_url'] = 'http://code.jquery.com/jquery.min.js';
 $conf['allowexport'] = FALSE;
 $conf['counter'] = FALSE;
 $conf['toccontents'] = FALSE;
+$conf['largetablecaptmargin'] = FALSE;
