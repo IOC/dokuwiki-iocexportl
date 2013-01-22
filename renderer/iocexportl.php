@@ -343,7 +343,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             }elseif ($figure){
                 if ($_SESSION['figlarge']){
                     $this->doc .= '\checkoddpage\ifthenelse{\boolean{oddpage}}{\hspace*{0mm}}{\hspace*{-\marginparwidth}\hspace*{-10mm}}'.DOKU_LF;
-                    $this->doc .= '\begin{center}\begin{minipage}[c]{\textwidth+\marginparwidth+\marginparsep}'. DOKU_LF;
+                    if ($img_width) {
+                        $this->doc .= '\begin{center}';
+                    }
+                    $this->doc .= '\begin{minipage}[c]{\textwidth+\marginparwidth+\marginparsep}'. DOKU_LF;
                 }
                 $this->doc .= '\begin{figure}[H]'.DOKU_LF;
             }
@@ -420,7 +423,10 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             if ($figure){
                 $this->doc .= '\end{figure}';
                 if ($_SESSION['figlarge']){
-                    $this->doc .= '\end{minipage}\end{center}'. DOKU_LF;
+                    $this->doc .= '\end{minipage}'. DOKU_LF;
+                    if ($img_width) {
+                        $this->doc .= '\end{center}'. DOKU_LF;
+                    }
                 }
             }elseif ($imgb){
                 if (!empty($footer)){
