@@ -178,6 +178,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         if (!isset($_SESSION['table_title'])){
             $_SESSION['table_title'] = '';
         }
+        if (!isset($_SESSION['table_widths'])){
+            $_SESSION['table_widths'] = '';
+        }
         if (!isset($_SESSION['u0'])){
             $_SESSION['u0'] = FALSE;
         }
@@ -637,16 +640,27 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             $tablecaption = '\tableiocelemcaption';
         }
         $this->doc .= '\begin{'.$table_type.'}'.$large.'{';
-        for($i=0; $i < $maxcols; $i++){
-            if($_SESSION['accounting'] && $i===0){
+        for($i=0; $i < $maxcols; $i++) {
+            $table_widths = $_SESSION['accounting'] &&
+                is_array($_SESSION['table_widths']) &&
+                array_key_exists($i, $_SESSION['table_widths']);
+            if ($table_widths) {
+                $value = floatval($_SESSION['table_widths'][$i]);
+                if ($value <= 1) {
+                    $col_width = '-1,';
+                } else {
+                    $col_width = $value . ',';
+                }
+                if ($i === 0) {
+                    $this->doc .= $border;
+                }
+            } elseif($_SESSION['accounting'] && $i===0) {//default behaviour
                 $col_width = '3,';
                 $this->doc .= $border;
-            }
-            $this->doc .= 'X['.$col_width.'l] '.$border;
-            if($_SESSION['accounting'] && $i===0){
+            } elseif($_SESSION['accounting']) {
                 $col_width = '-1,';
             }
-
+            $this->doc .= 'X['.$col_width.'l] '.$border;
         }
         $this->doc .= '}';
         if (!$_SESSION['table_small']){

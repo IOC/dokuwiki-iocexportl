@@ -142,6 +142,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         $renderer->doc .= '\begin{center}'.DOKU_LF;
                         $renderer->doc .= '\parbox[t]{\linewidth}{'.DOKU_LF;
                     }
+                    if (isset($params['widths'])) {
+                        $_SESSION['table_widths'] = explode(',', $params['widths']);
+                    }
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
@@ -173,6 +176,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                     $_SESSION['table_large'] = FALSE;
                     $_SESSION['table_small'] = FALSE;
                     $_SESSION['accounting'] = FALSE;
+                    $_SESSION['table_widths'] = '';
                     $this->type = '';
                     break;
             }
@@ -199,6 +203,9 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
                         }
                         if (isset($params['footer'])){
                             $renderer->doc .= '<strong>Peu:</strong> '.$params['footer'].'<br />';
+                        }
+                        if (isset($params['widths'])){
+                            $renderer->doc .= '<strong>Amplada columnes:</strong> '.$params['widths'].'<br />';
                         }
                         $renderer->doc .= '</div>';
                         break;
