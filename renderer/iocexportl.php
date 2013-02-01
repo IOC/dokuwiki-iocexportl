@@ -838,7 +838,7 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
     }
 
     function tablecell_close(){
-        if ($_SESSION['accounting'] && $this->col_colspan === 3){
+        if ($_SESSION['accounting'] && $this->col_colspan >= 3){
             $this->col_num += $this->col_colspan;
         }else{
             $col_num_aux = ($this->col_colspan > 1)?$this->col_num + $this->col_colspan:$this->col_num;
