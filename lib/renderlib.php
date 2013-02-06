@@ -122,6 +122,8 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
       }
       // plugin to add wiki pages into another
       addSyntaxmode('include', 'include', $modes);
+      // plugin to add notes
+      addSyntaxmode('note', '', $modes);
 
       // add default modes
       $std_modes = array('listblock','preformatted','notoc','nocache',
@@ -202,10 +204,18 @@ $symbols = array('α','β','Γ','γ','Δ','δ','ε','ζ','η','Θ','ι','κ','Λ
     function addSyntaxmode($nameplugin, $syntax, &$modes){
         global $DOKU_PLUGINS, $PARSER_MODES;
 
-        if(@file_exists(DOKU_PLUGIN . $nameplugin.'/syntax/' . $syntax . '.php')){
-            require_once DOKU_PLUGIN . $nameplugin.'/syntax/' . $syntax . '.php';
-            $class_name = 'syntax_plugin_' . $nameplugin . '_' . $syntax;
-            $syntax = $nameplugin . '_' . $syntax;
+        if ($syntax) {
+          $path = DOKU_PLUGIN . $nameplugin . '/syntax/' . $syntax . '.php';
+        } else {
+          $path = DOKU_PLUGIN . $nameplugin . '/syntax.php';
+        }
+        if(@file_exists($path)) {
+            require_once $path;
+            $class_name = 'syntax_plugin_' . $nameplugin;
+            if ($syntax) {
+              $class_name .= '_' . $syntax;
+            }
+            $syntax = ($syntax?$nameplugin . '_' . $syntax:$nameplugin);
             if (!empty($DOKU_PLUGINS['syntax'][$syntax])){
                 if (!$DOKU_PLUGINS['syntax'][$syntax]->isSingleton()) {
                     $DOKU_PLUGINS['syntax'][$syntax] = &class_exists($class_name) ? new $class_name(): null;
