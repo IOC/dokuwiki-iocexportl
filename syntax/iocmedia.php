@@ -11,6 +11,9 @@
 if(!defined('DOKU_INC')) die();
 
 if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
+if (!defined('DOKU_PLUGIN_TEMPLATES'))
+    define('DOKU_PLUGIN_TEMPLATES',DOKU_PLUGIN.'iocexportl/templates/');
+
 
 require_once(DOKU_PLUGIN.'syntax.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
@@ -21,6 +24,13 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     static $vimeo = 'http://www.vimeo.com/moogaloop.swf?clip_id=@VIDEO@';
     static $youtube = 'http://www.youtube.com/v/@VIDEO@?allowFullScreen=true&allowScriptAccess=always&fs=1';
     static $dailymotion = 'http://www.dailymotion.com/embed/video/@VIDEO@';
+    static $altamarFromUrl = 'vídeo[altamar: @VIDEO@]';
+    static $altamarFromId = 'vídeo[altamar: @VIDEO@]';
+    static $altamarFromReq = 'vídeo[altamar: @VIDEO@]';
+    static $altamarVideos = 'vídeo[altamar: @VIDEO@]';
+    
+//    static $altamarFromUrl = 'http://bcove.me/@VIDEO@';
+//    static $altamarFromId = http://link.brightcove.com/services/player/bcpid1326284612001?bckey=AQ~~,AAABNMyTcTE~,zjiPB9Bfp4EykEGoTnvDHUfnwtGu2QvJ&bctid=@VIDEO@';
 
    /**
     * Get an associative array with plugin info.
@@ -52,7 +62,7 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
      * Connect pattern to lexer
      */
     function connectTo($mode) {
-        $this->Lexer->addSpecialPattern('\{\{\s?(?:vimeo|youtube|dailymotion).*?>[^}]+\}\}', $mode, 'plugin_iocexportl_iocmedia');
+        $this->Lexer->addSpecialPattern('\{\{\s?(?:vimeo|youtube|dailymotion|altamarVideos|altamarFromUrl|altamarFromId|altamarFromReq).*?>[^}]+\}\}', $mode, 'plugin_iocexportl_iocmedia');
     }
 
     /**
@@ -100,12 +110,25 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
         if ($mode === 'iocexportl'){
             list($site, $url, $title) = $data;
-            if($site === 'dailymotion' || $site === 'vimeo' || $site === 'youtube'){
+            if($site === 'dailymotion' || $site === 'vimeo' 
+                    || $site === 'youtube' 
+                    || $site === 'altamarVideos'
+                    || $site === 'altamarFromId'
+                    || $site === 'altamarFromReq'
+                    || $site === 'altamarFromUrl'){
                 $_SESSION['qrcode'] = TRUE;
                 if ($site === 'dailymotion'){
                     $type = self::$dailymotion;
                 }elseif($site === 'vimeo'){
                     $type = self::$vimeo;
+                }elseif($site === 'altamarVideos'){
+                    $type = self::$altamarVideos;
+                }elseif($site === 'altamarFromUrl'){
+                    $type = self::$altamarFromUrl;
+                }elseif($site === 'altamarFromId'){
+                    $type = self::$altamarFromId;
+                }elseif($site === 'altamarFromReq'){
+                    $type = self::$altamarFromReq;
                 }else{
                     $type = self::$youtube;
                 }
@@ -117,7 +140,8 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
             $renderer->doc .= $title;
         }elseif ($mode === 'xhtml' || $mode === 'iocxhtml'){
             list($site, $url, $title, $width, $height) = $data;
-            if($site === 'dailymotion' || $site === 'vimeo' || $site === 'youtube'){
+            if($site === 'dailymotion' || $site === 'vimeo' 
+                    || $site === 'youtube'){
                 if ($site === 'dailymotion'){
                     $type = self::$dailymotion;
                 }elseif($site === 'vimeo'){
@@ -126,10 +150,25 @@ class syntax_plugin_iocexportl_iocmedia extends DokuWiki_Syntax_Plugin {
                     $type = self::$youtube;
                 }
                 $url = preg_replace('/@VIDEO@/', $url, $type);
+//            }else if($site === 'altamarFromUrl'){
+//                    $type = self::$altamarFromUrl;
             }
             $renderer->doc .= '<div class="mediavideo">';
             if ($site === 'dailymotion'){
                  $renderer->doc .='<iframe height="'.$height.'" width="'.$width.'" src="'.$url.'"></iframe>';
+            }elseif ($site === 'altamarVideos'
+                            || $site === 'altamarFromUrl'
+                            || $site === 'altamarFromId'
+                            || $site === 'altamarFromReq') {
+                $renderer->doc .= '<div id="vi'.$url.'">';
+                $renderer->doc .= '</div>';
+                $tpl = io_readFile(DOKU_PLUGIN_TEMPLATES.$site.'.tpl');
+                $tpl = preg_replace("/@QUERY@/", $site, $tpl);                
+                $tpl = preg_replace("/@ID_DIV@/", 'vi'.$url, $tpl);                
+                $tpl = preg_replace("/@HEIGHT@/", $height, $tpl);
+                $tpl = preg_replace("/@WIDTH@/", $width, $tpl);
+                $tpl = preg_replace("/@ID_VIDEO@/", strval($url), $tpl);
+                $renderer->doc .= $tpl;
             }else{
                 $renderer->doc .= html_flashobject(
                                 $url,
