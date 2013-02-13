@@ -2458,6 +2458,10 @@ article figure img {
 	overflow-x: auto;
 }
 
+.java{
+    font-size: 70%;
+}
+
 .code ol li {
 	list-style: none outside none;
 	margin: 0;
