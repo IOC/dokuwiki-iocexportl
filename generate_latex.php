@@ -352,7 +352,7 @@ class generate_latex{
             if (!file_exists($conf['mediadir'].'/'.$dest)){
                 mkdir($conf['mediadir'].'/'.$dest, 0755, TRUE);
             }
-            $filename_dest = ($this->log || auth_isadmin())?$filename:basename($filename, '.'.$type).'_draft.'.$type;
+            $filename_dest = ($this->log || $this->permissionToExport)?$filename:basename($filename, '.'.$type).'_draft.'.$type;
             //Replace log extension to txt, and show where error is
             if ($type === 'log'){
                 $filename_dest = preg_replace('/\.log$/', '.txt', $filename_dest, 1);
@@ -523,7 +523,7 @@ class generate_latex{
             $selfGenerationAllowed = stripos($conf['plugin']['iocexportl']
                                              ['UsersWithPdfSelf-generationAllowed'],
                                              $user)!==FALSE;
-            $return = (($aclLevel > AUTH_UPLOAD)&&($selfGenerationAllowed));
+            $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
     }   
