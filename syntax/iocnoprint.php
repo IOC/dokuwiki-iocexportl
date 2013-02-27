@@ -28,16 +28,17 @@ class syntax_plugin_iocexportl_iocnoprint extends DokuWiki_Syntax_Plugin {
         );
     }
 
-    function getType(){ return 'container'; }
-    function getPType(){ return 'block'; }
-    //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
-    function getAllowedTypes() {
-        return array('baseonly');
+    function getType(){
+        return 'container';
     }
+
+    function getPType(){
+        return 'block';
+    }
+
     function getSort(){
         return 513;
     }
-
 
     /**
      * Connect pattern to lexer

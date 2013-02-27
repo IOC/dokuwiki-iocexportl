@@ -39,11 +39,7 @@ class syntax_plugin_iocexportl_iocnoweb extends DokuWiki_Syntax_Plugin {
     function getPType(){
         return 'block';
     }
-    //'container','substition','protected','disabled','baseonly','formatting','paragraphs'
 
-    function getAllowedTypes() {
-        return array('container','substition','protected','disabled','baseonly','formatting','paragraphs');
-    }
     function getSort(){
         return 513;
     }
