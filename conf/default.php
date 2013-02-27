@@ -9,3 +9,4 @@ $conf['allowexport'] = FALSE;
 $conf['counter'] = FALSE;
 $conf['toccontents'] = FALSE;
 $conf['largetablecaptmargin'] = FALSE;
+$conf['UsersWithPdfSelf-generationAllowed'] = '';

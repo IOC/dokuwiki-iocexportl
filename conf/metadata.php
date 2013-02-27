@@ -10,3 +10,4 @@ $meta['allowexport']   = array('onoff');
 $meta['counter']   = array('onoff');
 $meta['toccontents'] = array('onoff');
 $meta['largetablecaptmargin'] = array('onoff');
+$meta['UsersWithPdfSelf-generationAllowed'] = array('string');

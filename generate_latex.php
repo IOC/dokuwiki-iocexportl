@@ -89,9 +89,12 @@ class generate_latex{
 
         if (!$this->export_ok) return FALSE;
         if (!$this->log && !$this->checkPerms()) return FALSE;
+        $this->permissionToExport = $this->hasUserPermissionToExport();
         $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
-        if (!$this->log && !$this->exportallowed && !auth_isadmin()) return FALSE;
-        if (!$this->log && !auth_isadmin() && $params['mode'] === 'zip') return FALSE;
+        if (!$this->log && !$this->exportallowed 
+                                && !$this->permissionToExport) return FALSE;
+        if (!$this->log && !$this->permissionToExport 
+                                && $params['mode'] === 'zip') return FALSE;
 
         $this->time_start = microtime(TRUE);
 
@@ -106,7 +109,7 @@ class generate_latex{
                 mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
                 mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
             }
-            if (!$this->log && !auth_isadmin()){
+            if (!$this->log && !$this->permissionToExport){
                 $latex .= '\draft{Provisional}' . DOKU_LF;
                 $_SESSION['draft'] = TRUE;
             }
@@ -508,6 +511,22 @@ class generate_latex{
         // AUTH_ADMIN, AUTH_READ,AUTH_EDIT,AUTH_CREATE,AUTH_UPLOAD,AUTH_DELETE
         return ($aclLevel >=  AUTH_UPLOAD);
       }
+      
+    private function hasUserPermissionToExport(){
+        global $USERINFO;
+        global $conf;
+        $return = auth_isadmin();
+        if(!$return){
+            $user = $_SERVER['REMOTE_USER'];
+            $groups = $USERINFO['grps'];
+            $aclLevel = auth_aclcheck($ID,$user,$groups);
+            $selfGenerationAllowed = stripos($conf['plugin']['iocexportl']
+                                             ['UsersWithPdfSelf-generationAllowed'],
+                                             $user)!==FALSE;
+            $return = (($aclLevel > AUTH_UPLOAD)&&($selfGenerationAllowed));
+        }
+        return $return;
+    }   
 
     /**
      *
