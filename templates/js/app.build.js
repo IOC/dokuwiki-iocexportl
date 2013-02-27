@@ -1,15 +1,18 @@
 ({
-    appDir: "../",
-    baseUrl: "js/",
-    dir: "../html/_/js",
-    //Comment out the optimize line if you want
-    //the code minified by UglifyJS
-    //optimize: "none",
-
-    modules: [
-        {
-            name: "main",
-			exclude: ["jquery.min"]
+    baseUrl: "/var/www/dokuwiki/lib/plugins/iocexportl/templates/js/",
+    out: '/var/www/dokuwiki/lib/plugins/iocexportl/templates/html/_/js/build.js',
+    name: 'main',
+    paths: {
+        requireLib: 'require'
+    },
+    include: 'requireLib',
+    shim: {
+        'jquery-ui.min': {
+            deps: ['jquery.min']
         },
-    ]
+        'jquery.imagesloaded': {
+            deps: ['jquery.min'],
+            exports: 'jQuery.fn.imagesLoaded'
+        }
+    }
 })
