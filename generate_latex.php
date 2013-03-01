@@ -520,9 +520,10 @@ class generate_latex{
             $user = $_SERVER['REMOTE_USER'];
             $groups = $USERINFO['grps'];
             $aclLevel = auth_aclcheck($ID,$user,$groups);
-            $selfGenerationAllowed = stripos($conf['plugin']['iocexportl']
-                                             ['UsersWithPdfSelf-generationAllowed'],
-                                             $user)!==FALSE;
+            $userWIthPermission = $conf['plugin']['iocexportl']
+                                        ['UsersWithPdfSelf-generationAllowed'];
+            $selfGenerationAllowed = preg_match('/'.$user.'(?:\b)/', 
+                                                          $userWIthPermission)==1;
             $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
