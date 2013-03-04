@@ -12,6 +12,11 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
 
+if (!defined('DOKU_IOCEXPORT_COUNTER_TYPE_TOTAL')) 
+        define('DOKU_IOCEXPORT_COUNTER_TYPE_TOTAL',0);
+if (!defined('DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT')) 
+        define('DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT',1);
+
 $id = getID();
 if (!checkPerms()) return FALSE;
  $path = wikiFN($id);
@@ -33,17 +38,35 @@ if (!checkPerms()) return FALSE;
             $instructions = get_latex_instructions($text);
             $clean_text = p_latex_render('ioccounter', $instructions, $info);
             if (preg_match('/::IOCVERDINICI::/', $clean_text)){
+                $result['counterType'] =  DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT;
                 $matches = array();
                 preg_match_all('/(?<=::IOCVERDINICI::)(.*?)(?=::IOCVERDFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
-                $verd = '';
+                $newContent = '';
                 foreach ($matches as $m){
-                    $verd .= $m[1];
+                    $newContent .= $m[1];
                 }
-                $noverd = preg_replace('/::IOCVERDINICI::.*?::IOCVERDFINAL::/', '', $clean_text);
-                $result = array($id, mb_strlen($noverd), 'Material de reaprofitament', mb_strlen($verd), 'Material de nova creació');
+                $reusedContent = preg_replace('/::IOCVERDINICI::.*?::IOCVERDFINAL::/', '', $clean_text);
+            }else if (preg_match('/::IOCNEWCONTENTINICI::/', $clean_text)){
+                $result['counterType'] =  DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT;
+                $matches = array();
+                preg_match_all('/(?<=::IOCNEWCONTENTINICI::)(.*?)(?=::IOCNEWCONTENTFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
+                $newContent = '';
+                foreach ($matches as $m){
+                    $newContent .= $m[1];
+                }
+                $result['newContentCounter']['tag']='de nova creació';
+                $result['newContentCounter']['value']=mb_strlen($newContent);
+                $reusedContent = preg_replace('/::IOCNEWCONTENTINICI::.*?::IOCNEWCONTENTFINAL::/', '', $clean_text);
+                $result['reusedContentCounter']['tag']='de reaprofitament';
+                $result['reusedContentCounter']['value']=mb_strlen($reusedContent)+sizeof($matches);
+                $totalCounter = $result['reusedContentCounter']['value']
+                                + $result['newContentCounter']['value'];
             }else{
-                $result = array($id, mb_strlen($clean_text));
+                $result['counterType'] =  DOKU_IOCEXPORT_COUNTER_TYPE_TOTAL;               
+                $totalCounter=mb_strlen($clean_text);
             }
+            $result['totalCounter'] = array('tag' => 'Total',
+                    'value' => $totalCounter,);
         }else{
             $result = null;
         }

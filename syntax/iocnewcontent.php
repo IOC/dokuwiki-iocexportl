@@ -74,12 +74,14 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
             list ($state, $text) = $data;
             switch ($state) {
                 case DOKU_LEXER_ENTER :
+                    $renderer->doc .= '::IOCNEWCONTENTINICI::';
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $instructions = get_latex_instructions($text);
                     $renderer->doc .= p_latex_render($mode, $instructions, $info);
                     break;
                 case DOKU_LEXER_EXIT :
+                    $renderer->doc .= '::IOCNEWCONTENTFINAL::';
                     break;
             }
             return TRUE;
