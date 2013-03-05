@@ -11,17 +11,11 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 
 require_once(DOKU_INC.'/inc/init.php');
 require_once(DOKU_PLUGIN.'iocexportl/lib/renderlib.php');
+require_once(DOKU_PLUGIN.'iocexportl/lib/ContentCounterClass.php');
 
-if (!defined('DOKU_IOCEXPORT_COUNTER_TYPE_TOTAL')) 
-        define('DOKU_IOCEXPORT_COUNTER_TYPE_TOTAL',0);
-if (!defined('DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT')) 
-        define('DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT',1);
-
-$id = getID();
-if (!checkPerms()) return FALSE;
- $path = wikiFN($id);
+if (!checkPerms(getID())) return FALSE;
  session_start();
- countCharacters($path);
+ countCharacters(getID());
  session_destroy();
 
     /**
@@ -29,56 +23,86 @@ if (!checkPerms()) return FALSE;
     * Count characters for the path indicated
     * @param string $path
     */
-    function countCharacters($path){
-        global $id;
-
-        if (file_exists($path)){
-            $text = io_readFile($path);
-            $text = preg_replace('/<noprint>\n?<noweb>\n?(<verd>.*?<\/verd>)\n?<\/noweb>\n?<\/noprint>/', '$1',$text);
-            $instructions = get_latex_instructions($text);
-            $clean_text = p_latex_render('ioccounter', $instructions, $info);
-            if (preg_match('/::IOCVERDINICI::/', $clean_text)){
-                $result['counterType'] =  DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT;
-                $matches = array();
-                preg_match_all('/(?<=::IOCVERDINICI::)(.*?)(?=::IOCVERDFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
-                $newContent = '';
-                foreach ($matches as $m){
-                    $newContent .= $m[1];
-                }
-                $reusedContent = preg_replace('/::IOCVERDINICI::.*?::IOCVERDFINAL::/', '', $clean_text);
-            }else if (preg_match('/::IOCNEWCONTENTINICI::/', $clean_text)){
-                $result['counterType'] =  DOKU_IOCEXPORT_COUNTER_TYPE_NEWCONTENT;
-                $matches = array();
-                preg_match_all('/(?<=::IOCNEWCONTENTINICI::)(.*?)(?=::IOCNEWCONTENTFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
-                $newContent = '';
-                foreach ($matches as $m){
-                    $newContent .= $m[1];
-                }
-                $result['newContentCounter']['tag']='de nova creació';
-                $result['newContentCounter']['value']=mb_strlen($newContent);
-                $reusedContent = preg_replace('/::IOCNEWCONTENTINICI::.*?::IOCNEWCONTENTFINAL::/', '', $clean_text);
-                $result['reusedContentCounter']['tag']='de reaprofitament';
-                $result['reusedContentCounter']['value']=mb_strlen($reusedContent)+sizeof($matches);
-                $totalCounter = $result['reusedContentCounter']['value']
-                                + $result['newContentCounter']['value'];
-            }else{
-                $result['counterType'] =  DOKU_IOCEXPORT_COUNTER_TYPE_TOTAL;               
-                $totalCounter=mb_strlen($clean_text);
-            }
-            $result['totalCounter'] = array('tag' => 'Total',
-                    'value' => $totalCounter,);
+    function countCharacters($id){
+        global $conf;
+        $startPageName = $conf['start'];
+        $ns = getNS($id);
+        $pageName = noNS($id);
+        if($startPageName===$pageName){
+            $result=  countCharactersOfIndex($ns, $pageName);
         }else{
-            $result = null;
+            $result= countCharactersOfDocument($ns, $pageName);
         }
-        echo json_encode($result);
+        echo $result->toJsonEncode();
+    }
+
+    function countCharactersOfIndex($ns, $pageName){
+        $result = new ContentCounterClass();
+        $pathFile = wikiFN($ns.":".$pageName);
+        if (file_exists($pathFile)){
+            $content = io_readFile($pathFile);
+             if (preg_match('/^index/i', $content)){
+                $contentArray = explode(DOKU_LF,$content);
+                $contentArray = array_filter($contentArray);
+                @array_shift($contentArray);
+                foreach ($contentArray as $p){
+                    $pathFile = wikiFN($ns.":".$p);
+                    _countCharactersOfDocument($pathFile, $result);
+                }
+             }
+        }else{
+            $result = null; /*TO DO canviar per un objecte error */
+        }
+        return $result;
+    }
+
+    function countCharactersOfDocument($ns, $pageName){
+        $result = new ContentCounterClass();
+        $pathFile = wikiFN($ns.":".$pageName);
+        if (file_exists($pathFile)){
+            _countCharactersOfDocument($pathFile, $result);
+        }else{
+            $result = null; /*TO DO canviar per un objecte error */
+        }
+        return $result;
+    }
+     
+     
+    function _countCharactersOfDocument($pathFile, &$result){
+        $text = io_readFile($pathFile);
+        $text = preg_replace('/<noprint>\n?<noweb>\n?(<verd>.*?<\/verd>)\n?<\/noweb>\n?<\/noprint>/', '$1',$text);
+        $instructions = get_latex_instructions($text);
+        $clean_text = p_latex_render('ioccounter', $instructions, $info);
+        if (preg_match('/::IOCVERDINICI::/', $clean_text)){
+            $matches = array();
+            preg_match_all('/(?<=::IOCVERDINICI::)(.*?)(?=::IOCVERDFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
+            $newContent = '';
+            foreach ($matches as $m){
+                $newContent .= $m[1];
+            }
+            $result->incNewContent(mb_strlen($newContent));
+            $reusedContent = preg_replace('/::IOCVERDINICI::.*?::IOCVERDFINAL::/', '', $clean_text);
+            $result->incReusedContent(mb_strlen($reusedContent));
+        }else if (preg_match('/::IOCNEWCONTENTINICI::/', $clean_text)){
+            $matches = array();
+            preg_match_all('/(?<=::IOCNEWCONTENTINICI::)(.*?)(?=::IOCNEWCONTENTFINAL::)/', $clean_text, $matches, PREG_SET_ORDER);
+            $newContent = '';
+            foreach ($matches as $m){
+                $newContent .= $m[1];
+            }
+            $result->incNewContent(mb_strlen($newContent));
+            $reusedContent = preg_replace('/::IOCNEWCONTENTINICI::.*?::IOCNEWCONTENTFINAL::/', ' ', $clean_text);
+            $result->incReusedContent(mb_strlen($reusedContent));
+        }else{
+            $result->incTotal(mb_strlen($clean_text));
+        }
     }
 
     /**
      *
      * Check whether user has right acces level
      */
-    function checkPerms() {
-        global $id;
+    function checkPerms($id) {
         global $USERINFO;
 
         $user = $_SERVER['REMOTE_USER'];
