@@ -22,6 +22,7 @@ $params['mode'] = $_POST['mode'];
 if ($params['id'] === $_POST['id']){
     $params['toexport'] = $_POST['toexport'];
     $params['ioclanguage'] = $_POST['ioclanguage'];
+    $params['user'] = $_SERVER['REMOTE_USER'];
     $generate = new generate_latex($params);
     $generate->init();
 }
@@ -47,6 +48,7 @@ class generate_latex{
     private $toexport;
     private $tmp_dir;
     private $unitzero;
+    private $permissionToExport;
 
 
 /**
@@ -57,6 +59,7 @@ class generate_latex{
     * @param array $params Array of parameters to pass to the constructor
     */
     function __construct($params){
+        global $USERINFO;
 
         //Due listings problems whith header it's necessary to replace extended characters
         $this->end_characters = array("\'{a}", "\'{e}", "\'{i}", "\'{o}", "\'{u}", "\`{a}", "\`{e}", "\`{o}", '\"{i}', '\"{u}', '\~{n}', '\c{c}', "\'{A}", "\'{E}", "\'{I}", "\'{O}", "\'{U}", "\`{A}", "\`{E}", "\`{O}", '\"{I}', '\"{U}', '\~{N}', '\c{C}','\break ');
@@ -78,6 +81,9 @@ class generate_latex{
         $this->tmp_dir = '';
         $this->toexport = explode(',', preg_replace('/:index(,|$)/',',',$params['toexport']));
         $this->unitzero = FALSE;
+        $this->permissionToExport=FALSE;
+        $this->user = $params['user'];
+        $this->groups = $USERINFO['grps'];
     }
 
     /**
@@ -89,7 +95,9 @@ class generate_latex{
 
         if (!$this->export_ok) return FALSE;
         if (!$this->log && !$this->checkPerms()) return FALSE;
-        $this->permissionToExport = $this->hasUserPermissionToExport();
+        $this->permissionToExport = $this->hasUserPermissionToExport(
+                    $conf['plugin']['iocexportl']['UsersWithPdfSelf-generationAllowed']
+                );
         $this->exportallowed = isset($conf['plugin']['iocexportl']['allowexport']);
         if (!$this->log && !$this->exportallowed 
                                 && !$this->permissionToExport) return FALSE;
@@ -512,18 +520,12 @@ class generate_latex{
         return ($aclLevel >=  AUTH_UPLOAD);
       }
       
-    private function hasUserPermissionToExport(){
-        global $USERINFO;
-        global $conf;
+    private function hasUserPermissionToExport($userWIthPermission){
         $return = auth_isadmin();
         if(!$return){
-            $user = $_SERVER['REMOTE_USER'];
-            $groups = $USERINFO['grps'];
-            $aclLevel = auth_aclcheck($ID,$user,$groups);
-            $userWIthPermission = $conf['plugin']['iocexportl']
-                                        ['UsersWithPdfSelf-generationAllowed'];
-            $selfGenerationAllowed = preg_match('/'.$user.'(?:\b)/', 
-                                                          $userWIthPermission)==1;
+            $aclLevel = auth_aclcheck($this->id,$this->user,$this->groups);             
+            $selfGenerationAllowed = (preg_match('/'.$user.'(?:\b)/', 
+                                                          $userWIthPermission)===1);
             $return = (($aclLevel >= AUTH_UPLOAD)&&($selfGenerationAllowed));
         }
         return $return;
