@@ -49,6 +49,8 @@ class generate_latex{
     private $tmp_dir;
     private $unitzero;
     private $permissionToExport;
+    private $user;
+    private $groups;
 
 
 /**
