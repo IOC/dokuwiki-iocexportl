@@ -1,4 +1,4 @@
-require(["jquery.min","jquery-ui.min","jquery.imagesloaded","render","functions","doctools","quiz","searchtools"], function(jQuery,jUi,jIl,render,func,Highlight,quiz,Search){
+require(["jquery.min","jquery-ui.min","jquery.imagesloaded","render","functions","doctools","quiz","searchtools", "mediaScript"], function(jQuery,jUi,jIl,render,func,Highlight,quiz,Search, mediaScript){
 	$("article").imagesLoaded(function(){
 		render.infoTable();
 		render.infoFigure();

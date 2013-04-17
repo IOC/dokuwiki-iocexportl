@@ -2,10 +2,9 @@
     function _akdsaghj(){        
         return 'http://c.brightcove.com/services/viewer/federated_f9/1326284612001?isVid=1&isUI=1&playerKey=AQ~~,AAABNMyTcTE~,zjiPB9Bfp4EykEGoTnvDHUfnwtGu2QvJ&videoID=@ID_VIDEO@';
     }
-    var node = document.getElementById("@ID_DIV@");
     if(window.location.protocol=="file:"){
-        var img = "../../../img/film.png";
-        node.innerHTML ="<img src='" + img 
+        document.getElementById("@ID_DIV@").innerHTML ="<img src='" 
+                  + "../../../img/film.png"
                   + "' alt='Per veure el vídeo cal estar connectat al campus' "
                   + "height='@HEIGHT@' width='@WIDTH@'/>";
         require(["dojo/ready", "dijit/Tooltip"], function(ready, Tooltip){
@@ -17,7 +16,7 @@
             });
         });    
     }else{
-        node.innerHTML = '<object seamlesstabbing="undefined" '
+        document.getElementById("@ID_DIV@").innerHTML = '<object seamlesstabbing="undefined" '
         + 'class="BrightcoveExperience" id="objvi@ID_VIDEO@" data="' 
         + _akdsaghj() + '" type="application/x-shockwave-flash" '
         + 'height="@HEIGHT@" width="@WIDTH@">'

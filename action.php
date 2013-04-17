@@ -42,11 +42,14 @@ class action_plugin_iocexportl extends DokuWiki_Action_Plugin{
         global $conf;
 
         $this->exportallowed = (isset($conf['plugin']['iocexportl']['allowexport']) && $conf['plugin']['iocexportl']['allowexport']);
+
+        $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/mediaScript.js');
+
         if (!$this->has_jquery()) {
             $this->link_script($event, 'http://code.jquery.com/jquery.min.js');
             $this->include_script($event, 'jQuery.noConflict();');
         }
-
+        
         if ($this->isExportPage() && $this->checkPerms() && $this->showcounts()){
             $this->link_script($event, DOKU_BASE.'lib/plugins/iocexportl/lib/counter.js');
         }
