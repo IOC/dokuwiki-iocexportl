@@ -4,7 +4,7 @@
     }
     if(window.location.protocol=="file:"){
         document.getElementById("@ID_DIV@").innerHTML ="<img src='" 
-                  + "../../../img/film.png"
+                  + "img/film.png"
                   + "' alt='Per veure el vídeo cal estar connectat al campus' "
                   + "height='@HEIGHT@' width='@WIDTH@'/>";
         require(["dojo/ready", "dijit/Tooltip"], function(ready, Tooltip){

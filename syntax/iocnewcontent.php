@@ -25,19 +25,19 @@ class syntax_plugin_iocexportl_iocnewcontent extends DokuWiki_Syntax_Plugin {
             'url'    => 'http://ioc.gencat.cat/',
         );
     }
-
+    
     /**
      * What kind of syntax are we?
      */
     function getType(){
-        return 'formatting';
+        return 'paragraphs';
     }
 
     /**
      * What about paragraphs?
      */
     function getPType(){
-        return 'block';
+        return 'stack';
     }
 
     /**

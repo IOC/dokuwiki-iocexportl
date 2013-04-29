@@ -10,3 +10,5 @@ $conf['counter'] = FALSE;
 $conf['toccontents'] = FALSE;
 $conf['largetablecaptmargin'] = FALSE;
 $conf['UsersWithPdfSelf-generationAllowed'] = '';
+$conf['ContentPageName'] = 'continguts';
+

@@ -2,7 +2,7 @@ define(function(){
    var _ehjkhjkl=function(node, data, img, h, w /*, Tooltip*/){
         node.innerHTML ="<img src='" + img 
         + "' alt='"+data+"' " 
-        + "height='"+h+"' width='"+w+"'/>";
+        + "height='"+h+"' width='"+w+"' title='"+data+"'/>";
         /*
         new Tooltip({
              connectId: ["@ID_DIV@"],

@@ -37,6 +37,9 @@ if (!checkPerms(getID())) return FALSE;
     }
 
     function countCharactersOfIndex($ns, $pageName){
+        global $conf;
+        $contentPage=$conf["plugin"]["iocexportl"]["ContentPageName"]; /*TO DO: set content name via properties*/
+//        $contentPage="continguts"; /*TO DO: set content name via properties*/
         $result = new ContentCounterClass();
         $pathFile = wikiFN($ns.":".$pageName);
         if (file_exists($pathFile)){
@@ -46,8 +49,11 @@ if (!checkPerms(getID())) return FALSE;
                 $contentArray = array_filter($contentArray);
                 @array_shift($contentArray);
                 foreach ($contentArray as $p){
-                    $pathFile = wikiFN($ns.":".$p);
-                    _countCharactersOfDocument($pathFile, $result);
+                    if(!preg_match("/^".$contentPage."$|:"
+                                        .$contentPage."$/i", $p)){
+                        $pathFile = wikiFN($ns.":".$p);
+                        _countCharactersOfDocument($pathFile, $result);
+                    }
                 }
              }
         }else{
