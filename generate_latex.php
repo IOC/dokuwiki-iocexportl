@@ -278,6 +278,7 @@ class generate_latex{
             if (isset($twotitles)){
                 $data[1]['nomcomplert'] = preg_replace('/\\\\\\\\/', '\\break', $data[1]['nomcomplert']);
             }
+            $data[1]['nomcomplert'] = preg_replace('/\'/','{\textquotesingle}', $data[1]['nomcomplert']);
             $data[1]['nomcomplert'] = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($data[1]['nomcomplert'],77,'\break ')), $latex);
             $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $data[1]['creditcodi'], $latex);
@@ -294,6 +295,7 @@ class generate_latex{
                 $latex = preg_replace('/@IOC_HEIGHT_CICLENOM@/', '10', $latex, 1);
             }
             $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
+            $data[1]['nomcomplert'] = preg_replace('/\'/','{\textquotesingle}', $data[1]['nomcomplert']);
             $data[1]['nomcomplert'] = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
             $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
             $header_nomcomplert = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
