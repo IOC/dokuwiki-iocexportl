@@ -175,8 +175,8 @@ class generate_latex{
             }else{//Render unit zero
                 $_SESSION['u0'] = TRUE;
                 $text = io_readFile(wikiFN($this->id));
-                $text = preg_replace('/(\={6} ?.*? ?\={6}\n{2,}\={5} [M|m]eta \={5}\n{2,}( {2,4}\* \*\*[^\*]+\*\*:.*\n?)+)/', '', $text);
-                preg_match('/(?<=\={5} [C|c]redits \={5})\n+(.*?\n?)+(?=\={5} [C|c]opyright \={5})/', $text, $matches);
+                $text = preg_replace('/(\={6} ?.*? ?\={6}\n{2,}\={5} [Mm]eta \={5}\n{2,}( {2,4}\* \*\*[^\*]+\*\*:.*\n?)+)/', '', $text);
+                preg_match('/(?<=\={5} [Cc]redits \={5})\n+(.*?\n?)+(?=\={5} [Cc]opyright \={5})/', $text, $matches);
                 if (isset($matches[0])){
                     $latex .= '\creditspacingline\creditspacingpar\scriptsize' . DOKU_LF;
                     $matches[0] = preg_replace('/^\n+/', '', $matches[0]);
@@ -184,24 +184,24 @@ class generate_latex{
                     $instructions = get_latex_instructions($matches[0]);
                     $latex .= p_latex_render('iocexportl', $instructions, $info);
                     $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
-                    $text = preg_replace('/(\={5} [C|c]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [C|c]opyright \={5})/', '', $text);
-                    preg_match('/(?<=\={5} [C|c]opyright \={5})\n+(.*?\n?)+\{\{[^\}]+\}\}/', $text, $matches);
+                    $text = preg_replace('/(\={5} [Cc]redits \={5}\n{2,}(.*?\n?)+)(?=\={5} [Cc]opyright \={5})/', '', $text);
+                    preg_match('%(?<=\={5} [Cc]opyright \={5})\n+(.*?\n?)+(?=//|\={6})%', $text, $matches);
                     if (isset($matches[0])){
-        				$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
+                        $matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
                         $latex .= '\vfill'.DOKU_LF;
                         $instructions = get_latex_instructions($matches[0]);
                         $latex .= p_latex_render('iocexportl', $instructions, $info);
-        				$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
-                        $text = preg_replace('/\={5} [C|c]opyright \={5}\n+(.*?\n?)+\{\{[^\}]+\}\}\n+/', '', $text);
-                        preg_match('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', $text, $matches);
+                        $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
+                        $text = preg_replace('%\={5} [Cc]opyright \={5}\n+(.*?\n?)+(?=//|\={6})%', '', $text);
+                        preg_match('/(.*?\n?)+(?=\={6} [Ii]ntro)/', $text, $matches);
                         if (isset($matches[0])){
-                            $latex .= '\creditspacingline\creditspacingpar\tiny\par\vspace{2ex}'.DOKU_LF.DOKU_LF;
+                            $latex .= '\creditspacingline\creditspacingpar\tiny\par\vspace{2ex}\vspace{2ex}'.DOKU_LF.DOKU_LF;
                             $matches[0] = preg_replace('/(http.*)/', DOKU_LF.DOKU_LF.'$1', $matches[0]);
-        					$matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
+                            $matches[0] = preg_replace('/\n{2,3}/', DOKU_LF.'@IOCBR@'.DOKU_LF, $matches[0]);
                             $instructions = get_latex_instructions($matches[0]);
                             $latex .= p_latex_render('iocexportl', $instructions, $info);
-        					$latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
-                            $text = preg_replace('/(.*?\n)+.*?http.*?\n+(?=\={6} .*? \={6})/', '', $text);
+                            $latex = preg_replace('/@IOCBR@/', '\par\vspace{2ex} ', $latex);
+                            $text = preg_replace('/([^=]+)(?=\={6} [Ii]ntro)/', '', $text);
                         }
                     }
                 }
@@ -473,8 +473,8 @@ class generate_latex{
         }
     }
 
-	/**
-	 *
+    /**
+     *
      * Remove specified dir
      * @param string $directory
      */
