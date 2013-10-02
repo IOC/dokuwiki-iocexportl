@@ -76,7 +76,7 @@ class syntax_plugin_iocexportl_iocfigure extends DokuWiki_Syntax_Plugin {
         switch ($state) {
             case DOKU_LEXER_ENTER :
                 if (preg_match('/::figure:(.*?$)/', $match, $matches)){
-                    $id = $matches[1];
+                    $id = trim($matches[1]);
                 }
                 break;
             case DOKU_LEXER_UNMATCHED :
