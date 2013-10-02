@@ -2091,7 +2091,7 @@ article {
 	box-shadow: 2px 2px 5px #000;
 }
 
-article p a {
+article p a, article li a {
 	color: #33f;
 }
 
