@@ -78,7 +78,7 @@ class syntax_plugin_iocexportl_ioctable extends DokuWiki_Syntax_Plugin {
         switch ($state) {
             case DOKU_LEXER_ENTER :
                 if (preg_match('/::(table|accounting):(.*?)\n/', $match, $matches)){
-					$id = $matches[2];
+					$id = trim($matches[2]);
                 }
                 preg_match_all('/\s{2}:(\w+):(.*?)\n/', $match, $matches, PREG_SET_ORDER);
                 foreach($matches as $m){
