@@ -51,6 +51,7 @@ class generate_latex{
     private $permissionToExport;
     private $user;
     private $groups;
+    private $fpd;
 
 
 /**
@@ -77,7 +78,7 @@ class generate_latex{
         $this->ioclangcontinue = array('CA' => 'continuació', 'DE' => 'fortsetzung', 'EN' => 'continued','ES' => 'continuación','FR' => 'suite','IT' => 'continua');
         $this->log = isset($params['log']);
         $this->media_path = 'lib/exe/fetch.php?media=';
-        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia');
+        $this->meta_params = array('autoria', 'ciclenom', 'creditcodi', 'creditnom', 'familia', 'coordinacio');
         $this->meta_option = 'opcions';
         $this->mode = $params['mode'];
         $this->tmp_dir = '';
@@ -86,6 +87,7 @@ class generate_latex{
         $this->permissionToExport=FALSE;
         $this->user = $params['user'];
         $this->groups = $USERINFO['grps'];
+        $this->fpd = FALSE;
     }
 
     /**
@@ -243,7 +245,30 @@ class generate_latex{
      */
     private function renderFrontpage(&$latex, $data){
 
-        if ($this->unitzero){
+         if ($this->fpd) {
+            $filename = 'backgroundfpd';
+            if ($this->unitzero) {
+                $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . 'frontpagefpd_u0.ltx');
+                $latex = preg_replace('/@IOC_EXPORT_FAMILIA@/', trim($data[1]['familia']), $latex);
+                $coordinacio = explode(',', $data[1]['coordinacio']);
+                $latex = preg_replace('/@IOC_EXPORT_COORDINACIO@/', implode('\\\\\\\\', $coordinacio), $latex, 1);
+                $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', clean_reserved_symbols($data[1]['creditcodi']), $latex);
+            } else {
+                $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES . 'frontpagefpd.ltx');
+                $data[1]['nomcomplert'] = preg_replace('/\'/','{\textquotesingle}', $data[1]['nomcomplert']);
+                $data[1]['nomcomplert'] = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
+                $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT@/', trim($data[1]['nomcomplert']), $latex);
+            }
+            $latex = preg_replace('/@IOC_BACKGROUND_FILENAME@/', $filename, $latex);
+            $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', trim($data[1]['ciclenom']), $latex);
+            $autoria = explode(',', $data[1]['autoria']);
+            $latex = preg_replace('/@IOC_EXPORT_AUTOR@/', implode('\\\\\\\\', $autoria), $latex, 1);
+            $header_creditnom = str_replace($this->ini_characters, $this->end_characters, $data[1]['creditnom']);
+            $latex = preg_replace('/@IOC_EXPORT_CREDIT_F@/', strtoupper($header_creditnom), $latex, 1);
+            $latex = preg_replace('/@IOC_EXPORT_CREDIT@/', $header_creditnom, $latex);
+            $header_nomcomplert = str_replace($this->ini_characters, $this->end_characters, $data[1]['nomcomplert']);
+            $latex = preg_replace('/@IOC_EXPORT_NOMCOMPLERT_H@/', trim(wordwrap($header_nomcomplert,77,'\break ')), $latex);
+        } else if ($this->unitzero){
             $filename = 'backgroundu0';
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage_u0.ltx');
             if ($_SESSION['double_cicle']){
@@ -285,7 +310,7 @@ class generate_latex{
             $header_ciclenom = str_replace($this->ini_characters, $this->end_characters, $data[1]['ciclenom']);
             $latex = preg_replace('/@IOC_EXPORT_CICLENOM@/', $header_ciclenom, $latex);
 
-        }else{
+        } else {
             $filename = 'background';
             $latex .= io_readFile(DOKU_PLUGIN_TEMPLATES.'frontpage.ltx');
             if ($_SESSION['double_cicle']){
@@ -648,13 +673,22 @@ class generate_latex{
                 foreach ($info as $i){
                     $key = trim($i[2]);
                     if (preg_match('/'.$key.'/i', $this->meta_option)){
-                        $options = trim($i[3]);
-                        //Double cicle name
-                        if (preg_match('/dcicle/i', $options)){
-                            $_SESSION['double_cicle'] = TRUE;
-                        //Avoid removing numeration on first two chapters
-                        }elseif(preg_match('/nointro/i', $options)){
-                            $_SESSION['introbook'] = FALSE;
+                        $options = explode(',', $i[3]);
+                        foreach ($options as $option) {
+                            switch (trim($option)) {
+                                //Double cicle name
+                                case 'dcicle':
+                                    $_SESSION['double_cicle'] = TRUE;
+                                    break;
+                                //Avoid removing numeration on first two chapters
+                                case 'nointro':
+                                    $_SESSION['introbook'] = FALSE;
+                                    break;
+                                case 'fpd':
+                                    $_SESSION['fpd'] = TRUE;
+                                    $this->fpd = TRUE;
+                                    break;
+                            }
                         }
                         continue;
                     }

@@ -76,12 +76,14 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
             mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir, 0775, TRUE);
             mkdir(DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media', 0775, TRUE);
         }
-        if ($_SESSION['u0']){
-            //copy(DOKU_PLUGIN.'iocexportl/templates/backgroundu0.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/backgroundu0.pdf');
-            $filename = 'backgroundu0';
-        }else{
-            //copy(DOKU_PLUGIN.'iocexportl/templates/background.pdf', DOKU_PLUGIN_LATEX_TMP.$this->tmp_dir.'/media/background.pdf');
-            $filename = 'background';
+        if ($_SESSION['fpd']){
+            $filename = 'backgroundfpd';
+        } else {
+            if ($_SESSION['u0']){
+                $filename = 'backgroundu0';
+            }else{
+                $filename = 'background';
+            }
         }
         if ($_SESSION['double_cicle']){
             $filename .= 'dc';
@@ -189,6 +191,9 @@ class renderer_plugin_iocexportl extends Doku_Renderer {
         }
         if (!isset($_SESSION['xhtml_latex_quiz'])){
             $_SESSION['xhtml_latex_quiz'] = FALSE;
+        }
+        if (!isset($_SESSION['fpd'])){
+            $_SESSION['fpd'] = FALSE;
         }
     }
 
